@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="en" class="h-full scroll-smooth">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Sign in · Vouch</title>
+    
+    <meta name="description" content="Fund causes you can verify. Every donation tracked, every expense reviewed, every update public.">
+    <meta name="theme-color" content="#134E4A">
+    
+
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+      tailwind.config = {
+        theme: {
+          extend: {
+            colors: {
+          primary: '#0F766E',
+          'primary-dark': '#134E4A',
+          accent: '#F4623A',
+          highlight: '#F5A524',
+          progress: '#22A06B',
+          error: '#D92D20',
+          background: '#FAF8F5',
+          surface: '#FFFFFF',
+          border: '#E3E8E6',
+          ink: '#1C2B2A',
+          muted: '#5B6B6A',
+              brand: { 50:'#eff8f7',100:'#d8eeeb',200:'#b4ddd8',300:'#80c7c0',400:'#43a99f',500:'#0F766E',600:'#0F766E',700:'#0F766E',800:'#134E4A',900:'#134E4A',950:'#134E4A' },
+              gold:  { 50:'#fff8e8',100:'#feefc8',200:'#fce09b',300:'#f8ca63',400:'#F5A524',500:'#F5A524',600:'#F5A524',700:'#F5A524' },
+              cream: '#FAF8F5'
+            },
+            fontFamily: { display: ['Georgia','Cambria','"Times New Roman"','serif'] }
+          }
+        }
+      }
+    </script>
+    
+  </head>
+  <body class="min-h-full bg-background font-sans text-ink antialiased">
+    <a href="#main" class="sr-only focus:not-sr-only focus:fixed focus:left-4 focus:top-4 focus:z-50 focus:rounded-lg focus:bg-surface focus:px-4 focus:py-2 focus:shadow">Skip to content</a>
+
+    <main id="main">
+  <div class="grid min-h-screen lg:grid-cols-2">
+    
+    <aside class="relative hidden overflow-hidden bg-brand-900 lg:block">
+      <div class="absolute inset-0 bg-gradient-to-br from-brand-700 via-brand-900 to-brand-950"><img src="static/images/auth-side.jpg" alt="" class="h-full w-full object-cover opacity-40 mix-blend-luminosity" loading="lazy" onerror="this.style.display='none'"></div>
+      <div class="absolute inset-0 bg-gradient-to-t from-brand-950 via-transparent to-brand-950/40"></div>
+      <div class="relative flex h-full flex-col justify-between p-12 text-white">
+        <a href="landing.html" class="flex items-center gap-2">
+          <svg xmlns="http://www.w3.org/2000/svg" width="100" height="40" viewBox="0 0 900 320"><title>Vouch crowdfunding</title><desc>A person supported by a V-shaped pair of arms beside the Vouch name.</desc><defs><mask id="cutout"><rect width="900" height="320" fill="white"/><circle cx="164" cy="113" r="22" fill="black"/><path d="M112 145 164 223 216 145" fill="none" stroke="black" stroke-width="21" stroke-linecap="round" stroke-linejoin="round"/></mask></defs><rect x="70" y="66" width="188" height="188" rx="46" fill="#FAF6EF" mask="url(#cutout)"/><path d="M353.70 211.45L342.60 211.45L310.50 122.05Q309.45 119.05 307.73 117.33Q306 115.60 303 114.70L303 114.70L299.40 113.50L299.40 112L342.60 112L342.60 113.50L337.95 114.85Q334.50 115.75 334.13 118Q333.75 120.25 334.80 123.55L334.80 123.55L357 189.40L379.35 123.40Q380.55 119.95 380.48 117.70Q380.40 115.45 376.95 114.55L376.95 114.55L373.05 113.50L373.05 112L394.05 112L394.05 113.50L390 114.70Q387.15 115.45 385.95 117.33Q384.75 119.20 383.70 122.20L383.70 122.20L353.70 211.45ZM435.75 213.25L435.75 213.25Q424.35 213.25 415.95 208.53Q407.55 203.80 402.98 195.10Q398.40 186.40 398.40 174.70L398.40 174.70Q398.40 163 403.28 154.45Q408.15 145.90 416.63 141.25Q425.10 136.60 435.75 136.60L435.75 136.60Q446.40 136.60 454.80 141.18Q463.20 145.75 468.07 154.30Q472.95 162.85 472.95 174.70L472.95 174.70Q472.95 186.55 468.38 195.18Q463.80 203.80 455.48 208.53Q447.15 213.25 435.75 213.25ZM435.75 210.25L435.75 210.25Q441 210.25 444.15 207.25Q447.30 204.25 448.73 196.60Q450.15 188.95 450.15 175L450.15 175Q450.15 160.90 448.73 153.25Q447.30 145.60 444.15 142.60Q441 139.60 435.75 139.60L435.75 139.60Q430.50 139.60 427.28 142.60Q424.05 145.60 422.63 153.25Q421.20 160.90 421.20 175L421.20 175Q421.20 188.95 422.63 196.60Q424.05 204.25 427.28 207.25Q430.50 210.25 435.75 210.25ZM506.70 213.25L506.70 213.25Q500.85 213.25 495.98 211Q491.10 208.75 488.32 203.72Q485.55 198.70 485.70 190.45L485.70 190.45L486.15 151.90Q486.15 148.45 484.95 146.95Q483.75 145.45 481.20 144.85L481.20 144.85L479.40 144.25L479.40 142.75L506.25 137.50L507.75 139L507 160.30L507 196.45Q507 201.25 509.78 203.50Q512.55 205.75 516.75 205.75L516.75 205.75Q520.95 205.75 524.25 204.55Q527.55 203.35 530.85 200.95L530.85 200.95L531.45 152.05Q531.45 148.60 530.40 147.18Q529.35 145.75 526.50 145.15L526.50 145.15L525 144.70L525 143.20L551.25 137.50L552.75 139L552.30 160.30L552.30 200.95Q552.30 204.25 553.20 206.05Q554.10 207.85 557.10 209.05L557.10 209.05L558.60 209.50L558.60 211L532.35 212.50L531 203.65Q526.05 207.70 520.27 210.47Q514.50 213.25 506.70 213.25ZM601.80 213.25L601.80 213.25Q591.60 213.25 583.27 208.82Q574.95 204.40 570.08 195.93Q565.20 187.45 565.20 175.15L565.20 175.15Q565.20 163 570.52 154.38Q575.85 145.75 584.77 141.18Q593.70 136.60 604.35 136.60L604.35 136.60Q613.05 136.60 619.05 139.45Q625.05 142.30 628.20 146.88Q631.35 151.45 631.35 156.40L631.35 156.40Q631.35 160.60 628.80 162.93Q626.25 165.25 622.20 165.25L622.20 165.25Q617.85 165.25 615.15 162.10Q612.45 158.95 612 153.85L612 153.85Q611.85 150.55 612.15 148.22Q612.45 145.90 612.15 143.50L612.15 143.50Q611.55 140.95 610.27 140.13Q609 139.30 606.75 139.30L606.75 139.30Q597.60 139.30 592.58 147.25Q587.55 155.20 587.55 172.60L587.55 172.60Q587.55 187.75 593.18 195.78Q598.80 203.80 610.50 203.80L610.50 203.80Q617.55 203.80 621.90 201.25Q626.25 198.70 630.30 193.60L630.30 193.60L631.80 194.80Q628.05 203.65 620.25 208.45Q612.45 213.25 601.80 213.25ZM674.25 211L639.15 211L639.15 209.50L640.95 208.90Q646.35 207.10 646.35 201.40L646.35 201.40L646.35 121.30Q646.35 118.15 645.30 116.65Q644.25 115.15 641.25 114.40L641.25 114.40L639 113.80L639 112.30L665.40 105.85L667.80 107.20L667.20 128.35L667.20 147.10Q672.45 142.75 678.53 139.68Q684.60 136.60 691.95 136.60L691.95 136.60Q701.70 136.60 707.48 142.15Q713.25 147.70 713.25 159.25L713.25 159.25L713.25 201.55Q713.25 204.55 714.45 206.35Q715.65 208.15 718.65 209.05L718.65 209.05L719.85 209.50L719.85 211L684.75 211L684.75 209.50L686.55 209.05Q691.95 207.25 691.95 201.40L691.95 201.40L691.95 154.30Q691.95 148.30 689.93 146.05Q687.90 143.80 682.80 143.80L682.80 143.80Q679.50 143.80 675.60 145.07Q671.70 146.35 667.65 149.50L667.65 149.50L667.65 201.70Q667.65 207.55 673.05 209.20L673.05 209.20L674.25 209.50L674.25 211Z" fill="#FAF6EF"/></svg>
+        </a>
+        <div>
+          
+  <h2 class="font-display text-4xl font-bold leading-tight">Welcome back. Your causes missed you.</h2>
+  <p class="mt-4 max-w-md text-lg text-brand-100">Check on your campaigns, follow where your donations went, and keep the story moving.</p>
+
+          <ul class="mt-8 space-y-3 text-sm text-brand-100">
+            <li class="flex items-center gap-3"><svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-gold-300" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 12l2 2 4-4m5.6-4A12 12 0 0112 3a12 12 0 01-8.6 3A12 12 0 003 12c0 5.6 3.8 10.3 9 11.6 5.2-1.3 9-6 9-11.6 0-1.9-.3-3.7-.4-6z"/></svg> Identity and evidence checks</li>
+            <li class="flex items-center gap-3"><svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-gold-300" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 14l6-6M9.5 8.5h.01M14.5 13.5h.01M5 21V4a1 1 0 011-1h12a1 1 0 011 1v17l-3-2-3 2-3-2-3 2z"/></svg> Expense approvals with public notes</li>
+            <li class="flex items-center gap-3"><svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-gold-300" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-12V7a4 4 0 00-8 0v2h8z"/></svg> Secure payments through licensed gateways</li>
+          </ul>
+        </div>
+        <p class="text-xs text-brand-300">© Vouch</p>
+      </div>
+    </aside>
+
+    
+    <section class="flex flex-col justify-center px-4 py-10 sm:px-10 lg:px-16">
+      <div class="mx-auto w-full max-w-md">
+        <a href="landing.html" class="mb-8 flex items-center gap-2 lg:hidden">
+          <svg xmlns="http://www.w3.org/2000/svg" width="100" height="40" viewBox="0 0 900 320"><title>Vouch crowdfunding</title><desc>A person supported by a V-shaped pair of arms beside the Vouch name.</desc><defs><mask id="cutout"><rect width="900" height="320" fill="white"/><circle cx="164" cy="113" r="22" fill="black"/><path d="M112 145 164 223 216 145" fill="none" stroke="black" stroke-width="21" stroke-linecap="round" stroke-linejoin="round"/></mask></defs><rect x="70" y="66" width="188" height="188" rx="46" fill="#1B2A25" mask="url(#cutout)"/><path d="M353.70 211.45L342.60 211.45L310.50 122.05Q309.45 119.05 307.73 117.33Q306 115.60 303 114.70L303 114.70L299.40 113.50L299.40 112L342.60 112L342.60 113.50L337.95 114.85Q334.50 115.75 334.13 118Q333.75 120.25 334.80 123.55L334.80 123.55L357 189.40L379.35 123.40Q380.55 119.95 380.48 117.70Q380.40 115.45 376.95 114.55L376.95 114.55L373.05 113.50L373.05 112L394.05 112L394.05 113.50L390 114.70Q387.15 115.45 385.95 117.33Q384.75 119.20 383.70 122.20L383.70 122.20L353.70 211.45ZM435.75 213.25L435.75 213.25Q424.35 213.25 415.95 208.53Q407.55 203.80 402.98 195.10Q398.40 186.40 398.40 174.70L398.40 174.70Q398.40 163 403.28 154.45Q408.15 145.90 416.63 141.25Q425.10 136.60 435.75 136.60L435.75 136.60Q446.40 136.60 454.80 141.18Q463.20 145.75 468.07 154.30Q472.95 162.85 472.95 174.70L472.95 174.70Q472.95 186.55 468.38 195.18Q463.80 203.80 455.48 208.53Q447.15 213.25 435.75 213.25ZM435.75 210.25L435.75 210.25Q441 210.25 444.15 207.25Q447.30 204.25 448.73 196.60Q450.15 188.95 450.15 175L450.15 175Q450.15 160.90 448.73 153.25Q447.30 145.60 444.15 142.60Q441 139.60 435.75 139.60L435.75 139.60Q430.50 139.60 427.28 142.60Q424.05 145.60 422.63 153.25Q421.20 160.90 421.20 175L421.20 175Q421.20 188.95 422.63 196.60Q424.05 204.25 427.28 207.25Q430.50 210.25 435.75 210.25ZM506.70 213.25L506.70 213.25Q500.85 213.25 495.98 211Q491.10 208.75 488.32 203.72Q485.55 198.70 485.70 190.45L485.70 190.45L486.15 151.90Q486.15 148.45 484.95 146.95Q483.75 145.45 481.20 144.85L481.20 144.85L479.40 144.25L479.40 142.75L506.25 137.50L507.75 139L507 160.30L507 196.45Q507 201.25 509.78 203.50Q512.55 205.75 516.75 205.75L516.75 205.75Q520.95 205.75 524.25 204.55Q527.55 203.35 530.85 200.95L530.85 200.95L531.45 152.05Q531.45 148.60 530.40 147.18Q529.35 145.75 526.50 145.15L526.50 145.15L525 144.70L525 143.20L551.25 137.50L552.75 139L552.30 160.30L552.30 200.95Q552.30 204.25 553.20 206.05Q554.10 207.85 557.10 209.05L557.10 209.05L558.60 209.50L558.60 211L532.35 212.50L531 203.65Q526.05 207.70 520.27 210.47Q514.50 213.25 506.70 213.25ZM601.80 213.25L601.80 213.25Q591.60 213.25 583.27 208.82Q574.95 204.40 570.08 195.93Q565.20 187.45 565.20 175.15L565.20 175.15Q565.20 163 570.52 154.38Q575.85 145.75 584.77 141.18Q593.70 136.60 604.35 136.60L604.35 136.60Q613.05 136.60 619.05 139.45Q625.05 142.30 628.20 146.88Q631.35 151.45 631.35 156.40L631.35 156.40Q631.35 160.60 628.80 162.93Q626.25 165.25 622.20 165.25L622.20 165.25Q617.85 165.25 615.15 162.10Q612.45 158.95 612 153.85L612 153.85Q611.85 150.55 612.15 148.22Q612.45 145.90 612.15 143.50L612.15 143.50Q611.55 140.95 610.27 140.13Q609 139.30 606.75 139.30L606.75 139.30Q597.60 139.30 592.58 147.25Q587.55 155.20 587.55 172.60L587.55 172.60Q587.55 187.75 593.18 195.78Q598.80 203.80 610.50 203.80L610.50 203.80Q617.55 203.80 621.90 201.25Q626.25 198.70 630.30 193.60L630.30 193.60L631.80 194.80Q628.05 203.65 620.25 208.45Q612.45 213.25 601.80 213.25ZM674.25 211L639.15 211L639.15 209.50L640.95 208.90Q646.35 207.10 646.35 201.40L646.35 201.40L646.35 121.30Q646.35 118.15 645.30 116.65Q644.25 115.15 641.25 114.40L641.25 114.40L639 113.80L639 112.30L665.40 105.85L667.80 107.20L667.20 128.35L667.20 147.10Q672.45 142.75 678.53 139.68Q684.60 136.60 691.95 136.60L691.95 136.60Q701.70 136.60 707.48 142.15Q713.25 147.70 713.25 159.25L713.25 159.25L713.25 201.55Q713.25 204.55 714.45 206.35Q715.65 208.15 718.65 209.05L718.65 209.05L719.85 209.50L719.85 211L684.75 211L684.75 209.50L686.55 209.05Q691.95 207.25 691.95 201.40L691.95 201.40L691.95 154.30Q691.95 148.30 689.93 146.05Q687.90 143.80 682.80 143.80L682.80 143.80Q679.50 143.80 675.60 145.07Q671.70 146.35 667.65 149.50L667.65 149.50L667.65 201.70Q667.65 207.55 673.05 209.20L673.05 209.20L674.25 209.50L674.25 211Z" fill="#1B2A25"/></svg>
+        </a>
+
+        
+          
+        
+
+        
+  <p class="text-xs font-semibold uppercase tracking-widest text-brand-600">Sign in</p>
+  <h1 class="mt-2 font-display text-3xl font-bold text-brand-950">Good to see you again</h1>
+  <p class="mt-2 text-sm text-muted">New here? <a href="register.html" class="font-semibold text-brand-700 hover:underline">Create a free account</a></p>
+
+
+
+  <form method="post" action="{{ url_for('user.login') }}" class="mt-8 space-y-5" novalidate>
+    
+    <div>
+    <label for="email" class="mb-1.5 block text-sm font-medium text-ink">Email address <span class="text-error" aria-hidden="true">*</span></label>
+    <input id="email" name="email" type="email" value="{{ request.form.get('email', '') }}" placeholder="you@example.com"
+          required autocomplete="email" autofocus
+          class="block w-full rounded-xl border border-border bg-surface px-4 py-3 text-sm text-ink placeholder:text-muted/70 focus:border-brand-600 focus:outline-none focus:ring-4 focus:ring-brand-100"
+          >
+    
+    
+  </div>
+    <div>
+      <div class="flex items-center justify-between">
+        <label for="password" class="block text-sm font-medium text-ink !mb-0">Password <span class="text-error">*</span></label>
+        <a href="forgot_password.html" class="text-xs font-semibold text-brand-700 hover:underline">Forgot password?</a>
+      </div>
+      <div class="relative mt-1.5">
+        <input id="password" name="password" type="password" required autocomplete="current-password" class="block w-full rounded-xl border border-border bg-surface px-4 py-3 text-sm text-ink placeholder:text-muted/70 focus:border-brand-600 focus:outline-none focus:ring-4 focus:ring-brand-100 pr-20">
+        <button type="button" id="pw-toggle" class="absolute inset-y-0 right-3 text-xs font-semibold text-brand-700">Show</button>
+      </div>
+      
+    </div>
+    <label class="flex items-center gap-3 text-sm text-muted">
+      <input type="checkbox" name="remember" class="h-4 w-4 rounded border-border text-brand-700 focus:ring-brand-200"> Keep me signed in on this device
+    </label>
+    <button type="submit" class="inline-flex items-center justify-center gap-2 rounded-xl px-5 font-semibold transition focus:outline-none focus-visible:ring-4 disabled:cursor-not-allowed disabled:opacity-50 bg-accent text-ink shadow-sm hover:bg-accent/90 focus-visible:ring-accent/20 w-full py-3.5 text-base">Sign in</button>
+  </form>
+
+  <p class="mt-8 rounded-xl bg-brand-50 p-4 text-xs leading-relaxed text-brand-900"><svg xmlns="http://www.w3.org/2000/svg" class="mr-1 inline h-4 w-4 align-text-bottom" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-12V7a4 4 0 00-8 0v2h8z"/></svg>We never ask for your password by email, phone or chat.</p>
+
+      </div>
+    </section>
+  </div>
+  </main>
+
+    
+
+    <script>
+      (function(){
+        var b = document.getElementById('menu-btn'), m = document.getElementById('mobile-menu');
+        if (b && m) b.addEventListener('click', function(){
+          var open = m.classList.toggle('hidden') === false;
+          b.setAttribute('aria-expanded', open);
+        });
+      })();
+    </script>
+    
+  <script>
+    document.getElementById('pw-toggle').addEventListener('click', function(){
+      var el = document.getElementById('password'), show = el.type === 'password';
+      el.type = show ? 'text' : 'password'; this.textContent = show ? 'Hide' : 'Show';
+    });
+  </script>
+
+  </body>
+</html>
