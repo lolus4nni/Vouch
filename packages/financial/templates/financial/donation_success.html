@@ -1,181 +1,43 @@
+{% extends "layouts/public.html" %}
+{% set signed_in = true %}
 
-<!DOCTYPE html>
+{% block title %}Thank you{% endblock %}
+
+{% block content %}
+    <main id="main">
+  <section class="relative overflow-hidden">
+    <div class="absolute inset-0 -z-10 bg-gradient-to-b from-brand-50 to-cream"></div>
+    <div class="mx-auto max-w-2xl px-4 py-16 text-center">
+      <div class="relative mx-auto mb-8 h-36 w-36 overflow-hidden rounded-full bg-gradient-to-br from-gold-200 to-brand-200 ring-8 ring-white shadow-xl"><img src="{{ url_for('finance.static', filename='images/success.jpg') }}" alt="" class="h-full w-full object-cover" loading="lazy" onerror="this.style.display='none'">
+        <span class="absolute inset-0 grid place-items-center text-brand-700"><svg xmlns="http://www.w3.org/2000/svg" class="h-14 w-14" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4.3 6.3a4.5 4.5 0 016.4 0L12 7.6l1.3-1.3a4.5 4.5 0 116.4 6.4L12 20.4l-7.7-7.7a4.5 4.5 0 010-6.4z"/></svg></span></div>
+      <h1 class="font-display text-4xl font-bold text-brand-950">Thank you. You just made a difference.</h1>
+      <p class="mt-3 text-lg text-slate-600">Your gift of <strong class="text-brand-800">₦25,000</strong> to <a href="{{ url_for('campaign.detail') }}" class="font-semibold text-brand-700 underline">Help Ada walk again: spinal surgery fund</a> was successful.</p>
+
+      <dl class="rounded-2xl border border-slate-200 bg-white shadow-sm mx-auto mt-8 max-w-md divide-y divide-slate-100 text-left text-sm">
+        <div class="flex justify-between px-5 py-3"><dt class="text-slate-500">Reference</dt><dd class="font-mono text-xs">DON_29dk3j</dd></div>
+        <div class="flex justify-between px-5 py-3"><dt class="text-slate-500">Date</dt><dd>09 Oct 2026, 06:11</dd></div>
+        <div class="flex justify-between px-5 py-3"><dt class="text-slate-500">Reaches the campaign</dt><dd class="font-semibold text-brand-800">₦23,750</dd></div>
+        <div class="flex justify-between px-5 py-3"><dt class="text-slate-500">Shown as</dt><dd>Your name</dd></div>
+      </dl>
+
+      <div class="mt-8 flex flex-wrap justify-center gap-3">
+        <a href="{{ url_for('finance.receipt') }}" class="inline-flex items-center justify-center gap-2 rounded-xl px-5 py-3 text-sm font-semibold transition focus:outline-none focus-visible:ring-4 disabled:cursor-not-allowed disabled:opacity-50 bg-brand-700 text-white shadow-sm hover:bg-brand-800 focus-visible:ring-brand-200"><svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 14l6-6M9.5 8.5h.01M14.5 13.5h.01M5 21V4a1 1 0 011-1h12a1 1 0 011 1v17l-3-2-3 2-3-2-3 2z"/></svg> View receipt</a>
+        <button type="button" id="share" data-url="{{ url_for('campaign.detail', _external=True) }}" class="inline-flex items-center justify-center gap-2 rounded-xl px-5 py-3 text-sm font-semibold transition focus:outline-none focus-visible:ring-4 disabled:cursor-not-allowed disabled:opacity-50 border border-slate-300 bg-white text-slate-700 hover:bg-slate-50 focus-visible:ring-slate-200"><svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8.7 10.7l6.6-3.4M8.7 13.3l6.6 3.4M6 15a3 3 0 100-6 3 3 0 000 6zm12-6a3 3 0 100-6 3 3 0 000 6zm0 12a3 3 0 100-6 3 3 0 000 6z"/></svg> <span>Share this campaign</span></button>
+      </div>
+      <p class="mt-8 text-sm text-slate-500">You'll get updates from the organiser, and you can follow every expense on the campaign page.</p>
+      <a href="{{ url_for('campaign.explore') }}" class="mt-6 inline-block text-sm font-semibold text-brand-700 hover:underline">Support another cause →</a>
+    </div>
+  </section>
+  </main>
 
 
-<html lang="en" class="h-full scroll-smooth">
-<head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Thank you · Vouch</title>
-  
-  <meta name="description" content="Fund causes you can verify. Every donation tracked, every expense reviewed, every update public.">
-  <meta name="theme-color" content="#134E4A">
-  
+{% endblock %}
 
-  <script src="https://cdn.tailwindcss.com"></script>
+{% block scripts %}
   <script>
-    tailwind.config = {
-      theme: {
-        extend: {
-          colors: {
-            primary: '#0F766E',
-            'primary-dark': '#134E4A',
-            accent: '#F4623A',
-            highlight: '#F5A524',
-            progress: '#22A06B',
-            error: '#D92D20',
-            background: '#FAF8F5',
-            surface: '#FFFFFF',
-            border: '#E3E8E6',
-            ink: '#1C2B2A',
-            muted: '#5B6B6A',
-            brand: { 50:'#EAF5F3',100:'#D7EAE7',200:'#B5D8D4',300:'#8AC1BA',400:'#56A59B',500:'#22A06B',600:'#0F766E',700:'#0F766E',800:'#134E4A',900:'#134E4A',950:'#134E4A' },
-            gold: { 50:'#FFF7E8',100:'#FCECCB',200:'#F9D88C',300:'#F7BE54',400:'#F5A524',500:'#E98918',600:'#C86E13',700:'#A45612' },
-            cream: '#FAF8F5',
-            slate: { 50:'#FAF8F5',100:'#F3F4F2',200:'#E3E8E6',300:'#CBD4D1',400:'#8A9896',500:'#5B6B6A',600:'#5B6B6A',700:'#1C2B2A',800:'#1C2B2A',900:'#1C2B2A',950:'#1C2B2A' },
-            rose: { 50:'#FEF3F2',100:'#FEE4E2',200:'#FECDCA',300:'#FDA29B',400:'#F97066',500:'#D92D20',600:'#D92D20',700:'#B42318',800:'#912018',900:'#7A271A' }
-          },
-          fontFamily: { display: ['Georgia','Cambria','"Times New Roman"','serif'] }
-        }
-      }
-    }
+    document.getElementById('share').addEventListener('click', async function(){
+      var u = this.dataset.url, s = this.querySelector('span');
+      try { if (navigator.share) await navigator.share({url:u, title:document.title}); else { await navigator.clipboard.writeText(u); s.textContent='Link copied!'; } } catch(e){}
+    });
   </script>
-  
-</head>
-<body class="min-h-full bg-cream font-sans text-slate-800 antialiased">
-  <a href="#main" class="sr-only focus:not-sr-only focus:fixed focus:left-4 focus:top-4 focus:z-50 focus:rounded-lg focus:bg-white focus:px-4 focus:py-2 focus:shadow">Skip to content</a>
-
-  
-  <header class="sticky top-0 z-40 border-b border-slate-200/70 bg-cream/90 backdrop-blur">
-    <div class="mx-auto flex max-w-7xl items-center justify-between px-4 py-3 sm:px-6 lg:px-8">
-      <a href="../users/landing.html" class="flex items-center gap-2" aria-label="Vouch home">
-        <svg xmlns="http://www.w3.org/2000/svg" width="100" height="40" viewBox="0 0 900 320"><title>Vouch crowdfunding</title><desc>A person supported by a V-shaped pair of arms beside the Vouch name.</desc><defs><mask id="cutout"><rect width="900" height="320" fill="white"/><circle cx="164" cy="113" r="22" fill="black"/><path d="M112 145 164 223 216 145" fill="none" stroke="black" stroke-width="21" stroke-linecap="round" stroke-linejoin="round"/></mask></defs><rect x="70" y="66" width="188" height="188" rx="46" fill="#1B2A25" mask="url(#cutout)"/><path d="M353.70 211.45L342.60 211.45L310.50 122.05Q309.45 119.05 307.73 117.33Q306 115.60 303 114.70L303 114.70L299.40 113.50L299.40 112L342.60 112L342.60 113.50L337.95 114.85Q334.50 115.75 334.13 118Q333.75 120.25 334.80 123.55L334.80 123.55L357 189.40L379.35 123.40Q380.55 119.95 380.48 117.70Q380.40 115.45 376.95 114.55L376.95 114.55L373.05 113.50L373.05 112L394.05 112L394.05 113.50L390 114.70Q387.15 115.45 385.95 117.33Q384.75 119.20 383.70 122.20L383.70 122.20L353.70 211.45ZM435.75 213.25L435.75 213.25Q424.35 213.25 415.95 208.53Q407.55 203.80 402.98 195.10Q398.40 186.40 398.40 174.70L398.40 174.70Q398.40 163 403.28 154.45Q408.15 145.90 416.63 141.25Q425.10 136.60 435.75 136.60L435.75 136.60Q446.40 136.60 454.80 141.18Q463.20 145.75 468.07 154.30Q472.95 162.85 472.95 174.70L472.95 174.70Q472.95 186.55 468.38 195.18Q463.80 203.80 455.48 208.53Q447.15 213.25 435.75 213.25ZM435.75 210.25L435.75 210.25Q441 210.25 444.15 207.25Q447.30 204.25 448.73 196.60Q450.15 188.95 450.15 175L450.15 175Q450.15 160.90 448.73 153.25Q447.30 145.60 444.15 142.60Q441 139.60 435.75 139.60L435.75 139.60Q430.50 139.60 427.28 142.60Q424.05 145.60 422.63 153.25Q421.20 160.90 421.20 175L421.20 175Q421.20 188.95 422.63 196.60Q424.05 204.25 427.28 207.25Q430.50 210.25 435.75 210.25ZM506.70 213.25L506.70 213.25Q500.85 213.25 495.98 211Q491.10 208.75 488.32 203.72Q485.55 198.70 485.70 190.45L485.70 190.45L486.15 151.90Q486.15 148.45 484.95 146.95Q483.75 145.45 481.20 144.85L481.20 144.85L479.40 144.25L479.40 142.75L506.25 137.50L507.75 139L507 160.30L507 196.45Q507 201.25 509.78 203.50Q512.55 205.75 516.75 205.75L516.75 205.75Q520.95 205.75 524.25 204.55Q527.55 203.35 530.85 200.95L530.85 200.95L531.45 152.05Q531.45 148.60 530.40 147.18Q529.35 145.75 526.50 145.15L526.50 145.15L525 144.70L525 143.20L551.25 137.50L552.75 139L552.30 160.30L552.30 200.95Q552.30 204.25 553.20 206.05Q554.10 207.85 557.10 209.05L557.10 209.05L558.60 209.50L558.60 211L532.35 212.50L531 203.65Q526.05 207.70 520.27 210.47Q514.50 213.25 506.70 213.25ZM601.80 213.25L601.80 213.25Q591.60 213.25 583.27 208.82Q574.95 204.40 570.08 195.93Q565.20 187.45 565.20 175.15L565.20 175.15Q565.20 163 570.52 154.38Q575.85 145.75 584.77 141.18Q593.70 136.60 604.35 136.60L604.35 136.60Q613.05 136.60 619.05 139.45Q625.05 142.30 628.20 146.88Q631.35 151.45 631.35 156.40L631.35 156.40Q631.35 160.60 628.80 162.93Q626.25 165.25 622.20 165.25L622.20 165.25Q617.85 165.25 615.15 162.10Q612.45 158.95 612 153.85L612 153.85Q611.85 150.55 612.15 148.22Q612.45 145.90 612.15 143.50L612.15 143.50Q611.55 140.95 610.27 140.13Q609 139.30 606.75 139.30L606.75 139.30Q597.60 139.30 592.58 147.25Q587.55 155.20 587.55 172.60L587.55 172.60Q587.55 187.75 593.18 195.78Q598.80 203.80 610.50 203.80L610.50 203.80Q617.55 203.80 621.90 201.25Q626.25 198.70 630.30 193.60L630.30 193.60L631.80 194.80Q628.05 203.65 620.25 208.45Q612.45 213.25 601.80 213.25ZM674.25 211L639.15 211L639.15 209.50L640.95 208.90Q646.35 207.10 646.35 201.40L646.35 201.40L646.35 121.30Q646.35 118.15 645.30 116.65Q644.25 115.15 641.25 114.40L641.25 114.40L639 113.80L639 112.30L665.40 105.85L667.80 107.20L667.20 128.35L667.20 147.10Q672.45 142.75 678.53 139.68Q684.60 136.60 691.95 136.60L691.95 136.60Q701.70 136.60 707.48 142.15Q713.25 147.70 713.25 159.25L713.25 159.25L713.25 201.55Q713.25 204.55 714.45 206.35Q715.65 208.15 718.65 209.05L718.65 209.05L719.85 209.50L719.85 211L684.75 211L684.75 209.50L686.55 209.05Q691.95 207.25 691.95 201.40L691.95 201.40L691.95 154.30Q691.95 148.30 689.93 146.05Q687.90 143.80 682.80 143.80L682.80 143.80Q679.50 143.80 675.60 145.07Q671.70 146.35 667.65 149.50L667.65 149.50L667.65 201.70Q667.65 207.55 673.05 209.20L673.05 209.20L674.25 209.50L674.25 211Z" fill="#1B2A25"/></svg>
-      </a>
-
-      <nav class="hidden items-center gap-1 md:flex" aria-label="Main">
-        <a href="../campaigns/explore.html" class="rounded-lg px-3 py-2 text-sm font-medium text-slate-700 hover:bg-brand-50 hover:text-brand-800">Explore</a>
-        <a href="../users/how_it_works.html" class="rounded-lg px-3 py-2 text-sm font-medium text-slate-700 hover:bg-brand-50 hover:text-brand-800">How it works</a>
-        <a href="../users/landing.html#trust" class="rounded-lg px-3 py-2 text-sm font-medium text-slate-700 hover:bg-brand-50 hover:text-brand-800">Our trust promise</a>
-      </nav>
-
-      <div class="hidden items-center gap-2 md:flex">
-        
-          <a href="../campaigns/create.html" class="inline-flex items-center justify-center gap-2 rounded-xl font-semibold transition focus:outline-none focus-visible:ring-4 disabled:cursor-not-allowed disabled:opacity-50 bg-accent text-ink shadow-sm hover:bg-[#F06A44] focus-visible:ring-gold-200 px-3.5 py-2 text-xs">Start a campaign</a>
-          <details class="relative">
-            <summary class="flex cursor-pointer list-none items-center gap-2 rounded-full border border-slate-200 bg-white py-1 pl-1 pr-3 hover:bg-slate-50">
-              <span class="grid h-8 w-8 place-items-center overflow-hidden rounded-full bg-brand-100 text-sm font-bold text-brand-800">
-                A
-              </span>
-              <span class="max-w-[8rem] truncate text-sm font-medium">Amaka Obi</span>
-              <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-slate-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M19 9l-7 7-7-7"/></svg>
-            </summary>
-            <div class="absolute right-0 mt-2 w-56 rounded-2xl border border-slate-200 bg-white p-2 shadow-lg">
-              <a class="block rounded-lg px-3 py-2 text-sm hover:bg-brand-50" href="../users/dashboard.html">Dashboard</a>
-              <a class="block rounded-lg px-3 py-2 text-sm hover:bg-brand-50" href="../campaigns/my_campaigns.html">My campaigns</a>
-              <a class="block rounded-lg px-3 py-2 text-sm hover:bg-brand-50" href="my_donations.html">My donations</a>
-              <a class="block rounded-lg px-3 py-2 text-sm hover:bg-brand-50" href="../users/settings.html">Settings</a>
-              <hr class="my-1 border-slate-100">
-              <a class="block rounded-lg px-3 py-2 text-sm text-rose-600 hover:bg-rose-50" href="/logout">Sign out</a>
-            </div>
-          </details>
-        
-      </div>
-
-      <button type="button" id="menu-btn" class="rounded-lg p-2 text-slate-700 hover:bg-brand-50 md:hidden" aria-controls="mobile-menu" aria-expanded="false" aria-label="Open menu">
-        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 6h16M4 12h16M4 18h16"/></svg>
-      </button>
-    </div>
-
-    <div id="mobile-menu" class="hidden border-t border-slate-200 bg-cream px-4 pb-4 pt-2 md:hidden">
-      <a class="block rounded-lg px-3 py-3 text-sm font-medium" href="../campaigns/explore.html">Explore campaigns</a>
-      <a class="block rounded-lg px-3 py-3 text-sm font-medium" href="../users/how_it_works.html">How it works</a>
-      
-        <a class="block rounded-lg px-3 py-3 text-sm font-medium" href="../users/dashboard.html">Dashboard</a>
-        <a class="inline-flex items-center justify-center gap-2 rounded-xl px-5 py-3 text-sm font-semibold transition focus:outline-none focus-visible:ring-4 disabled:cursor-not-allowed disabled:opacity-50 bg-accent text-ink shadow-sm hover:bg-[#F06A44] focus-visible:ring-gold-200 mt-2 w-full" href="../campaigns/create.html">Start a campaign</a>
-        <a class="inline-flex items-center justify-center gap-2 rounded-xl px-5 py-3 text-sm font-semibold transition focus:outline-none focus-visible:ring-4 disabled:cursor-not-allowed disabled:opacity-50 border border-slate-300 bg-white text-slate-700 hover:bg-slate-50 focus-visible:ring-slate-200 mt-2 w-full" href="/logout">Sign out</a>
-      
-    </div>
-  </header>
-  <main id="main">
-<section class="relative overflow-hidden">
-  <div class="absolute inset-0 -z-10 bg-gradient-to-b from-brand-50 to-cream"></div>
-  <div class="mx-auto max-w-2xl px-4 py-16 text-center">
-    <div class="relative mx-auto mb-8 h-36 w-36 overflow-hidden rounded-full bg-gradient-to-br from-gold-200 to-brand-200 ring-8 ring-white shadow-xl"><img src="static/images/success.jpg" alt="" class="h-full w-full object-cover" loading="lazy" onerror="this.style.display='none'">
-      <span class="absolute inset-0 grid place-items-center text-brand-700"><svg xmlns="http://www.w3.org/2000/svg" class="h-14 w-14" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4.3 6.3a4.5 4.5 0 016.4 0L12 7.6l1.3-1.3a4.5 4.5 0 116.4 6.4L12 20.4l-7.7-7.7a4.5 4.5 0 010-6.4z"/></svg></span></div>
-    <h1 class="font-display text-4xl font-bold text-brand-950">Thank you. You just made a difference.</h1>
-    <p class="mt-3 text-lg text-slate-600">Your gift of <strong class="text-brand-800">₦25,000</strong> to <a href="../campaigns/detail.html" class="font-semibold text-brand-700 underline">Help Ada walk again: spinal surgery fund</a> was successful.</p>
-
-    <dl class="rounded-2xl border border-slate-200 bg-white shadow-sm mx-auto mt-8 max-w-md divide-y divide-slate-100 text-left text-sm">
-      <div class="flex justify-between px-5 py-3"><dt class="text-slate-500">Reference</dt><dd class="font-mono text-xs">DON_29dk3j</dd></div>
-      <div class="flex justify-between px-5 py-3"><dt class="text-slate-500">Date</dt><dd>09 Oct 2026, 06:11</dd></div>
-      <div class="flex justify-between px-5 py-3"><dt class="text-slate-500">Reaches the campaign</dt><dd class="font-semibold text-brand-800">₦23,750</dd></div>
-      <div class="flex justify-between px-5 py-3"><dt class="text-slate-500">Shown as</dt><dd>Your name</dd></div>
-    </dl>
-
-    <div class="mt-8 flex flex-wrap justify-center gap-3">
-      <a href="receipt.html" class="inline-flex items-center justify-center gap-2 rounded-xl px-5 py-3 text-sm font-semibold transition focus:outline-none focus-visible:ring-4 disabled:cursor-not-allowed disabled:opacity-50 bg-brand-700 text-white shadow-sm hover:bg-brand-800 focus-visible:ring-brand-200"><svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 14l6-6M9.5 8.5h.01M14.5 13.5h.01M5 21V4a1 1 0 011-1h12a1 1 0 011 1v17l-3-2-3 2-3-2-3 2z"/></svg> View receipt</a>
-      <button type="button" id="share" data-url="http://localhost/campaign/detail?slug=campaign-1" class="inline-flex items-center justify-center gap-2 rounded-xl px-5 py-3 text-sm font-semibold transition focus:outline-none focus-visible:ring-4 disabled:cursor-not-allowed disabled:opacity-50 border border-slate-300 bg-white text-slate-700 hover:bg-slate-50 focus-visible:ring-slate-200"><svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8.7 10.7l6.6-3.4M8.7 13.3l6.6 3.4M6 15a3 3 0 100-6 3 3 0 000 6zm12-6a3 3 0 100-6 3 3 0 000 6zm0 12a3 3 0 100-6 3 3 0 000 6z"/></svg> <span>Share this campaign</span></button>
-    </div>
-    <p class="mt-8 text-sm text-slate-500">You'll get updates from the organiser, and you can follow every expense on the campaign page.</p>
-    <a href="../campaigns/explore.html" class="mt-6 inline-block text-sm font-semibold text-brand-700 hover:underline">Support another cause →</a>
-  </div>
-</section>
-</main>
-
-  
-  <footer class="mt-24 bg-brand-950 text-brand-100">
-    <div class="mx-auto grid max-w-7xl gap-10 px-4 py-14 sm:px-6 md:grid-cols-4 lg:px-8">
-      <div class="md:col-span-1">
-        <div class="flex items-center gap-2">
-          <svg xmlns="http://www.w3.org/2000/svg" width="100" height="40" viewBox="0 0 900 320"><title>Vouch crowdfunding</title><desc>A person supported by a V-shaped pair of arms beside the Vouch name.</desc><defs><mask id="cutout"><rect width="900" height="320" fill="white"/><circle cx="164" cy="113" r="22" fill="black"/><path d="M112 145 164 223 216 145" fill="none" stroke="black" stroke-width="21" stroke-linecap="round" stroke-linejoin="round"/></mask></defs><rect x="70" y="66" width="188" height="188" rx="46" fill="#FAF6EF" mask="url(#cutout)"/><path d="M353.70 211.45L342.60 211.45L310.50 122.05Q309.45 119.05 307.73 117.33Q306 115.60 303 114.70L303 114.70L299.40 113.50L299.40 112L342.60 112L342.60 113.50L337.95 114.85Q334.50 115.75 334.13 118Q333.75 120.25 334.80 123.55L334.80 123.55L357 189.40L379.35 123.40Q380.55 119.95 380.48 117.70Q380.40 115.45 376.95 114.55L376.95 114.55L373.05 113.50L373.05 112L394.05 112L394.05 113.50L390 114.70Q387.15 115.45 385.95 117.33Q384.75 119.20 383.70 122.20L383.70 122.20L353.70 211.45ZM435.75 213.25L435.75 213.25Q424.35 213.25 415.95 208.53Q407.55 203.80 402.98 195.10Q398.40 186.40 398.40 174.70L398.40 174.70Q398.40 163 403.28 154.45Q408.15 145.90 416.63 141.25Q425.10 136.60 435.75 136.60L435.75 136.60Q446.40 136.60 454.80 141.18Q463.20 145.75 468.07 154.30Q472.95 162.85 472.95 174.70L472.95 174.70Q472.95 186.55 468.38 195.18Q463.80 203.80 455.48 208.53Q447.15 213.25 435.75 213.25ZM435.75 210.25L435.75 210.25Q441 210.25 444.15 207.25Q447.30 204.25 448.73 196.60Q450.15 188.95 450.15 175L450.15 175Q450.15 160.90 448.73 153.25Q447.30 145.60 444.15 142.60Q441 139.60 435.75 139.60L435.75 139.60Q430.50 139.60 427.28 142.60Q424.05 145.60 422.63 153.25Q421.20 160.90 421.20 175L421.20 175Q421.20 188.95 422.63 196.60Q424.05 204.25 427.28 207.25Q430.50 210.25 435.75 210.25ZM506.70 213.25L506.70 213.25Q500.85 213.25 495.98 211Q491.10 208.75 488.32 203.72Q485.55 198.70 485.70 190.45L485.70 190.45L486.15 151.90Q486.15 148.45 484.95 146.95Q483.75 145.45 481.20 144.85L481.20 144.85L479.40 144.25L479.40 142.75L506.25 137.50L507.75 139L507 160.30L507 196.45Q507 201.25 509.78 203.50Q512.55 205.75 516.75 205.75L516.75 205.75Q520.95 205.75 524.25 204.55Q527.55 203.35 530.85 200.95L530.85 200.95L531.45 152.05Q531.45 148.60 530.40 147.18Q529.35 145.75 526.50 145.15L526.50 145.15L525 144.70L525 143.20L551.25 137.50L552.75 139L552.30 160.30L552.30 200.95Q552.30 204.25 553.20 206.05Q554.10 207.85 557.10 209.05L557.10 209.05L558.60 209.50L558.60 211L532.35 212.50L531 203.65Q526.05 207.70 520.27 210.47Q514.50 213.25 506.70 213.25ZM601.80 213.25L601.80 213.25Q591.60 213.25 583.27 208.82Q574.95 204.40 570.08 195.93Q565.20 187.45 565.20 175.15L565.20 175.15Q565.20 163 570.52 154.38Q575.85 145.75 584.77 141.18Q593.70 136.60 604.35 136.60L604.35 136.60Q613.05 136.60 619.05 139.45Q625.05 142.30 628.20 146.88Q631.35 151.45 631.35 156.40L631.35 156.40Q631.35 160.60 628.80 162.93Q626.25 165.25 622.20 165.25L622.20 165.25Q617.85 165.25 615.15 162.10Q612.45 158.95 612 153.85L612 153.85Q611.85 150.55 612.15 148.22Q612.45 145.90 612.15 143.50L612.15 143.50Q611.55 140.95 610.27 140.13Q609 139.30 606.75 139.30L606.75 139.30Q597.60 139.30 592.58 147.25Q587.55 155.20 587.55 172.60L587.55 172.60Q587.55 187.75 593.18 195.78Q598.80 203.80 610.50 203.80L610.50 203.80Q617.55 203.80 621.90 201.25Q626.25 198.70 630.30 193.60L630.30 193.60L631.80 194.80Q628.05 203.65 620.25 208.45Q612.45 213.25 601.80 213.25ZM674.25 211L639.15 211L639.15 209.50L640.95 208.90Q646.35 207.10 646.35 201.40L646.35 201.40L646.35 121.30Q646.35 118.15 645.30 116.65Q644.25 115.15 641.25 114.40L641.25 114.40L639 113.80L639 112.30L665.40 105.85L667.80 107.20L667.20 128.35L667.20 147.10Q672.45 142.75 678.53 139.68Q684.60 136.60 691.95 136.60L691.95 136.60Q701.70 136.60 707.48 142.15Q713.25 147.70 713.25 159.25L713.25 159.25L713.25 201.55Q713.25 204.55 714.45 206.35Q715.65 208.15 718.65 209.05L718.65 209.05L719.85 209.50L719.85 211L684.75 211L684.75 209.50L686.55 209.05Q691.95 207.25 691.95 201.40L691.95 201.40L691.95 154.30Q691.95 148.30 689.93 146.05Q687.90 143.80 682.80 143.80L682.80 143.80Q679.50 143.80 675.60 145.07Q671.70 146.35 667.65 149.50L667.65 149.50L667.65 201.70Q667.65 207.55 673.05 209.20L673.05 209.20L674.25 209.50L674.25 211Z" fill="#FAF6EF"/></svg>
-        </div>
-        <p class="mt-4 text-sm leading-relaxed text-brand-200">Crowdfunding where trust is built in: verified people, verified causes, and spending anyone can follow.</p>
-      </div>
-      <div>
-        <h3 class="text-sm font-semibold text-white">Give</h3>
-        <ul class="mt-4 space-y-2 text-sm text-brand-200">
-          <li><a class="hover:text-white" href="../campaigns/explore.html">Explore campaigns</a></li>
-          <li><a class="hover:text-white" href="../users/how_it_works.html">How giving works</a></li>
-          <li><a class="hover:text-white" href="../users/landing.html#faq">Donor FAQ</a></li>
-        </ul>
-      </div>
-      <div>
-        <h3 class="text-sm font-semibold text-white">Raise</h3>
-        <ul class="mt-4 space-y-2 text-sm text-brand-200">
-          <li><a class="hover:text-white" href="../campaigns/create.html">Start a campaign</a></li>
-          <li><a class="hover:text-white" href="../users/register.html">For NGOs</a></li>
-          <li><a class="hover:text-white" href="../users/how_it_works.html#campaigners">Campaigner guide</a></li>
-        </ul>
-      </div>
-      <div>
-        <h3 class="text-sm font-semibold text-white">Trust</h3>
-        <ul class="mt-4 space-y-2 text-sm text-brand-200">
-          <li><a class="hover:text-white" href="../users/landing.html#trust">Verification process</a></li>
-          <li><a class="hover:text-white" href="../users/landing.html#fees">Fees, explained</a></li>
-          <li><a class="hover:text-white" href="../users/login.html">Sign in</a></li>
-        </ul>
-      </div>
-    </div>
-    <div class="border-t border-white/10 py-5 text-center text-xs text-brand-300">© 2026 Vouch. All donations are processed by licensed payment gateways.</div>
-  </footer>
-  
-
-  <script>
-    (function(){
-      var b = document.getElementById('menu-btn'), m = document.getElementById('mobile-menu');
-      if (b && m) b.addEventListener('click', function(){
-        var open = m.classList.toggle('hidden') === false;
-        b.setAttribute('aria-expanded', open);
-      });
-    })();
-  </script>
-  
-<script>
-  document.getElementById('share').addEventListener('click', async function(){
-    var u = this.dataset.url, s = this.querySelector('span');
-    try { if (navigator.share) await navigator.share({url:u, title:document.title}); else { await navigator.clipboard.writeText(u); s.textContent='Link copied!'; } } catch(e){}
-  });
-</script>
-
-</body>
-</html>
+{% endblock %}

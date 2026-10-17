@@ -1,208 +1,141 @@
+{% extends "base.html" %}
 
-<!DOCTYPE html>
+{% block title %}Donate to Help Ada walk again: spinal surgery fund{% endblock %}
 
+{% block body %}
+  <header class="border-b border-slate-200 bg-white"><div class="mx-auto flex max-w-6xl items-center justify-between px-4 py-4">
+    <a href="{{ url_for('campaign.detail') }}" class="inline-flex items-center gap-1 text-sm font-medium text-slate-600 hover:text-brand-700"><svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M11 17l-5-5m0 0l5-5m-5 5h12"/></svg> Back to campaign</a>
+    <p class="flex items-center gap-2 text-sm text-slate-500"><svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-brand-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-12V7a4 4 0 00-8 0v2h8z"/></svg> Secure checkout</p></div></header>
 
-<html lang="en" class="h-full scroll-smooth">
-<head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Donate to Help Ada walk again: spinal surgery fund · Vouch</title>
-  
-  <meta name="description" content="Fund causes you can verify. Every donation tracked, every expense reviewed, every update public.">
-  <meta name="theme-color" content="#134E4A">
-  
+    <main id="main">
+  <form action="{{ url_for('finance.donate') }}" method="post" class="mx-auto grid grid-cols-1 max-w-6xl gap-8 px-4 py-10 sm:px-6 lg:grid-cols-5" id="donate-form" novalidate>
 
-  <script src="https://cdn.tailwindcss.com"></script>
-  <script>
-    tailwind.config = {
-      theme: {
-        extend: {
-          colors: {
-            primary: '#0F766E',
-            'primary-dark': '#134E4A',
-            accent: '#F4623A',
-            highlight: '#F5A524',
-            progress: '#22A06B',
-            error: '#D92D20',
-            background: '#FAF8F5',
-            surface: '#FFFFFF',
-            border: '#E3E8E6',
-            ink: '#1C2B2A',
-            muted: '#5B6B6A',
-            brand: { 50:'#EAF5F3',100:'#D7EAE7',200:'#B5D8D4',300:'#8AC1BA',400:'#56A59B',500:'#22A06B',600:'#0F766E',700:'#0F766E',800:'#134E4A',900:'#134E4A',950:'#134E4A' },
-            gold: { 50:'#FFF7E8',100:'#FCECCB',200:'#F9D88C',300:'#F7BE54',400:'#F5A524',500:'#E98918',600:'#C86E13',700:'#A45612' },
-            cream: '#FAF8F5',
-            slate: { 50:'#FAF8F5',100:'#F3F4F2',200:'#E3E8E6',300:'#CBD4D1',400:'#8A9896',500:'#5B6B6A',600:'#5B6B6A',700:'#1C2B2A',800:'#1C2B2A',900:'#1C2B2A',950:'#1C2B2A' },
-            rose: { 50:'#FEF3F2',100:'#FEE4E2',200:'#FECDCA',300:'#FDA29B',400:'#F97066',500:'#D92D20',600:'#D92D20',700:'#B42318',800:'#912018',900:'#7A271A' }
-          },
-          fontFamily: { display: ['Georgia','Cambria','"Times New Roman"','serif'] }
-        }
-      }
-    }
-  </script>
-  
-</head>
-<body class="min-h-full bg-cream font-sans text-slate-800 antialiased">
-  <a href="#main" class="sr-only focus:not-sr-only focus:fixed focus:left-4 focus:top-4 focus:z-50 focus:rounded-lg focus:bg-white focus:px-4 focus:py-2 focus:shadow">Skip to content</a>
-
-  
-<header class="border-b border-slate-200 bg-white"><div class="mx-auto flex max-w-6xl items-center justify-between px-4 py-4">
-  <a href="../campaigns/detail.html" class="inline-flex items-center gap-1 text-sm font-medium text-slate-600 hover:text-brand-700"><svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M11 17l-5-5m0 0l5-5m-5 5h12"/></svg> Back to campaign</a>
-  <p class="flex items-center gap-2 text-sm text-slate-500"><svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-brand-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-12V7a4 4 0 00-8 0v2h8z"/></svg> Secure checkout</p></div></header>
-
-
-  
-  
-    
-  
-
-  <main id="main">
-<form method="post" action="#" class="mx-auto grid max-w-6xl gap-8 px-4 py-10 sm:px-6 lg:grid-cols-5" id="donate-form" novalidate>
-  
-
-  
-  <div class="space-y-6 lg:col-span-3">
-    <div>
-      <p class="text-xs font-semibold uppercase tracking-widest text-brand-600">Your donation</p>
-      <h1 class="mt-1 font-display text-3xl font-bold text-brand-950">Every naira will be tracked</h1>
-    </div>
-
-    
-    <section class="rounded-2xl border border-slate-200 bg-white shadow-sm p-6">
-      <h2 class="text-sm font-semibold text-slate-900">1. Choose an amount</h2>
-      <div class="mt-4 grid grid-cols-2 gap-3 sm:grid-cols-3">
-        
-        <button type="button" data-preset="2000" class="rounded-xl border border-slate-300 bg-white px-4 py-3 text-sm font-semibold text-slate-800 transition hover:border-brand-500 hover:bg-brand-50 aria-pressed:border-brand-600 aria-pressed:bg-brand-50 aria-pressed:ring-4 aria-pressed:ring-brand-100" aria-pressed="false">₦2,000</button>
-        
-        <button type="button" data-preset="5000" class="rounded-xl border border-slate-300 bg-white px-4 py-3 text-sm font-semibold text-slate-800 transition hover:border-brand-500 hover:bg-brand-50 aria-pressed:border-brand-600 aria-pressed:bg-brand-50 aria-pressed:ring-4 aria-pressed:ring-brand-100" aria-pressed="false">₦5,000</button>
-        
-        <button type="button" data-preset="10000" class="rounded-xl border border-slate-300 bg-white px-4 py-3 text-sm font-semibold text-slate-800 transition hover:border-brand-500 hover:bg-brand-50 aria-pressed:border-brand-600 aria-pressed:bg-brand-50 aria-pressed:ring-4 aria-pressed:ring-brand-100" aria-pressed="false">₦10,000</button>
-        
-        <button type="button" data-preset="25000" class="rounded-xl border border-slate-300 bg-white px-4 py-3 text-sm font-semibold text-slate-800 transition hover:border-brand-500 hover:bg-brand-50 aria-pressed:border-brand-600 aria-pressed:bg-brand-50 aria-pressed:ring-4 aria-pressed:ring-brand-100" aria-pressed="false">₦25,000</button>
-        
-        <button type="button" data-preset="50000" class="rounded-xl border border-slate-300 bg-white px-4 py-3 text-sm font-semibold text-slate-800 transition hover:border-brand-500 hover:bg-brand-50 aria-pressed:border-brand-600 aria-pressed:bg-brand-50 aria-pressed:ring-4 aria-pressed:ring-brand-100" aria-pressed="false">₦50,000</button>
-        
+    <div class="space-y-6 lg:col-span-3">
+      <div>
+        <p class="text-xs font-semibold uppercase tracking-widest text-brand-600">Your donation</p>
+        <h1 class="mt-1 font-display text-3xl font-bold text-brand-950">Every naira will be tracked</h1>
       </div>
-      <div class="relative mt-4">
-        <label for="amount" class="mb-1.5 block text-sm font-medium text-slate-700">Or enter your own amount</label>
-        <span class="pointer-events-none absolute bottom-0 left-4 grid h-[46px] place-items-center text-sm font-semibold text-slate-500">₦</span>
-        <input id="amount" name="amount" type="number" inputmode="numeric" min="500" step="1" required placeholder="0" class="block w-full rounded-xl border border-slate-300 bg-white px-4 py-3 text-slate-900 placeholder:text-slate-400 focus:border-brand-600 focus:outline-none focus:ring-4 focus:ring-brand-100 pl-9 text-lg font-semibold">
-      </div>
-      <p class="mt-1.5 text-xs text-slate-500">Minimum ₦500.</p>
-      
-    </section>
 
-    
-    <section class="rounded-2xl border border-slate-200 bg-white shadow-sm space-y-5 p-6">
-      <h2 class="text-sm font-semibold text-slate-900">2. About you</h2>
-      
-        <div>
-  <label for="guest_email" class="mb-1.5 block text-sm font-medium text-slate-700">Email for your receipt <span class="text-rose-500" aria-hidden="true">*</span></label>
-  <input id="guest_email" name="guest_email" type="email" value="" placeholder="you@example.com"
-         required autocomplete="email" 
-         class="block w-full rounded-xl border border-slate-300 bg-white px-4 py-3 text-sm text-slate-900 placeholder:text-slate-400 focus:border-brand-600 focus:outline-none focus:ring-4 focus:ring-brand-100"
-         >
-  <p class="mt-1.5 text-xs text-slate-500">Or <a class="underline" href="../users/login.html">sign in</a> to keep a donation history.</p>
-  
-</div>
-      
-      <label class="flex items-start gap-3 rounded-xl border border-slate-200 p-4 text-sm has-[:checked]:border-brand-500 has-[:checked]:bg-brand-50">
-        <input type="checkbox" name="is_anonymous" value="1" class="mt-0.5 h-4 w-4 rounded border-slate-300 text-brand-700 focus:ring-brand-200">
-        <span><span class="font-semibold text-slate-900">Give anonymously</span><span class="block text-slate-500">Your name won't appear on the campaign's donor list. The organiser can't see who you are.</span></span>
-      </label>
-    </section>
+      <section class="rounded-2xl border border-slate-200 bg-white shadow-sm p-6">
+        <h2 class="text-sm font-semibold text-slate-900">1. Choose an amount</h2>
+        <div class="mt-4 grid grid-cols-2 gap-3 sm:grid-cols-3">
 
-    
-    <section class="rounded-2xl border border-slate-200 bg-white shadow-sm p-6">
-      <h2 class="text-sm font-semibold text-slate-900">3. Payment method</h2>
-      <div class="mt-4 space-y-3">
-        
-        <label class="flex cursor-pointer items-center gap-4 rounded-xl border border-slate-300 p-4 has-[:checked]:border-brand-600 has-[:checked]:bg-brand-50 has-[:checked]:ring-4 has-[:checked]:ring-brand-100">
-          <input type="radio" name="payment_gateway" value="paystack" class="h-4 w-4 text-brand-700 focus:ring-brand-200" checked>
-          <span class="h-7 w-20"><img src="static/images/paystack.svg" alt="Card, bank or USSD" class="h-full w-full object-contain object-left" loading="lazy" onerror="this.style.display='none'"></span>
-          <span class="text-sm font-medium text-slate-800">Card, bank or USSD</span>
-        </label>
-        
-        <label class="flex cursor-pointer items-center gap-4 rounded-xl border border-slate-300 p-4 has-[:checked]:border-brand-600 has-[:checked]:bg-brand-50 has-[:checked]:ring-4 has-[:checked]:ring-brand-100">
-          <input type="radio" name="payment_gateway" value="paystack" class="h-4 w-4 text-brand-700 focus:ring-brand-200" >
-          <span class="h-7 w-20"><img src="static/images/paystack.svg" alt="paystack" class="h-full w-full object-contain object-left" loading="lazy" onerror="this.style.display='none'"></span>
-          <span class="text-sm font-medium text-slate-800">Paystack</span>
-        </label>
-        
-      </div>
-      
-    </section>
+          <button type="button" data-preset="2000" class="rounded-xl border border-slate-300 bg-white px-4 py-3 text-sm font-semibold text-slate-800 transition hover:border-brand-500 hover:bg-brand-50 aria-pressed:border-brand-600 aria-pressed:bg-brand-50 aria-pressed:ring-4 aria-pressed:ring-brand-100" aria-pressed="false">₦2,000</button>
 
-    <button id="pay-btn" class="inline-flex items-center justify-center gap-2 rounded-xl px-5 font-semibold transition focus:outline-none focus-visible:ring-4 disabled:cursor-not-allowed disabled:opacity-50 bg-accent text-ink shadow-sm hover:bg-[#F06A44] focus-visible:ring-gold-200 w-full py-4 text-base" disabled><svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-12V7a4 4 0 00-8 0v2h8z"/></svg> <span id="pay-label">Enter an amount to continue</span></button>
-    <p class="text-center text-xs text-slate-500">You'll be redirected to our payment partner to complete payment securely. We never store card details.</p>
+          <button type="button" data-preset="5000" class="rounded-xl border border-slate-300 bg-white px-4 py-3 text-sm font-semibold text-slate-800 transition hover:border-brand-500 hover:bg-brand-50 aria-pressed:border-brand-600 aria-pressed:bg-brand-50 aria-pressed:ring-4 aria-pressed:ring-brand-100" aria-pressed="false">₦5,000</button>
+
+          <button type="button" data-preset="10000" class="rounded-xl border border-slate-300 bg-white px-4 py-3 text-sm font-semibold text-slate-800 transition hover:border-brand-500 hover:bg-brand-50 aria-pressed:border-brand-600 aria-pressed:bg-brand-50 aria-pressed:ring-4 aria-pressed:ring-brand-100" aria-pressed="false">₦10,000</button>
+
+          <button type="button" data-preset="25000" class="rounded-xl border border-slate-300 bg-white px-4 py-3 text-sm font-semibold text-slate-800 transition hover:border-brand-500 hover:bg-brand-50 aria-pressed:border-brand-600 aria-pressed:bg-brand-50 aria-pressed:ring-4 aria-pressed:ring-brand-100" aria-pressed="false">₦25,000</button>
+
+          <button type="button" data-preset="50000" class="rounded-xl border border-slate-300 bg-white px-4 py-3 text-sm font-semibold text-slate-800 transition hover:border-brand-500 hover:bg-brand-50 aria-pressed:border-brand-600 aria-pressed:bg-brand-50 aria-pressed:ring-4 aria-pressed:ring-brand-100" aria-pressed="false">₦50,000</button>
+
+        </div>
+        <div class="relative mt-4">
+          <label for="amount" class="mb-1.5 block text-sm font-medium text-slate-700">Or enter your own amount</label>
+          <span class="pointer-events-none absolute bottom-0 left-4 grid h-[46px] place-items-center text-sm font-semibold text-slate-500">₦</span>
+          <input id="amount" name="amount" type="number" inputmode="numeric" min="500" step="1" required placeholder="0" class="block w-full rounded-xl border border-slate-300 bg-white px-4 py-3 text-slate-900 placeholder:text-slate-400 focus:border-brand-600 focus:outline-none focus:ring-4 focus:ring-brand-100 pl-9 text-lg font-semibold">
+        </div>
+        <p class="mt-1.5 text-xs text-slate-500">Minimum ₦500.</p>
+
+      </section>
+
+      <section class="rounded-2xl border border-slate-200 bg-white shadow-sm space-y-5 p-6">
+        <h2 class="text-sm font-semibold text-slate-900">2. About you</h2>
+
+          <div>
+    <label for="guest_email" class="mb-1.5 block text-sm font-medium text-slate-700">Email for your receipt <span class="text-rose-500" aria-hidden="true">*</span></label>
+    <input id="guest_email" name="guest_email" type="email" value="" placeholder="you@example.com"
+           required autocomplete="email" 
+           class="block w-full rounded-xl border border-slate-300 bg-white px-4 py-3 text-sm text-slate-900 placeholder:text-slate-400 focus:border-brand-600 focus:outline-none focus:ring-4 focus:ring-brand-100"
+           >
+    <p class="mt-1.5 text-xs text-slate-500">Or <a class="underline" href="{{ url_for('user.login') }}">sign in</a> to keep a donation history.</p>
+
   </div>
 
-  
-  <aside class="lg:col-span-2">
-    <div class="space-y-4 lg:sticky lg:top-6">
-      <div class="rounded-2xl border border-slate-200 bg-white shadow-sm overflow-hidden">
-        <div class="relative h-32 bg-gradient-to-br from-brand-300 to-gold-200">
-          <img src="static/images/donate-side.jpg" alt="" class="h-full w-full object-cover" loading="lazy" onerror="this.style.display='none'"></div>
-        <div class="p-5">
-          <p class="font-display text-lg font-bold leading-snug text-brand-950">Help Ada walk again: spinal surgery fund</p>
-          <div class="mt-3"><div class="w-full overflow-hidden rounded-full bg-brand-100 h-2.5" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="42">
-  <div class="h-full rounded-full bg-[#22A06B]" style="width: 41.7%"></div>
-</div></div>
-          <p class="mt-1 text-xs text-slate-500">₦1.2M raised of ₦3.0M</p>
-        </div>
-      </div>
-
-      <div class="rounded-2xl border border-slate-200 bg-white shadow-sm p-5">
-        <h2 class="text-sm font-semibold text-slate-900">Where your money goes</h2>
-        <dl class="mt-4 space-y-3 text-sm" id="breakdown" data-rate="0.05">
-          <div class="flex justify-between"><dt class="text-slate-600">Your donation</dt><dd class="font-semibold" id="bd-gross">₦0</dd></div>
-          <div class="flex justify-between"><dt class="text-slate-600">Platform fee <span class="text-xs text-slate-400">(5.0%)</span></dt><dd id="bd-fee">− ₦0</dd></div>
-          <div class="h-px bg-slate-200"></div>
-          <div class="flex justify-between text-base"><dt class="font-semibold text-brand-900">Reaches the campaign</dt><dd class="font-display text-xl font-bold text-brand-700" id="bd-net">₦0</dd></div>
-        </dl>
-        <label class="mt-5 flex items-start gap-3 rounded-xl bg-gold-50 p-3 text-xs text-gold-700">
-          <input type="checkbox" id="cover-fee" name="cover_fee" value="1" class="mt-0.5 h-4 w-4 rounded border-gold-300 text-brand-700 focus:ring-gold-200">
-          <span><strong>Cover the fee</strong> so the full amount reaches the cause. You'll pay a little extra.</span>
+        <label class="flex items-start gap-3 rounded-xl border border-slate-200 p-4 text-sm has-[:checked]:border-brand-500 has-[:checked]:bg-brand-50">
+          <input type="checkbox" name="is_anonymous" value="1" class="mt-0.5 h-4 w-4 rounded border-slate-300 text-brand-700 focus:ring-brand-200">
+          <span><span class="font-semibold text-slate-900">Give anonymously</span><span class="block text-slate-500">Your name won't appear on the campaign's donor list. The organiser can't see who you are.</span></span>
         </label>
-      </div>
-      <p class="flex items-start gap-2 px-1 text-xs text-slate-500"><svg xmlns="http://www.w3.org/2000/svg" class="mt-0.5 h-4 w-4 shrink-0 text-brand-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 12l2 2 4-4m5.6-4A12 12 0 0112 3a12 12 0 01-8.6 3A12 12 0 003 12c0 5.6 3.8 10.3 9 11.6 5.2-1.3 9-6 9-11.6 0-1.9-.3-3.7-.4-6z"/></svg> Funds are released only against reviewed expenses and paid directly to the recipient.</p>
+      </section>
+
+      <section class="rounded-2xl border border-slate-200 bg-white shadow-sm p-6">
+        <h2 class="text-sm font-semibold text-slate-900">3. Payment method</h2>
+        <div class="mt-4 space-y-3">
+
+          <label class="flex cursor-pointer items-center gap-4 rounded-xl border border-slate-300 p-4 has-[:checked]:border-brand-600 has-[:checked]:bg-brand-50 has-[:checked]:ring-4 has-[:checked]:ring-brand-100">
+            <input type="radio" name="payment_gateway" value="paystack" class="h-4 w-4 text-brand-700 focus:ring-brand-200" checked>
+            <span class="h-7 w-20"><img src="{{ url_for('finance.static', filename='images/paystack.svg') }}" alt="Card, bank or USSD" class="h-full w-full object-contain object-left" loading="lazy" onerror="this.style.display='none'"></span>
+            <span class="text-sm font-medium text-slate-800">Card, bank or USSD</span>
+          </label>
+
+          <label class="flex cursor-pointer items-center gap-4 rounded-xl border border-slate-300 p-4 has-[:checked]:border-brand-600 has-[:checked]:bg-brand-50 has-[:checked]:ring-4 has-[:checked]:ring-brand-100">
+            <input type="radio" name="payment_gateway" value="paystack" class="h-4 w-4 text-brand-700 focus:ring-brand-200" >
+            <span class="h-7 w-20"><img src="{{ url_for('finance.static', filename='images/paystack.svg') }}" alt="paystack" class="h-full w-full object-contain object-left" loading="lazy" onerror="this.style.display='none'"></span>
+            <span class="text-sm font-medium text-slate-800">Paystack</span>
+          </label>
+
+        </div>
+
+      </section>
+
+      <button id="pay-btn" class="inline-flex items-center justify-center gap-2 rounded-xl px-5 font-semibold transition focus:outline-none focus-visible:ring-4 disabled:cursor-not-allowed disabled:opacity-50 bg-accent text-ink shadow-sm hover:bg-[#F06A44] focus-visible:ring-gold-200 w-full py-4 text-base" disabled><svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-12V7a4 4 0 00-8 0v2h8z"/></svg> <span id="pay-label">Enter an amount to continue</span></button>
+      <p class="text-center text-xs text-slate-500">You'll be redirected to our payment partner to complete payment securely. We never store card details.</p>
     </div>
-  </aside>
-</form>
-</main>
 
-  
+    <aside class="lg:col-span-2">
+      <div class="space-y-4 lg:sticky lg:top-6">
+        <div class="rounded-2xl border border-slate-200 bg-white shadow-sm overflow-hidden">
+          <div class="relative h-32 bg-gradient-to-br from-brand-300 to-gold-200">
+            <img src="{{ url_for('finance.static', filename='images/donate-side.jpg') }}" alt="" class="h-full w-full object-cover" loading="lazy" onerror="this.style.display='none'"></div>
+          <div class="p-5">
+            <p class="font-display text-lg font-bold leading-snug text-brand-950">Help Ada walk again: spinal surgery fund</p>
+            <div class="mt-3"><div class="w-full overflow-hidden rounded-full bg-brand-100 h-2.5" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="42">
+    <div class="h-full rounded-full bg-[#22A06B]" style="width: 41.7%"></div>
+  </div></div>
+            <p class="mt-1 text-xs text-slate-500">₦1.2M raised of ₦3.0M</p>
+          </div>
+        </div>
 
+        <div class="rounded-2xl border border-slate-200 bg-white shadow-sm p-5">
+          <h2 class="text-sm font-semibold text-slate-900">Where your money goes</h2>
+          <dl class="mt-4 space-y-3 text-sm" id="breakdown" data-rate="0.05">
+            <div class="flex justify-between"><dt class="text-slate-600">Your donation</dt><dd class="font-semibold" id="bd-gross">₦0</dd></div>
+            <div class="flex justify-between"><dt class="text-slate-600">Platform fee <span class="text-xs text-slate-400">(5.0%)</span></dt><dd id="bd-fee">− ₦0</dd></div>
+            <div class="h-px bg-slate-200"></div>
+            <div class="flex justify-between text-base"><dt class="font-semibold text-brand-900">Reaches the campaign</dt><dd class="font-display text-xl font-bold text-brand-700" id="bd-net">₦0</dd></div>
+          </dl>
+          <label class="mt-5 flex items-start gap-3 rounded-xl bg-gold-50 p-3 text-xs text-gold-700">
+            <input type="checkbox" id="cover-fee" name="cover_fee" value="1" class="mt-0.5 h-4 w-4 rounded border-gold-300 text-brand-700 focus:ring-gold-200">
+            <span><strong>Cover the fee</strong> so the full amount reaches the cause. You'll pay a little extra.</span>
+          </label>
+        </div>
+        <p class="flex items-start gap-2 px-1 text-xs text-slate-500"><svg xmlns="http://www.w3.org/2000/svg" class="mt-0.5 h-4 w-4 shrink-0 text-brand-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 12l2 2 4-4m5.6-4A12 12 0 0112 3a12 12 0 01-8.6 3A12 12 0 003 12c0 5.6 3.8 10.3 9 11.6 5.2-1.3 9-6 9-11.6 0-1.9-.3-3.7-.4-6z"/></svg> Funds are released only against reviewed expenses and paid directly to the recipient.</p>
+      </div>
+    </aside>
+  </form>
+  </main>
+{% endblock %}
+
+{% block scripts %}
   <script>
-    (function(){
-      var b = document.getElementById('menu-btn'), m = document.getElementById('mobile-menu');
-      if (b && m) b.addEventListener('click', function(){
-        var open = m.classList.toggle('hidden') === false;
-        b.setAttribute('aria-expanded', open);
-      });
-    })();
+  (function(){
+    var amt = document.getElementById('amount'), bd = document.getElementById('breakdown'), rate = parseFloat(bd.dataset.rate),
+        cover = document.getElementById('cover-fee'), btn = document.getElementById('pay-btn'), lbl = document.getElementById('pay-label'),
+        presets = document.querySelectorAll('[data-preset]');
+    var fmt = function(n){ return '₦' + Math.round(n).toLocaleString('en-NG'); };
+    function render(){
+      var v = parseFloat(amt.value) || 0, gross, fee, net;
+      if (cover.checked) { net = v; gross = v / (1 - rate); fee = gross - net; } else { gross = v; fee = v * rate; net = v - fee; }
+      document.getElementById('bd-gross').textContent = fmt(gross);
+      document.getElementById('bd-fee').textContent = '− ' + fmt(fee);
+      document.getElementById('bd-net').textContent = fmt(net);
+      var ok = v >= 500; btn.disabled = !ok;
+      lbl.textContent = ok ? 'Donate ' + fmt(gross) + ' securely' : 'Enter an amount to continue';
+      presets.forEach(function(p){ p.setAttribute('aria-pressed', String(parseFloat(p.dataset.preset) === v)); });
+    }
+    presets.forEach(function(p){ p.addEventListener('click', function(){ amt.value = p.dataset.preset; render(); }); });
+    amt.addEventListener('input', render); cover.addEventListener('change', render); render();
+  })();
   </script>
-  
-<script>
-(function(){
-  var amt = document.getElementById('amount'), bd = document.getElementById('breakdown'), rate = parseFloat(bd.dataset.rate),
-      cover = document.getElementById('cover-fee'), btn = document.getElementById('pay-btn'), lbl = document.getElementById('pay-label'),
-      presets = document.querySelectorAll('[data-preset]');
-  var fmt = function(n){ return '₦' + Math.round(n).toLocaleString('en-NG'); };
-  function render(){
-    var v = parseFloat(amt.value) || 0, gross, fee, net;
-    if (cover.checked) { net = v; gross = v / (1 - rate); fee = gross - net; } else { gross = v; fee = v * rate; net = v - fee; }
-    document.getElementById('bd-gross').textContent = fmt(gross);
-    document.getElementById('bd-fee').textContent = '− ' + fmt(fee);
-    document.getElementById('bd-net').textContent = fmt(net);
-    var ok = v >= 500; btn.disabled = !ok;
-    lbl.textContent = ok ? 'Donate ' + fmt(gross) + ' securely' : 'Enter an amount to continue';
-    presets.forEach(function(p){ p.setAttribute('aria-pressed', String(parseFloat(p.dataset.preset) === v)); });
-  }
-  presets.forEach(function(p){ p.addEventListener('click', function(){ amt.value = p.dataset.preset; render(); }); });
-  amt.addEventListener('input', render); cover.addEventListener('change', render); render();
-})();
-</script>
-
-</body>
-</html>
+{% endblock %}

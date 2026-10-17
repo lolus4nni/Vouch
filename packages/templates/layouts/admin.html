@@ -1,0 +1,21 @@
+{# Admin console layout. Extends the app shell. #}
+{% extends "layouts/_shell.html" %}
+{% import "partials/macros.html" as ui %}
+
+{% block sidebar_badge %}
+  <p class="mx-6 mb-1 rounded-md bg-gold-400/15 px-2 py-1 text-[11px] font-semibold uppercase tracking-widest text-gold-300">Admin console</p>
+{% endblock %}
+
+{% block sidebar_nav %}
+  {{ ui.nav_link('admin.dashboard', 'Overview', 'M3 12l9-9 9 9M5 10v10h5v-6h4v6h5V10') }}
+  {{ ui.nav_link('admin.campaign_queue', 'Campaign reviews', 'M5 21V4m0 0h11l-2 4 2 4H5') }}
+  {{ ui.nav_link('admin.expense_queue', 'Expense reviews', 'M9 14l6-6M9.5 8.5h.01M14.5 13.5h.01M5 21V4a1 1 0 011-1h12a1 1 0 011 1v17l-3-2-3 2-3-2-3 2z') }}
+  {{ ui.nav_link('admin.disbursals', 'Payouts', 'M3 10l9-6 9 6M5 10v8m4-8v8m6-8v8m4-8v8M3 21h18') }}
+  {{ ui.nav_link('admin.profile_queue', 'Identity checks', 'M9 12l2 2 4-4m5.6-4A12 12 0 0112 3a12 12 0 01-8.6 3A12 12 0 003 12c0 5.6 3.8 10.3 9 11.6 5.2-1.3 9-6 9-11.6 0-1.9-.3-3.7-.4-6z') }}
+  {{ ui.nav_link('admin.donations', 'Donations monitor', 'M4.3 6.3a4.5 4.5 0 016.4 0L12 7.6l1.3-1.3a4.5 4.5 0 116.4 6.4L12 20.4l-7.7-7.7a4.5 4.5 0 010-6.4z') }}
+  {{ ui.nav_link('admin.accounts', 'Accounts', 'M17 20h5v-2a4 4 0 00-5-3.9M9 11a4 4 0 100-8 4 4 0 000 8zm8 0a3 3 0 100-6M2 20v-2a4 4 0 014-4h6a4 4 0 014 4v2') }}
+  {{ ui.nav_link('admin.categories', 'Categories', 'M7 7h.01M3 11V5a2 2 0 012-2h6l9 9-8 8-9-9z') }}
+  {{ ui.nav_link('admin.verification_logs', 'Audit trail', 'M8 6h13M8 12h13M8 18h13M3 6h.01M3 12h.01M3 18h.01') }}
+{% endblock %}
+
+{% block role_label %}admin{% endblock %}
