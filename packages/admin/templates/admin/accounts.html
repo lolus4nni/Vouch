@@ -14,29 +14,37 @@
 {% block content %}
   <main id="main" class="flex-1 px-4 py-6 sm:px-6 lg:py-8">
     <div class="mx-auto max-w-6xl">
-      <form action="{{ url_for('admin.accounts') }}" method="get" class="mb-6 flex flex-wrap gap-3">
+      <form id="account-filters" action="{{ url_for('admin.accounts') }}" method="get" class="mb-6 flex flex-wrap gap-3">
         <div class="relative min-w-[16rem] flex-1"><span class="pointer-events-none absolute inset-y-0 left-3 grid place-items-center text-slate-400"><svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 21l-4.3-4.3M10 18a8 8 0 100-16 8 8 0 000 16z"/></svg></span>
-          <input name="q" value="" placeholder="Search by email or name" class="block w-full rounded-xl border border-slate-300 bg-white px-4 py-3 text-sm text-slate-900 placeholder:text-slate-400 focus:border-brand-600 focus:outline-none focus:ring-4 focus:ring-brand-100 pl-10"></div>
-        <select name="role" class="block rounded-xl border border-slate-300 bg-white px-4 py-3 text-sm text-slate-900 placeholder:text-slate-400 focus:border-brand-600 focus:outline-none focus:ring-4 focus:ring-brand-100 !w-auto" onchange="this.form.submit()">
-          <option value="">All roles</option><option value="donor" >Donor</option><option value="campaigner" >Campaigner</option><option value="ngo" >Ngo</option><option value="admin" selected>Admin</option>
+          <input name="q" value="{{ search }}" placeholder="Search by email or name" class="block w-full rounded-xl border border-slate-300 bg-white px-4 py-3 text-sm text-slate-900 placeholder:text-slate-400 focus:border-brand-600 focus:outline-none focus:ring-4 focus:ring-brand-100 pl-10"></div>
+        <select name="role" class="block rounded-xl border border-slate-300 bg-white px-4 py-3 text-sm text-slate-900 placeholder:text-slate-400 focus:border-brand-600 focus:outline-none focus:ring-4 focus:ring-brand-100 !w-auto">
+          <option value="" {{ 'selected' if not selected_role else '' }}>All roles</option><option value="donor" {{ 'selected' if selected_role == 'donor' else '' }}>Donor</option><option value="campaigner" {{ 'selected' if selected_role == 'campaigner' else '' }}>Campaigner</option><option value="ngo" {{ 'selected' if selected_role == 'ngo' else '' }}>Ngo</option><option value="admin" {{ 'selected' if selected_role == 'admin' else '' }}>Admin</option>
         </select>
         <button class="inline-flex items-center justify-center gap-2 rounded-xl px-5 py-3 text-sm font-semibold transition focus:outline-none focus-visible:ring-4 disabled:cursor-not-allowed disabled:opacity-50 bg-accent-500 text-ink shadow-sm hover:bg-accent-600 focus-visible:ring-accent-200">Search</button>
       </form>
 
       <div class="rounded-2xl border border-slate-200 bg-white shadow-sm overflow-hidden"><div class="relative overflow-x-auto"><table class="min-w-full divide-y divide-slate-200">
         <thead class="bg-slate-50"><tr><th class="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide text-slate-500">User</th><th class="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide text-slate-500">Role</th><th class="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide text-slate-500">Verification</th><th class="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide text-slate-500">Joined</th><th class="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide text-slate-500">Status</th><th class="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide text-slate-500"></th></tr></thead>
-        <tbody class="divide-y divide-slate-100 bg-white">
-
-          <tr class="hover:bg-slate-50"><td class="px-4 py-3.5 text-sm text-slate-700"><p class="font-medium text-slate-900">Amaka Obi</p><p class="text-xs text-slate-500">amaka@example.com</p></td>
-            <td class="px-4 py-3.5 text-sm text-slate-700 capitalize">donor</td><td class="px-4 py-3.5 text-sm text-slate-700"><span class="inline-flex items-center gap-1 rounded-full px-2.5 py-0.5 text-xs font-medium bg-gold-100 text-gold-700"><svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 7v5l3 2m6-2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>Review in progress</span></td><td class="px-4 py-3.5 text-sm text-slate-700 whitespace-nowrap">09 Oct 2026</td>
-            <td class="px-4 py-3.5 text-sm text-slate-700"><span class="inline-flex items-center gap-1 rounded-full px-2.5 py-0.5 text-xs font-medium bg-progress/10 text-progress">Active</span></td>
-            <td class="px-4 py-3.5 text-sm text-slate-700 text-right"><form action="{{ url_for('admin.accounts') }}" method="post" onsubmit="return confirm('Deactivate this account?');"><button class="inline-flex items-center justify-center gap-2 rounded-xl font-semibold transition focus:outline-none focus-visible:ring-4 disabled:cursor-not-allowed disabled:opacity-50 border border-slate-300 bg-white text-slate-700 hover:bg-slate-50 focus-visible:ring-slate-200 px-3.5 py-2 text-xs">Deactivate</button></form></td></tr>
-
-          <tr class="hover:bg-slate-50"><td class="px-4 py-3.5 text-sm text-slate-700"><p class="font-medium text-slate-900">Amaka Obi</p><p class="text-xs text-slate-500">amaka@example.com</p></td>
-            <td class="px-4 py-3.5 text-sm text-slate-700 capitalize">donor</td><td class="px-4 py-3.5 text-sm text-slate-700"><span class="inline-flex items-center gap-1 rounded-full px-2.5 py-0.5 text-xs font-medium bg-gold-100 text-gold-700"><svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 7v5l3 2m6-2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>Review in progress</span></td><td class="px-4 py-3.5 text-sm text-slate-700 whitespace-nowrap">09 Oct 2026</td>
-            <td class="px-4 py-3.5 text-sm text-slate-700"><span class="inline-flex items-center gap-1 rounded-full px-2.5 py-0.5 text-xs font-medium bg-progress/10 text-progress">Active</span></td>
-            <td class="px-4 py-3.5 text-sm text-slate-700 text-right"><form action="{{ url_for('admin.accounts') }}" method="post" onsubmit="return confirm('Deactivate this account?');"><button class="inline-flex items-center justify-center gap-2 rounded-xl font-semibold transition focus:outline-none focus-visible:ring-4 disabled:cursor-not-allowed disabled:opacity-50 border border-slate-300 bg-white text-slate-700 hover:bg-slate-50 focus-visible:ring-slate-200 px-3.5 py-2 text-xs">Deactivate</button></form></td></tr>
-
+        <tbody id="account-results" class="divide-y divide-slate-100 bg-white">
+          {% for account in accounts %}
+            <tr class="hover:bg-slate-50">
+              <td class="px-4 py-3.5 text-sm text-slate-700"><p class="font-medium text-slate-900">{{ account.display_name }}</p><p class="text-xs text-slate-500">{{ account.email or '' }}</p></td>
+              <td class="px-4 py-3.5 text-sm capitalize text-slate-700">{{ 'campaigner' if account.campaigner_enabled else 'donor' }}</td>
+              <td class="px-4 py-3.5 text-sm text-slate-700">Not verified</td>
+              <td class="px-4 py-3.5 whitespace-nowrap text-sm text-slate-700">{{ account.created_at.strftime('%d %b %Y') }}</td>
+              <td class="px-4 py-3.5 text-sm capitalize text-slate-700">{{ account.account_status }}</td>
+              <td class="px-4 py-3.5 text-right text-sm text-slate-700">
+                {% if account.account_status == 'active' %}
+                  <form action="{{ url_for('admin.accounts') }}" method="post" onsubmit="return confirm('Deactivate this account?');">
+                    <input type="hidden" name="account_id" value="{{ account.id }}">
+                    <button class="rounded-xl border border-slate-300 bg-white px-3.5 py-2 text-xs font-semibold text-slate-700 hover:bg-slate-50">Deactivate</button>
+                  </form>
+                {% endif %}
+              </td>
+            </tr>
+          {% else %}
+            <tr><td colspan="6" class="px-4 py-8 text-center text-sm text-slate-500">No accounts found.</td></tr>
+          {% endfor %}
         </tbody></table></div></div>
 
     <nav class="mt-10 flex items-center justify-center gap-1" aria-label="Pagination">
@@ -52,4 +60,98 @@
 
     </div>
     </main>
+{% endblock %}
+
+{% block scripts %}
+<script>
+  (function () {
+    var form = document.getElementById('account-filters');
+    var results = document.getElementById('account-results');
+    var timer;
+
+    function addCell(row, text) {
+      var cell = document.createElement('td');
+      cell.className = 'px-4 py-3.5 text-sm text-slate-700';
+      cell.textContent = text;
+      row.appendChild(cell);
+    }
+
+    async function searchAccounts() {
+      var params = new URLSearchParams(new FormData(form));
+      params.set('format', 'json');
+      try {
+        var response = await fetch(form.action + '?' + params.toString());
+        if (!response.ok) throw new Error('Could not load accounts.');
+        var data = await response.json();
+        results.replaceChildren();
+        data.accounts.forEach(function (account) {
+          var row = document.createElement('tr');
+          row.className = 'hover:bg-slate-50';
+          var identity = document.createElement('td');
+          identity.className = 'px-4 py-3.5 text-sm text-slate-700';
+          var name = document.createElement('p');
+          name.className = 'font-medium text-slate-900';
+          name.textContent = account.name;
+          var email = document.createElement('p');
+          email.className = 'text-xs text-slate-500';
+          email.textContent = account.email;
+          identity.append(name, email);
+          row.appendChild(identity);
+          addCell(row, account.role);
+          addCell(row, 'Review in progress');
+          addCell(row, account.joined);
+          addCell(row, account.status);
+          var actionCell = document.createElement('td');
+          actionCell.className = 'px-4 py-3.5 text-right text-sm text-slate-700';
+          if (account.status === 'active') {
+            var deactivateForm = document.createElement('form');
+            deactivateForm.action = form.action;
+            deactivateForm.method = 'post';
+            var accountId = document.createElement('input');
+            accountId.type = 'hidden';
+            accountId.name = 'account_id';
+            accountId.value = account.id;
+            var deactivateButton = document.createElement('button');
+            deactivateButton.type = 'submit';
+            deactivateButton.className = 'rounded-xl border border-slate-300 bg-white px-3.5 py-2 text-xs font-semibold text-slate-700 hover:bg-slate-50';
+            deactivateButton.textContent = 'Deactivate';
+            deactivateForm.append(accountId, deactivateButton);
+            actionCell.appendChild(deactivateForm);
+          }
+          row.appendChild(actionCell);
+          results.appendChild(row);
+        });
+        if (!data.accounts.length) {
+          var row = document.createElement('tr');
+          var cell = document.createElement('td');
+          cell.colSpan = 6;
+          cell.className = 'px-4 py-8 text-center text-sm text-slate-500';
+          cell.textContent = 'No accounts found.';
+          row.appendChild(cell);
+          results.appendChild(row);
+        }
+      } catch (error) {
+        results.replaceChildren();
+        var row = document.createElement('tr');
+        var cell = document.createElement('td');
+        cell.colSpan = 6;
+        cell.className = 'px-4 py-8 text-center text-sm text-red-600';
+        cell.textContent = error.message;
+        row.appendChild(cell);
+        results.appendChild(row);
+      }
+    }
+
+    form.addEventListener('submit', function (event) {
+      event.preventDefault();
+      searchAccounts();
+    });
+    form.elements.q.addEventListener('input', function () {
+      clearTimeout(timer);
+      timer = setTimeout(searchAccounts, 250);
+    });
+    form.elements.role.addEventListener('change', searchAccounts);
+    searchAccounts();
+  })();
+</script>
 {% endblock %}

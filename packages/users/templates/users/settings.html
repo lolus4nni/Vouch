@@ -20,7 +20,7 @@
         <div><h2 class="font-display text-xl font-bold text-brand-950">Email address</h2><p class="mt-1 text-sm text-muted">We send receipts and verification updates here.</p></div>
         <div>
       <label for="email" class="mb-1.5 block text-sm font-medium text-ink">Email <span class="text-error" aria-hidden="true">*</span></label>
-      <input id="email" name="email" type="email" value="amaka@example.com" placeholder=""
+      <input id="email" name="email" type="email" value="{{ account.email or '' }}" placeholder=""
             required autocomplete="email" 
             class="block w-full rounded-xl border border-border bg-surface px-4 py-3 text-sm text-ink placeholder:text-muted/70 focus:border-brand-600 focus:outline-none focus:ring-4 focus:ring-brand-100"
             >
@@ -75,6 +75,9 @@
         <h2 class="font-display text-xl font-bold text-error">Deactivate account</h2>
         <p class="mt-1 text-sm text-error/80">Your account will be disabled. Active campaigns must be closed first, and donation records are kept for financial compliance.</p>
         <form action="{{ url_for('user.settings') }}" method="post" class="mt-5" onsubmit="return confirm('Deactivate your account? You can ask support to restore it later.');">
+          <input type="hidden" name="section" value="deactivate">
+          <label for="deactivate-password" class="mb-1.5 block text-sm font-medium text-ink">Current password</label>
+          <input id="deactivate-password" name="current_password" type="password" required autocomplete="current-password" class="mb-4 block w-full rounded-xl border border-border bg-surface px-4 py-3 text-sm text-ink focus:border-brand-600 focus:outline-none focus:ring-4 focus:ring-brand-100">
           <button class="inline-flex items-center justify-center gap-2 rounded-xl font-semibold transition focus:outline-none focus-visible:ring-4 disabled:cursor-not-allowed disabled:opacity-50 bg-error text-white hover:bg-error/90 focus-visible:ring-error/20 px-3.5 py-2 text-xs">Deactivate my account</button>
         </form>
       </section>

@@ -11,6 +11,20 @@
     <p class="mt-2 text-sm text-slate-600">Reports are reviewed by our team and are confidential. Thank you for protecting the community.</p>
     <form action="{{ url_for('campaign.report') }}" method="post" class="rounded-2xl border border-border bg-surface shadow-sm mt-8 space-y-5 p-6" novalidate>
 
+      <div>
+        <label for="campaign_id" class="mb-1.5 block text-sm font-medium text-slate-700">Campaign</label>
+        <select id="campaign_id" name="campaign_id" required class="block w-full rounded-xl border border-slate-300 bg-surface px-4 py-3 text-sm">
+          <option value="">Choose a campaign…</option>
+          {% for campaign in campaigns %}
+            <option value="{{ campaign.id }}">{{ campaign.slug }}</option>
+          {% endfor %}
+        </select>
+      </div>
+      <div>
+        <label for="email" class="mb-1.5 block text-sm font-medium text-slate-700">Your email</label>
+        <input id="email" name="email" type="email" autocomplete="email" class="block w-full rounded-xl border border-slate-300 bg-surface px-4 py-3 text-sm" placeholder="you@example.com">
+      </div>
+
       <fieldset>
         <legend class="mb-1.5 block text-sm font-medium text-slate-700">What's the concern?</legend>
         <div class="space-y-2">

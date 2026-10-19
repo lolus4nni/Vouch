@@ -60,6 +60,16 @@
   <body class="min-h-full bg-background font-sans text-[15px] leading-relaxed text-ink antialiased sm:text-base">
     <a href="#main" class="sr-only focus:not-sr-only focus:fixed focus:left-4 focus:top-4 focus:z-50 focus:rounded-lg focus:bg-surface focus:px-4 focus:py-2 focus:shadow">Skip to content</a>
 
+    {% with messages = get_flashed_messages(with_categories=true) %}
+      {% if messages %}
+        <div class="fixed right-4 top-4 z-50 space-y-2" role="status" aria-live="polite">
+          {% for category, message in messages %}
+            <p class="max-w-md rounded-xl px-4 py-3 text-sm shadow-lg {{ 'bg-rose-100 text-rose-900' if category == 'error' else 'bg-brand-100 text-brand-900' }}">{{ message }}</p>
+          {% endfor %}
+        </div>
+      {% endif %}
+    {% endwith %}
+
     {% block body %}{% endblock %}
 
     {% block layout_scripts %}{% endblock %}

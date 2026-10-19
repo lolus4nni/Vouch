@@ -37,7 +37,9 @@
           <label for="category_id" class="mb-1.5 block text-sm font-medium text-slate-700">Category <span class="text-error">*</span></label>
           <select id="category_id" name="category_id" required class="block w-full rounded-xl border border-slate-300 bg-surface px-4 py-3 text-sm text-ink placeholder:text-slate-400 focus:border-brand-600 focus:outline-none focus:ring-4 focus:ring-brand-100">
             <option value="" disabled selected>Choose one…</option>
-            <option value="1" >Health &amp; Medical</option><option value="2" >Education</option>
+            {% for category in categories %}
+              <option value="{{ category.id }}">{{ category.name }}</option>
+            {% endfor %}
           </select>
 
         </div>

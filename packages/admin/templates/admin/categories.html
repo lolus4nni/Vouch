@@ -18,24 +18,19 @@
 
       <ul class="rounded-2xl border border-slate-200 bg-white shadow-sm divide-y divide-slate-100">
 
-        <li class="p-5">
-          <form action="{{ url_for('admin.categories') }}" method="post" class="grid grid-cols-1 gap-3 sm:grid-cols-6 sm:items-end">
-
-            <div class="sm:col-span-2"><label class="mb-1.5 block text-sm font-medium text-slate-700" for="name-1">Name</label><input id="name-1" name="name" value="Health &amp; Medical" required class="block w-full rounded-xl border border-slate-300 bg-white px-4 py-3 text-sm text-slate-900 placeholder:text-slate-400 focus:border-brand-600 focus:outline-none focus:ring-4 focus:ring-brand-100"></div>
-            <div class="sm:col-span-3"><label class="mb-1.5 block text-sm font-medium text-slate-700" for="desc-1">Description</label><input id="desc-1" name="description" value="Treatment and care" class="block w-full rounded-xl border border-slate-300 bg-white px-4 py-3 text-sm text-slate-900 placeholder:text-slate-400 focus:border-brand-600 focus:outline-none focus:ring-4 focus:ring-brand-100"></div>
-            <div class="flex items-center gap-3 sm:col-span-1"><label class="flex items-center gap-2 text-xs text-slate-600"><input type="checkbox" name="is_active" value="1" checked class="h-4 w-4 rounded border-slate-300 text-brand-700">Active</label><button class="inline-flex items-center justify-center gap-2 rounded-xl font-semibold transition focus:outline-none focus-visible:ring-4 disabled:cursor-not-allowed disabled:opacity-50 border border-slate-300 bg-white text-slate-700 hover:bg-slate-50 focus-visible:ring-slate-200 px-3.5 py-2 text-xs">Save</button></div>
-          </form>
-          <p class="mt-2 text-xs text-slate-400">slug: <span class="font-mono">health</span> · 12 campaigns</p>
-        </li>
-        <li class="p-5">
-          <form action="{{ url_for('admin.categories') }}" method="post" class="grid grid-cols-1 gap-3 sm:grid-cols-6 sm:items-end">
-
-            <div class="sm:col-span-2"><label class="mb-1.5 block text-sm font-medium text-slate-700" for="name-2">Name</label><input id="name-2" name="name" value="Education" required class="block w-full rounded-xl border border-slate-300 bg-white px-4 py-3 text-sm text-slate-900 placeholder:text-slate-400 focus:border-brand-600 focus:outline-none focus:ring-4 focus:ring-brand-100"></div>
-            <div class="sm:col-span-3"><label class="mb-1.5 block text-sm font-medium text-slate-700" for="desc-2">Description</label><input id="desc-2" name="description" value="Schools and scholarships" class="block w-full rounded-xl border border-slate-300 bg-white px-4 py-3 text-sm text-slate-900 placeholder:text-slate-400 focus:border-brand-600 focus:outline-none focus:ring-4 focus:ring-brand-100"></div>
-            <div class="flex items-center gap-3 sm:col-span-1"><label class="flex items-center gap-2 text-xs text-slate-600"><input type="checkbox" name="is_active" value="1" checked class="h-4 w-4 rounded border-slate-300 text-brand-700">Active</label><button class="inline-flex items-center justify-center gap-2 rounded-xl font-semibold transition focus:outline-none focus-visible:ring-4 disabled:cursor-not-allowed disabled:opacity-50 border border-slate-300 bg-white text-slate-700 hover:bg-slate-50 focus-visible:ring-slate-200 px-3.5 py-2 text-xs">Save</button></div>
-          </form>
-          <p class="mt-2 text-xs text-slate-400">slug: <span class="font-mono">education</span> · 7 campaigns</p>
-        </li>
+        {% for category in categories %}
+          <li class="p-5">
+            <form action="{{ url_for('admin.categories') }}" method="post" class="grid grid-cols-1 gap-3 sm:grid-cols-6 sm:items-end">
+              <input type="hidden" name="category_id" value="{{ category.id }}">
+              <div class="sm:col-span-2"><label class="mb-1.5 block text-sm font-medium text-slate-700" for="name-{{ category.id }}">Name</label><input id="name-{{ category.id }}" name="name" value="{{ category.name }}" required maxlength="100" class="block w-full rounded-xl border border-slate-300 bg-white px-4 py-3 text-sm text-slate-900"></div>
+              <div class="sm:col-span-3"><label class="mb-1.5 block text-sm font-medium text-slate-700" for="description-{{ category.id }}">Description</label><input id="description-{{ category.id }}" name="description" value="{{ category.description or '' }}" maxlength="500" class="block w-full rounded-xl border border-slate-300 bg-white px-4 py-3 text-sm text-slate-900"></div>
+              <div class="flex items-center gap-3 sm:col-span-1"><label class="flex items-center gap-2 text-xs text-slate-600"><input type="checkbox" name="is_active" value="1" {{ 'checked' if category.is_active else '' }} class="h-4 w-4 rounded border-slate-300 text-brand-700">Active</label><button class="rounded-xl border border-slate-300 bg-white px-3.5 py-2 text-xs font-semibold text-slate-700 hover:bg-slate-50">Save</button></div>
+            </form>
+            <p class="mt-2 text-xs text-slate-400">slug: <span class="font-mono">{{ category.slug }}</span></p>
+          </li>
+        {% else %}
+          <li class="p-5 text-sm text-slate-500">No categories yet. Add one using the form.</li>
+        {% endfor %}
       </ul>
 
     </section>

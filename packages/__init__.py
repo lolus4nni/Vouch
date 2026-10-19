@@ -17,10 +17,9 @@ from packages.users.routes import user
 migrate = Migrate()
 
 
-def create_app():
+def create_app(config_object=None):
     app = Flask(__name__)
-
-    app.config.from_object(DevelopmentConfig)
+    app.config.from_object(config_object or DevelopmentConfig)
 
 
     db.init_app(app)

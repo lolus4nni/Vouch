@@ -34,7 +34,7 @@
           <div class="flex-1 space-y-5">
             <div>
       <label for="display_name" class="mb-1.5 block text-sm font-medium text-ink">Display name <span class="text-error" aria-hidden="true">*</span></label>
-      <input id="display_name" name="display_name" type="text" value="Amaka Obi" placeholder=""
+      <input id="display_name" name="display_name" type="text" value="{{ account.display_name }}" placeholder=""
             required  
             class="block w-full rounded-xl border border-border bg-surface px-4 py-3 text-sm text-ink placeholder:text-muted/70 focus:border-brand-600 focus:outline-none focus:ring-4 focus:ring-brand-100"
             >
@@ -44,7 +44,7 @@
             <div>
       <label for="bio" class="mb-1.5 block text-sm font-medium text-ink">Short bio</label>
       <textarea id="bio" name="bio" rows="4" placeholder="Who are you, and why do you care?"  maxlength="500"
-                class="block w-full rounded-xl border border-border bg-surface px-4 py-3 text-sm text-ink placeholder:text-muted/70 focus:border-brand-600 focus:outline-none focus:ring-4 focus:ring-brand-100">Teacher and community organiser.</textarea>
+                class="block w-full rounded-xl border border-border bg-surface px-4 py-3 text-sm text-ink placeholder:text-muted/70 focus:border-brand-600 focus:outline-none focus:ring-4 focus:ring-brand-100">{{ account.bio or '' }}</textarea>
       <p class="mt-1.5 text-xs text-muted">Up to 500 characters.</p>
 
     </div>
@@ -60,7 +60,7 @@
         <div class="mt-6 grid grid-cols-1 gap-5 sm:grid-cols-2">
           <div class="sm:col-span-2"><div>
       <label for="legal_name" class="mb-1.5 block text-sm font-medium text-ink">Registered organisation name <span class="text-error" aria-hidden="true">*</span></label>
-      <input id="legal_name" name="legal_name" type="text" value="Amaka Obi" placeholder="As on registration certificate"
+      <input id="legal_name" name="legal_name" type="text" value="{{ account.legal_name or '' }}" placeholder="As on registration certificate"
             required autocomplete="name" 
             class="block w-full rounded-xl border border-border bg-surface px-4 py-3 text-sm text-ink placeholder:text-muted/70 focus:border-brand-600 focus:outline-none focus:ring-4 focus:ring-brand-100"
             >
@@ -69,7 +69,7 @@
     </div></div>
           <div><div>
       <label for="phone_number" class="mb-1.5 block text-sm font-medium text-ink">Phone number <span class="text-error" aria-hidden="true">*</span></label>
-      <input id="phone_number" name="phone_number" type="tel" value="0801 234 5678" placeholder="+234…"
+      <input id="phone_number" name="phone_number" type="tel" value="{{ account.phone_number or '' }}" placeholder="+234…"
             required autocomplete="tel" 
             class="block w-full rounded-xl border border-border bg-surface px-4 py-3 text-sm text-ink placeholder:text-muted/70 focus:border-brand-600 focus:outline-none focus:ring-4 focus:ring-brand-100"
             >
@@ -77,7 +77,7 @@
     </div></div>
           <div><div>
       <label for="address_country" class="mb-1.5 block text-sm font-medium text-ink">Country <span class="text-error" aria-hidden="true">*</span></label>
-      <input id="address_country" name="address_country" type="text" value="Nigeria" placeholder=""
+      <input id="address_country" name="address_country" type="text" value="{{ account.address_country or '' }}" placeholder=""
             required autocomplete="country-name" 
             class="block w-full rounded-xl border border-border bg-surface px-4 py-3 text-sm text-ink placeholder:text-muted/70 focus:border-brand-600 focus:outline-none focus:ring-4 focus:ring-brand-100"
             >
@@ -86,12 +86,12 @@
           <div class="sm:col-span-2"><div>
       <label for="address_street" class="mb-1.5 block text-sm font-medium text-ink">Street address <span class="text-error" aria-hidden="true">*</span></label>
       <textarea id="address_street" name="address_street" rows="2" placeholder="House number, street, area" required 
-                class="block w-full rounded-xl border border-border bg-surface px-4 py-3 text-sm text-ink placeholder:text-muted/70 focus:border-brand-600 focus:outline-none focus:ring-4 focus:ring-brand-100">12 Allen Avenue</textarea>
+                class="block w-full rounded-xl border border-border bg-surface px-4 py-3 text-sm text-ink placeholder:text-muted/70 focus:border-brand-600 focus:outline-none focus:ring-4 focus:ring-brand-100">{{ account.address_street or '' }}</textarea>
 
     </div></div>
           <div><div>
       <label for="address_state" class="mb-1.5 block text-sm font-medium text-ink">State <span class="text-error" aria-hidden="true">*</span></label>
-      <input id="address_state" name="address_state" type="text" value="Lagos" placeholder="e.g. Lagos"
+      <input id="address_state" name="address_state" type="text" value="{{ account.address_state or '' }}" placeholder="e.g. Lagos"
             required autocomplete="address-level1" 
             class="block w-full rounded-xl border border-border bg-surface px-4 py-3 text-sm text-ink placeholder:text-muted/70 focus:border-brand-600 focus:outline-none focus:ring-4 focus:ring-brand-100"
             >
@@ -106,7 +106,7 @@
         <div class="mt-6 grid grid-cols-1 gap-5 sm:grid-cols-2">
           <div>
       <label for="registration_number" class="mb-1.5 block text-sm font-medium text-ink">Registration number <span class="text-error" aria-hidden="true">*</span></label>
-      <input id="registration_number" name="registration_number" type="text" value="RC 1234567" placeholder="e.g. RC 1234567"
+      <input id="registration_number" name="registration_number" type="text" value="{{ organization.registration_number if organization else '' }}" placeholder="e.g. RC 1234567"
             required  
             class="block w-full rounded-xl border border-border bg-surface px-4 py-3 text-sm text-ink placeholder:text-muted/70 focus:border-brand-600 focus:outline-none focus:ring-4 focus:ring-brand-100"
             >
@@ -114,7 +114,7 @@
     </div>
           <div>
       <label for="founded_date" class="mb-1.5 block text-sm font-medium text-ink">Date founded</label>
-      <input id="founded_date" name="founded_date" type="date" value="2015-03-01" placeholder=""
+      <input id="founded_date" name="founded_date" type="date" value="{{ organization.founded_date.isoformat() if organization and organization.founded_date else '' }}" placeholder=""
 
             class="block w-full rounded-xl border border-border bg-surface px-4 py-3 text-sm text-ink placeholder:text-muted/70 focus:border-brand-600 focus:outline-none focus:ring-4 focus:ring-brand-100"
             >
@@ -122,14 +122,14 @@
     </div>
           <div class="sm:col-span-2"><div>
       <label for="website_url" class="mb-1.5 block text-sm font-medium text-ink">Website</label>
-      <input id="website_url" name="website_url" type="url" value="https://example.org" placeholder="https://"
+      <input id="website_url" name="website_url" type="url" value="{{ organization.website_url if organization else '' }}" placeholder="https://"
 
             class="block w-full rounded-xl border border-border bg-surface px-4 py-3 text-sm text-ink placeholder:text-muted/70 focus:border-brand-600 focus:outline-none focus:ring-4 focus:ring-brand-100"
             >
 
     </div></div>
           <label class="flex items-start gap-3 rounded-xl border border-border p-4 text-sm sm:col-span-2">
-            <input type="checkbox" name="tax_exempt_status" value="1" class="mt-0.5 h-4 w-4 rounded border-border text-brand-700 focus:ring-brand-200" checked>
+            <input type="checkbox" name="tax_exempt_status" value="1" class="mt-0.5 h-4 w-4 rounded border-border text-brand-700 focus:ring-brand-200" {{ 'checked' if organization and organization.tax_exempt_status else '' }}>
             <span><span class="font-semibold text-ink">We are tax-exempt</span><span class="block text-muted">You'll be asked to upload proof as part of verification.</span></span>
           </label>
         </div>

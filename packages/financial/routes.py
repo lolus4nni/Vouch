@@ -1,8 +1,5 @@
-"""Money pages: donate flow, receipts, public ledger, expenses and payouts.
-
-No database / payment gateway yet: GET renders the template, POST redirects.
-"""
-from flask import Blueprint, redirect, render_template, request, url_for
+"""Money pages: donate flow, receipts, public ledger, expenses and payouts."""
+from flask import Blueprint, flash, render_template, request
 
 
 finance = Blueprint("finance", __name__, template_folder="templates", static_folder="static")
@@ -13,8 +10,8 @@ finance = Blueprint("finance", __name__, template_folder="templates", static_fol
 @finance.route("/donate", methods=["GET", "POST"])
 def donate():
     if request.method == "POST":
-        # TODO(payments): initialise the Paystack transaction here.
-        return redirect(url_for("finance.donation_success"))
+        flash("Donations are not available until payment processing is configured.", "error")
+        return render_template("financial/donate.html"), 503
     return render_template("financial/donate.html")
 
 
@@ -51,7 +48,8 @@ def ledger():
 @finance.route("/expense_new", methods=["GET", "POST"])
 def expense_new():
     if request.method == "POST":
-        return redirect(url_for("finance.expense_detail"))
+        flash("Expense requests need secure bank-detail encryption and file storage before they can be saved.", "error")
+        return render_template("financial/expense_new.html"), 503
     return render_template("financial/expense_new.html")
 
 
