@@ -7,10 +7,21 @@ from datetime import date, datetime, timezone
 from functools import wraps
 
 from flask import Blueprint, current_app, flash, redirect, render_template, request, session, url_for
+from sqlalchemy import func, or_
 from sqlalchemy.exc import IntegrityError
 from werkzeug.security import check_password_hash, generate_password_hash
 
-from packages.models import Organization, StaffRole, User, db
+from packages.models import (
+    Campaign,
+    CampaignRevision,
+    CampaignUpdate,
+    Donation,
+    ExpenseRequest,
+    Organization,
+    User,
+    VerificationCase,
+    db,
+)
 
 
 user = Blueprint("user", __name__, template_folder="templates", static_folder="static", static_url_path="/users/static")
@@ -50,8 +61,82 @@ def how_it_works():
 
 
 @user.route("/public_profile")
-def public_profile():
-    return render_template("users/public_profile.html")
+@user.route("/public_profile/<int:user_id>")
+def public_profile(user_id=None):
+    if user_id is None:
+        profile = _signed_in_user()
+        if profile is None:
+            return redirect(url_for("user.login", next=request.path))
+    else:
+        profile = User.query.filter_by(
+            id=user_id,
+            account_status="active",
+            deleted_at=None,
+        ).first_or_404()
+
+    organization = Organization.query.filter_by(
+        owner_user_id=profile.id,
+        deleted_at=None,
+        organization_status="active",
+    ).first()
+    if organization:
+        verification_case = VerificationCase.query.filter_by(
+            subject_organization_id=organization.id,
+            status="approved",
+        ).first()
+    else:
+        verification_case = VerificationCase.query.filter_by(
+            subject_user_id=profile.id,
+            status="approved",
+        ).first()
+
+    campaign_query = Campaign.query.filter_by(
+        status="active",
+        deleted_at=None,
+    )
+    if organization:
+        campaign_query = campaign_query.filter(
+            or_(
+                Campaign.owner_user_id == profile.id,
+                Campaign.owner_organization_id == organization.id,
+            )
+        )
+    else:
+        campaign_query = campaign_query.filter_by(owner_user_id=profile.id)
+
+    public_campaigns = []
+    for campaign_record in campaign_query.order_by(Campaign.updated_at.desc()).all():
+        revision = CampaignRevision.query.filter_by(
+            campaign_id=campaign_record.id,
+            status="approved",
+        ).order_by(CampaignRevision.version_number.desc()).first()
+        if revision is None:
+            continue
+        raised_minor = (
+            db.session.query(func.coalesce(func.sum(Donation.credited_amount_minor), 0))
+            .filter(
+                Donation.campaign_id == campaign_record.id,
+                Donation.status == "succeeded",
+            )
+            .scalar()
+            or 0
+        )
+        public_campaigns.append({
+            "campaign": campaign_record,
+            "revision": revision,
+            "raised_minor": int(raised_minor),
+            "progress": min(100, round(int(raised_minor) * 100 / revision.goal_amount_minor)),
+        })
+
+    total_raised_minor = sum(item["raised_minor"] for item in public_campaigns)
+    return render_template(
+        "users/public_profile.html",
+        profile=profile,
+        organization=organization,
+        is_verified=verification_case is not None,
+        campaigns=public_campaigns,
+        total_raised_minor=total_raised_minor,
+    )
 
 
 @user.route("/pages")
@@ -124,34 +209,8 @@ def login():
         password = request.form.get("password", "")
         next_page = request.args.get("next", "")
 
-        if email == current_app.config["ADMIN_EMAIL"] and password == current_app.config["ADMIN_PASSWORD"]:
-            admin_account = User.query.filter_by(email=email).first()
-            if admin_account is None:
-                admin_account = User(
-                    email=email,
-                    password_hash=generate_password_hash(password),
-                    display_name="Vouch Admin",
-                )
-                db.session.add(admin_account)
-                db.session.flush()
-            admin_role = StaffRole.query.filter_by(
-                user_id=admin_account.id,
-                role="admin",
-                revoked_at=None,
-            ).first()
-            if admin_role is None:
-                db.session.add(
-                    StaffRole(
-                        user_id=admin_account.id,
-                        role="admin",
-                        granted_by_user_id=admin_account.id,
-                    )
-                )
-            db.session.commit()
-            session.clear()
-            session["admin_logged_in"] = True
-            session["admin_user_id"] = admin_account.id
-            return redirect(next_page if next_page.startswith("/admin") else url_for("admin.dashboard"))
+        if email == current_app.config.get("ADMIN_EMAIL", "").strip().lower():
+            return redirect(url_for("admin.login", next=next_page))
 
         account = User.query.filter_by(email=email).first()
         if account is None or not account.password_hash or not check_password_hash(account.password_hash, password):
@@ -197,7 +256,170 @@ def logout():
 @user.route("/dashboard")
 @login_required
 def dashboard():
-    return render_template("users/dashboard.html")
+    account = _signed_in_user()
+    if account is None:
+        session.clear()
+        return redirect(url_for("user.login"))
+
+    organization = Organization.query.filter_by(
+        owner_user_id=account.id,
+        deleted_at=None,
+    ).first()
+    campaign_query = Campaign.query.filter_by(deleted_at=None)
+    if organization:
+        campaign_query = campaign_query.filter(
+            or_(
+                Campaign.owner_user_id == account.id,
+                Campaign.owner_organization_id == organization.id,
+            )
+        )
+    else:
+        campaign_query = campaign_query.filter_by(owner_user_id=account.id)
+    owned_campaigns = campaign_query.order_by(Campaign.updated_at.desc()).all()
+    campaign_ids = [record.id for record in owned_campaigns]
+
+    campaign_rows = []
+    for campaign_record in owned_campaigns[:4]:
+        revision = CampaignRevision.query.filter_by(
+            campaign_id=campaign_record.id,
+        ).order_by(CampaignRevision.version_number.desc()).first()
+        if revision is None:
+            continue
+        raised_minor = (
+            db.session.query(func.coalesce(func.sum(Donation.credited_amount_minor), 0))
+            .filter(
+                Donation.campaign_id == campaign_record.id,
+                Donation.status == "succeeded",
+            )
+            .scalar()
+            or 0
+        )
+        campaign_rows.append({
+            "campaign": campaign_record,
+            "revision": revision,
+            "raised_minor": int(raised_minor),
+            "progress": min(100, round(int(raised_minor) * 100 / revision.goal_amount_minor)),
+        })
+
+    total_raised_minor = 0
+    paid_expenses_minor = 0
+    approved_expenses_minor = 0
+    expenses_in_review = 0
+    if campaign_ids:
+        total_raised_minor = (
+            db.session.query(func.coalesce(func.sum(Donation.credited_amount_minor), 0))
+            .filter(
+                Donation.campaign_id.in_(campaign_ids),
+                Donation.status == "succeeded",
+            )
+            .scalar()
+            or 0
+        )
+        paid_expenses_minor = (
+            db.session.query(func.coalesce(func.sum(ExpenseRequest.amount_minor), 0))
+            .filter(
+                ExpenseRequest.campaign_id.in_(campaign_ids),
+                ExpenseRequest.status == "paid",
+            )
+            .scalar()
+            or 0
+        )
+        approved_expenses_minor = (
+            db.session.query(func.coalesce(func.sum(ExpenseRequest.amount_minor), 0))
+            .filter(
+                ExpenseRequest.campaign_id.in_(campaign_ids),
+                ExpenseRequest.status == "approved",
+            )
+            .scalar()
+            or 0
+        )
+        expenses_in_review = ExpenseRequest.query.filter(
+            ExpenseRequest.campaign_id.in_(campaign_ids),
+            ExpenseRequest.status.in_(["submitted", "in_review"]),
+        ).count()
+
+    donations = Donation.query.filter_by(
+        donor_user_id=account.id,
+    ).order_by(Donation.created_at.desc()).limit(5).all()
+    recent_donations = []
+    for donation in donations:
+        revision = CampaignRevision.query.filter_by(
+            campaign_id=donation.campaign_id,
+            status="approved",
+        ).order_by(CampaignRevision.version_number.desc()).first()
+        recent_donations.append({
+            "donation": donation,
+            "revision": revision,
+        })
+    donation_totals = (
+        db.session.query(
+            func.coalesce(func.sum(Donation.credited_amount_minor), 0),
+            func.count(Donation.id),
+            func.count(func.distinct(Donation.campaign_id)),
+        )
+        .filter(
+            Donation.donor_user_id == account.id,
+            Donation.status == "succeeded",
+        )
+        .one()
+    )
+    supported_campaign_ids = [
+        campaign_id
+        for (campaign_id,) in db.session.query(Donation.campaign_id)
+        .filter(
+            Donation.donor_user_id == account.id,
+            Donation.status == "succeeded",
+        )
+        .distinct()
+        .all()
+    ]
+    recent_updates = []
+    if supported_campaign_ids:
+        updates = CampaignUpdate.query.filter(
+            CampaignUpdate.campaign_id.in_(supported_campaign_ids),
+            CampaignUpdate.published_at.isnot(None),
+            CampaignUpdate.deleted_at.is_(None),
+        ).order_by(CampaignUpdate.published_at.desc()).limit(5).all()
+        for update in updates:
+            revision = CampaignRevision.query.filter_by(
+                campaign_id=update.campaign_id,
+                status="approved",
+            ).order_by(CampaignRevision.version_number.desc()).first()
+            recent_updates.append({
+                "campaign_update": update,
+                "revision": revision,
+            })
+
+    verification_subject = (
+        {"subject_organization_id": organization.id}
+        if organization
+        else {"subject_user_id": account.id}
+    )
+    verification_case = VerificationCase.query.filter_by(
+        **verification_subject,
+    ).order_by(VerificationCase.submitted_at.desc()).first()
+
+    return render_template(
+        "users/dashboard.html",
+        account=account,
+        campaign_rows=campaign_rows,
+        campaign_count=len(owned_campaigns),
+        total_raised_minor=int(total_raised_minor),
+        paid_expenses_minor=int(paid_expenses_minor),
+        available_minor=max(
+            int(total_raised_minor)
+            - int(paid_expenses_minor)
+            - int(approved_expenses_minor),
+            0,
+        ),
+        expenses_in_review=expenses_in_review,
+        recent_donations=recent_donations,
+        total_given_minor=int(donation_totals[0] or 0),
+        donation_count=donation_totals[1],
+        supported_campaign_count=donation_totals[2],
+        recent_updates=recent_updates,
+        verification_status=verification_case.status if verification_case else "not_started",
+    )
 
 
 @user.route("/profile_edit", methods=["GET", "POST"])
@@ -208,15 +430,35 @@ def profile_edit():
         session.clear()
         return redirect(url_for("user.login"))
     organization = Organization.query.filter_by(owner_user_id=account.id, deleted_at=None).first()
+    verification_subject = (
+        {"subject_organization_id": organization.id}
+        if organization
+        else {"subject_user_id": account.id}
+    )
+    verification_case = VerificationCase.query.filter_by(
+        **verification_subject,
+    ).order_by(VerificationCase.submitted_at.desc()).first()
+    verification_status = verification_case.status if verification_case else "not_started"
     if request.method == "POST":
+        next_action = request.form.get("action", "save")
         avatar = request.files.get("avatar")
         if avatar and avatar.filename:
             flash("Profile photos cannot be saved until file storage is configured.", "error")
-            return render_template("users/profile_edit.html", account=account, organization=organization), 503
+            return render_template(
+                "users/profile_edit.html",
+                account=account,
+                organization=organization,
+                verification_status=verification_status,
+            ), 503
         display_name = request.form.get("display_name", "").strip()
         if not display_name:
             flash("Enter a display name.", "error")
-            return render_template("users/profile_edit.html", account=account, organization=organization), 400
+            return render_template(
+                "users/profile_edit.html",
+                account=account,
+                organization=organization,
+                verification_status=verification_status,
+            ), 400
 
         account.display_name = display_name[:120]
         account.bio = request.form.get("bio", "").strip()[:500] or None
@@ -237,7 +479,12 @@ def profile_edit():
             except ValueError:
                 flash("Enter a valid organisation founding date.", "error")
                 db.session.rollback()
-                return render_template("users/profile_edit.html", account=account, organization=organization), 400
+                return render_template(
+                    "users/profile_edit.html",
+                    account=account,
+                    organization=organization,
+                    verification_status=verification_status,
+                ), 400
             organization.tax_exempt_status = request.form.get("tax_exempt_status") == "1"
 
         try:
@@ -245,10 +492,22 @@ def profile_edit():
         except IntegrityError:
             db.session.rollback()
             flash("That organisation registration number is already in use.", "error")
-            return render_template("users/profile_edit.html", account=account, organization=organization), 400
+            return render_template(
+                "users/profile_edit.html",
+                account=account,
+                organization=organization,
+                verification_status=verification_status,
+            ), 400
         flash("Your profile was saved.", "success")
+        if next_action == "submit_verification":
+            return redirect(url_for("user.verification"))
         return redirect(url_for("user.profile_edit"))
-    return render_template("users/profile_edit.html", account=account, organization=organization)
+    return render_template(
+        "users/profile_edit.html",
+        account=account,
+        organization=organization,
+        verification_status=verification_status,
+    )
 
 
 @user.route("/settings", methods=["GET", "POST"])

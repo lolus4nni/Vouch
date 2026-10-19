@@ -16,15 +16,15 @@
   <div class="mx-auto max-w-6xl">
     <div class="mb-6 flex gap-2 overflow-x-auto text-sm font-medium">
 
-      <a href="{{ url_for('campaign.my_campaigns') }}" class="whitespace-nowrap rounded-full px-4 py-2 bg-brand-700 text-white">All</a>
+      <a href="{{ url_for('campaign.my_campaigns') }}" class="whitespace-nowrap rounded-full px-4 py-2 {{ 'bg-brand-700 text-white' if selected_status == 'all' else 'bg-surface text-slate-600 ring-1 ring-slate-200 hover:bg-background' }}">All</a>
 
-      <a href="{{ url_for('campaign.my_campaigns') }}" class="whitespace-nowrap rounded-full px-4 py-2 bg-surface text-slate-600 ring-1 ring-slate-200 hover:bg-background">Live</a>
+      <a href="{{ url_for('campaign.my_campaigns', status='live') }}" class="whitespace-nowrap rounded-full px-4 py-2 {{ 'bg-brand-700 text-white' if selected_status == 'live' else 'bg-surface text-slate-600 ring-1 ring-slate-200 hover:bg-background' }}">Live</a>
 
-      <a href="{{ url_for('campaign.my_campaigns') }}" class="whitespace-nowrap rounded-full px-4 py-2 bg-surface text-slate-600 ring-1 ring-slate-200 hover:bg-background">In review</a>
+      <a href="{{ url_for('campaign.my_campaigns', status='review') }}" class="whitespace-nowrap rounded-full px-4 py-2 {{ 'bg-brand-700 text-white' if selected_status == 'review' else 'bg-surface text-slate-600 ring-1 ring-slate-200 hover:bg-background' }}">In review</a>
 
-      <a href="{{ url_for('campaign.my_campaigns') }}" class="whitespace-nowrap rounded-full px-4 py-2 bg-surface text-slate-600 ring-1 ring-slate-200 hover:bg-background">Drafts</a>
+      <a href="{{ url_for('campaign.my_campaigns', status='drafts') }}" class="whitespace-nowrap rounded-full px-4 py-2 {{ 'bg-brand-700 text-white' if selected_status == 'drafts' else 'bg-surface text-slate-600 ring-1 ring-slate-200 hover:bg-background' }}">Drafts</a>
 
-      <a href="{{ url_for('campaign.my_campaigns') }}" class="whitespace-nowrap rounded-full px-4 py-2 bg-surface text-slate-600 ring-1 ring-slate-200 hover:bg-background">Completed</a>
+      <a href="{{ url_for('campaign.my_campaigns', status='completed') }}" class="whitespace-nowrap rounded-full px-4 py-2 {{ 'bg-brand-700 text-white' if selected_status == 'completed' else 'bg-surface text-slate-600 ring-1 ring-slate-200 hover:bg-background' }}">Completed</a>
 
     </div>
 
@@ -38,10 +38,10 @@
               <h2 class="truncate font-display text-lg font-bold text-brand-950">{{ revision.title if revision else campaign.slug }}</h2>
               <p class="mt-1 text-xs text-muted">Created {{ campaign.created_at.strftime('%d %b %Y') }}</p>
             </div>
-            <span class="rounded-full bg-brand-100 px-2.5 py-0.5 text-xs font-medium capitalize text-brand-800">{{ campaign.status }}</span>
+            <span class="rounded-full bg-brand-100 px-2.5 py-0.5 text-xs font-medium capitalize text-brand-800">{{ campaign.status|replace('_', ' ') }}</span>
           </div>
           <div class="mt-5 flex flex-wrap gap-2 border-t border-slate-100 pt-4">
-            <a href="{{ url_for('campaign.edit', campaign_id=campaign.id) }}" class="inline-flex items-center justify-center gap-2 rounded-xl bg-brand-700 px-3.5 py-2 text-xs font-semibold text-white">Edit campaign</a>
+            <a href="{{ url_for('campaign.manage', campaign_id=campaign.id) }}" class="inline-flex items-center justify-center gap-2 rounded-xl bg-brand-700 px-3.5 py-2 text-xs font-semibold text-white">Manage campaign</a>
             <a href="{{ url_for('campaign.post_update', campaign_id=campaign.id) }}" class="inline-flex items-center justify-center gap-2 rounded-xl px-3.5 py-2 text-xs font-semibold text-brand-800 hover:bg-brand-50">Post update</a>
           </div>
         </article>

@@ -1,6 +1,6 @@
 {% extends "base.html" %}
 
-{% block title %}Sign in{% endblock %}
+{% block title %}{{ "Admin sign in" if admin_login else "Sign in" }}{% endblock %}
 
 {% block body %}
     <main id="main">
@@ -15,8 +15,8 @@
         </a>
         <div>
 
-  <h2 class="font-display text-4xl font-bold leading-tight">Welcome back. Your causes missed you.</h2>
-  <p class="mt-4 max-w-md text-lg text-brand-100">Check on your campaigns, follow where your donations went, and keep the story moving.</p>
+  <h2 class="font-display text-4xl font-bold leading-tight">{{ "Admin console sign in" if admin_login else "Welcome back. Your causes missed you." }}</h2>
+  <p class="mt-4 max-w-md text-lg text-brand-100">{{ "Sign in with your administrator credentials to review campaigns, accounts and financial activity." if admin_login else "Check on your campaigns, follow where your donations went, and keep the story moving." }}</p>
 
           <ul class="mt-8 space-y-3 text-sm text-brand-100">
             <li class="flex items-center gap-3"><svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-gold-300" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 12l2 2 4-4m5.6-4A12 12 0 0112 3a12 12 0 01-8.6 3A12 12 0 003 12c0 5.6 3.8 10.3 9 11.6 5.2-1.3 9-6 9-11.6 0-1.9-.3-3.7-.4-6z"/></svg> Identity and evidence checks</li>
@@ -34,11 +34,12 @@
           <img src="{{ url_for('static', filename='images/brand/logo-dark.svg') }}" alt="Vouch" width="100" height="36" class="h-9 w-auto">
         </a>
 
-  <p class="text-xs font-semibold uppercase tracking-widest text-brand-600">Sign in</p>
-  <h1 class="mt-2 font-display text-3xl font-bold text-brand-950">Good to see you again</h1>
-  <p class="mt-2 text-sm text-muted">New here? <a href="{{ url_for('user.register') }}" class="font-semibold text-brand-700 hover:underline">Create a free account</a></p>
+  <p class="text-xs font-semibold uppercase tracking-widest text-brand-600">{{ "Administrator access" if admin_login else "Sign in" }}</p>
+  <h1 class="mt-2 font-display text-3xl font-bold text-brand-950">{{ "Admin sign in" if admin_login else "Good to see you again" }}</h1>
+  {% if not admin_login %}<p class="mt-2 text-sm text-muted">New here? <a href="{{ url_for('user.register') }}" class="font-semibold text-brand-700 hover:underline">Create a free account</a></p>{% endif %}
 
-  <form method="post" action="{{ url_for('user.login') }}" class="mt-8 space-y-5" novalidate>
+  <form method="post" action="{{ url_for('admin.login', next=request.args.get('next', '')) if admin_login else url_for('user.login') }}" class="mt-8 space-y-5" novalidate>
+    {% if admin_login %}<input type="hidden" name="csrf_token" value="{{ csrf_token }}">{% endif %}
 
     <div>
     <label for="email" class="mb-1.5 block text-sm font-medium text-ink">Email address <span class="text-error" aria-hidden="true">*</span></label>
@@ -65,7 +66,7 @@
     <button type="submit" class="inline-flex items-center justify-center gap-2 rounded-xl px-5 font-semibold transition focus:outline-none focus-visible:ring-4 disabled:cursor-not-allowed disabled:opacity-50 bg-accent text-ink shadow-sm hover:bg-accent/90 focus-visible:ring-accent/20 w-full py-3.5 text-base">Sign in</button>
   </form>
 
-  <p class="mt-8 rounded-xl bg-brand-50 p-4 text-xs leading-relaxed text-brand-900"><svg xmlns="http://www.w3.org/2000/svg" class="mr-1 inline h-4 w-4 align-text-bottom" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-12V7a4 4 0 00-8 0v2h8z"/></svg>We never ask for your password by email, phone or chat.</p>
+  <p class="mt-8 rounded-xl bg-brand-50 p-4 text-xs leading-relaxed text-brand-900"><svg xmlns="http://www.w3.org/2000/svg" class="mr-1 inline h-4 w-4 align-text-bottom" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-12V7a4 4 0 00-8 0v2h8z"/></svg>{% if admin_login %}Use the configured administrator credentials. Admin access is logged in a separate session from member access.{% else %}We never ask for your password by email, phone or chat.{% endif %}</p>
 
       </div>
     </section>

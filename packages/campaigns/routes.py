@@ -6,26 +6,63 @@ from datetime import date, datetime, timezone
 from flask import Blueprint, flash, jsonify, redirect, render_template, request, session, url_for
 from sqlalchemy import func, or_
 
-from packages.models import Campaign, CampaignRevision, CampaignReport, CampaignUpdate, Category, Currency, Donation, User, VerificationCase, db
+from packages.models import (
+    Campaign,
+    CampaignEvidence,
+    CampaignReport,
+    CampaignReview,
+    CampaignRevision,
+    CampaignUpdate,
+    Category,
+    Currency,
+    Donation,
+    ExpenseRequest,
+    Organization,
+    User,
+    VerificationCase,
+    db,
+)
 
 campaign = Blueprint("campaign", __name__, template_folder="templates", static_folder="static")
 
 
 def _campaign_search():
     """Return active, approved campaigns matching the current search filters."""
+    latest_approved_version = (
+        db.session.query(func.max(CampaignRevision.version_number))
+        .filter(
+            CampaignRevision.campaign_id == Campaign.id,
+            CampaignRevision.status == "approved",
+        )
+        .correlate(Campaign)
+        .scalar_subquery()
+    )
     raised = (
         db.session.query(func.coalesce(func.sum(Donation.credited_amount_minor), 0))
         .filter(Donation.campaign_id == Campaign.id, Donation.status == "succeeded")
         .correlate(Campaign)
         .scalar_subquery()
     )
+    verified = db.session.query(VerificationCase.id).filter(
+        VerificationCase.status == "approved",
+        or_(
+            VerificationCase.subject_user_id == Campaign.owner_user_id,
+            VerificationCase.subject_organization_id == Campaign.owner_organization_id,
+        ),
+    ).exists()
     query = (
-        db.session.query(CampaignRevision, Campaign, raised.label("raised_minor"))
+        db.session.query(
+            CampaignRevision,
+            Campaign,
+            raised.label("raised_minor"),
+            verified.label("is_verified"),
+        )
         .join(Campaign, Campaign.id == CampaignRevision.campaign_id)
         .filter(
             Campaign.status == "active",
             Campaign.deleted_at.is_(None),
             CampaignRevision.status == "approved",
+            CampaignRevision.version_number == latest_approved_version,
         )
     )
 
@@ -43,14 +80,7 @@ def _campaign_search():
     if category_id:
         query = query.filter(CampaignRevision.category_id == category_id)
     if request.args.get("verified") == "1":
-        query = query.filter(
-            db.session.query(VerificationCase.id)
-            .filter(
-                VerificationCase.subject_user_id == Campaign.owner_user_id,
-                VerificationCase.status == "approved",
-            )
-            .exists()
-        )
+        query = query.filter(verified)
 
     if sort == "ending":
         query = query.order_by(CampaignRevision.end_date.asc())
@@ -73,8 +103,9 @@ def _campaign_json(results):
             "category": revision.category.name,
             "goal_minor": revision.goal_amount_minor,
             "raised_minor": int(raised_minor or 0),
+            "verified": bool(is_verified),
         }
-        for revision, campaign_record, raised_minor in results
+        for revision, campaign_record, raised_minor, is_verified in results
     ]
 
 
@@ -155,12 +186,124 @@ def search():
 
 @campaign.route("/detail")
 def detail():
-    return render_template("campaigns/detail.html")
+    slug = request.args.get("slug", "").strip()
+    if not slug:
+        return redirect(url_for("campaign.explore"))
+
+    campaign_record = Campaign.query.filter_by(
+        slug=slug,
+        status="active",
+        deleted_at=None,
+    ).first_or_404()
+    revision = CampaignRevision.query.filter_by(
+        campaign_id=campaign_record.id,
+        status="approved",
+    ).order_by(CampaignRevision.version_number.desc()).first_or_404()
+
+    owner_organization = campaign_record.owner_organization
+    organizer = campaign_record.owner_user or (
+        owner_organization.owner if owner_organization else None
+    )
+    organization = owner_organization
+    if organization and (
+        organization.organization_status != "active"
+        or organization.deleted_at is not None
+    ):
+        organization = None
+
+    verification_filter = (
+        {"subject_organization_id": owner_organization.id}
+        if owner_organization
+        else {"subject_user_id": campaign_record.owner_user_id}
+    )
+    verified = VerificationCase.query.filter_by(
+        **verification_filter,
+        status="approved",
+    ).first() is not None
+
+    donations = Donation.query.filter_by(
+        campaign_id=campaign_record.id,
+        status="succeeded",
+    )
+    raised_minor = db.session.query(
+        func.coalesce(func.sum(Donation.credited_amount_minor), 0)
+    ).filter(
+        Donation.campaign_id == campaign_record.id,
+        Donation.status == "succeeded",
+    ).scalar() or 0
+    donor_count = donations.count()
+    recent_donations = donations.order_by(Donation.created_at.desc()).limit(12).all()
+
+    expenses = ExpenseRequest.query.filter_by(
+        campaign_id=campaign_record.id,
+        status="paid",
+    ).order_by(ExpenseRequest.submitted_at.desc()).all()
+    paid_minor = sum(expense.amount_minor for expense in expenses)
+    approved_minor = db.session.query(
+        func.coalesce(func.sum(ExpenseRequest.amount_minor), 0)
+    ).filter(
+        ExpenseRequest.campaign_id == campaign_record.id,
+        ExpenseRequest.status == "approved",
+    ).scalar() or 0
+    updates = CampaignUpdate.query.filter_by(
+        campaign_id=campaign_record.id,
+        deleted_at=None,
+    ).filter(
+        CampaignUpdate.published_at.isnot(None),
+    ).order_by(CampaignUpdate.published_at.desc()).all()
+    evidence = CampaignEvidence.query.filter_by(
+        campaign_id=campaign_record.id,
+        visibility="approved_public",
+    ).order_by(CampaignEvidence.created_at.desc()).all()
+    review = CampaignReview.query.filter_by(
+        revision_id=revision.id,
+        decision="approved",
+    ).order_by(CampaignReview.decided_at.desc()).first()
+
+    progress = min(100, round(int(raised_minor) * 100 / revision.goal_amount_minor))
+    days_left = (
+        max((revision.end_date - date.today()).days, 0)
+        if revision.end_date
+        else None
+    )
+    return render_template(
+        "campaigns/detail.html",
+        campaign=campaign_record,
+        revision=revision,
+        organizer=organizer,
+        organization=organization,
+        verified=verified,
+        raised_minor=int(raised_minor),
+        paid_minor=paid_minor,
+        available_minor=max(int(raised_minor) - paid_minor - int(approved_minor), 0),
+        progress=progress,
+        days_left=days_left,
+        donor_count=donor_count,
+        recent_donations=recent_donations,
+        expenses=expenses,
+        updates=updates,
+        evidence=evidence,
+        review=review,
+    )
 
 
 @campaign.route("/report", methods=["GET", "POST"])
 def report():
     campaigns = Campaign.query.filter_by(status="active", deleted_at=None).all()
+    selected_campaign_id = request.args.get("campaign_id", type=int)
+    campaign_by_id = {record.id: record for record in campaigns}
+    selected_campaign = campaign_by_id.get(selected_campaign_id)
+    if selected_campaign is None:
+        selected_campaign_id = None
+    campaign_titles = {}
+    for campaign_record in campaigns:
+        revision = CampaignRevision.query.filter_by(
+            campaign_id=campaign_record.id,
+            status="approved",
+        ).order_by(CampaignRevision.version_number.desc()).first()
+        campaign_titles[campaign_record.id] = (
+            revision.title if revision else campaign_record.slug
+        )
     if request.method == "POST":
         campaign_record = db.session.get(Campaign, request.form.get("campaign_id", type=int))
         reason = request.form.get("reason", "")
@@ -174,8 +317,17 @@ def report():
             or not reporter_email
             or "@" not in reporter_email
         ):
+            selected_campaign = campaign_by_id.get(
+                campaign_record.id if campaign_record else None
+            )
             flash("Choose an active campaign and explain the concern.", "error")
-            return render_template("campaigns/report.html", campaigns=campaigns), 400
+            return render_template(
+                "campaigns/report.html",
+                campaigns=campaigns,
+                campaign_titles=campaign_titles,
+                selected_campaign_id=selected_campaign.id if selected_campaign else None,
+                selected_campaign=selected_campaign,
+            ), 400
         db.session.add(
             CampaignReport(
                 campaign_id=campaign_record.id,
@@ -188,7 +340,13 @@ def report():
         db.session.commit()
         flash("Thank you. Your report has been sent for review.", "success")
         return redirect(url_for("campaign.explore"))
-    return render_template("campaigns/report.html", campaigns=campaigns)
+    return render_template(
+        "campaigns/report.html",
+        campaigns=campaigns,
+        campaign_titles=campaign_titles,
+        selected_campaign_id=selected_campaign_id,
+        selected_campaign=selected_campaign,
+    )
 
 
 # ---------- Campaigner ----------
@@ -251,17 +409,80 @@ def my_campaigns():
     account = _signed_in_user()
     if account is None:
         return redirect(url_for("user.login", next=request.path))
-    records = (
-        Campaign.query.filter_by(owner_user_id=account.id, deleted_at=None)
-        .order_by(Campaign.created_at.desc())
-        .all()
+    selected_status = request.args.get("status", "all")
+    records_query = Campaign.query.filter_by(owner_user_id=account.id, deleted_at=None)
+    status_filters = {
+        "live": "active",
+        "review": "submitted",
+        "drafts": "draft",
+        "completed": "closed",
+    }
+    if selected_status in status_filters:
+        records_query = records_query.filter_by(status=status_filters[selected_status])
+    else:
+        selected_status = "all"
+    records = records_query.order_by(Campaign.created_at.desc()).all()
+    return render_template(
+        "campaigns/my_campaigns.html",
+        campaigns=records,
+        selected_status=selected_status,
     )
-    return render_template("campaigns/my_campaigns.html", campaigns=records)
 
 
 @campaign.route("/manage")
 def manage():
-    return render_template("campaigns/manage.html")
+    account = _signed_in_user()
+    if account is None:
+        return redirect(url_for("user.login", next=request.full_path))
+    campaign_id = request.args.get("campaign_id", type=int)
+    campaign_record = _campaign_for_owner(campaign_id, account.id) if campaign_id else None
+    if campaign_record is None:
+        flash("Choose one of your campaigns to manage.", "error")
+        return redirect(url_for("campaign.my_campaigns"))
+
+    revision = CampaignRevision.query.filter_by(
+        campaign_id=campaign_record.id,
+    ).order_by(CampaignRevision.version_number.desc()).first()
+    if revision is None:
+        flash("This campaign has no saved details yet.", "error")
+        return redirect(url_for("campaign.my_campaigns"))
+    raised_minor = db.session.query(
+        func.coalesce(func.sum(Donation.credited_amount_minor), 0)
+    ).filter(
+        Donation.campaign_id == campaign_record.id,
+        Donation.status == "succeeded",
+    ).scalar() or 0
+    expenses = ExpenseRequest.query.filter_by(
+        campaign_id=campaign_record.id,
+    ).order_by(ExpenseRequest.submitted_at.desc()).all()
+    paid_minor = sum(
+        expense.amount_minor for expense in expenses if expense.status == "paid"
+    )
+    committed_minor = sum(
+        expense.amount_minor
+        for expense in expenses
+        if expense.status in {"approved", "paid"}
+    )
+    updates = CampaignUpdate.query.filter_by(
+        campaign_id=campaign_record.id,
+        deleted_at=None,
+    ).order_by(CampaignUpdate.created_at.desc()).all()
+    donations = Donation.query.filter_by(
+        campaign_id=campaign_record.id,
+        status="succeeded",
+    ).order_by(Donation.created_at.desc()).limit(10).all()
+    return render_template(
+        "campaigns/manage.html",
+        campaign=campaign_record,
+        revision=revision,
+        raised_minor=int(raised_minor),
+        paid_minor=paid_minor,
+        available_minor=max(int(raised_minor) - committed_minor, 0),
+        progress=min(100, round(int(raised_minor) * 100 / revision.goal_amount_minor)),
+        expenses=expenses,
+        updates=updates,
+        donations=donations,
+    )
 
 
 @campaign.route("/edit", methods=["GET", "POST"])
@@ -282,20 +503,41 @@ def edit():
     if revision is None:
         flash("This campaign has no editable draft.", "error")
         return redirect(url_for("campaign.my_campaigns"))
+    review = CampaignReview.query.filter_by(
+        revision_id=revision.id,
+    ).order_by(CampaignReview.decided_at.desc()).first()
     categories = Category.query.filter_by(is_active=True).order_by(Category.name).all()
     if request.method == "POST":
         cover = request.files.get("cover")
         if cover and cover.filename:
             flash("Campaign images cannot be saved until file storage is configured.", "error")
-            return render_template("campaigns/edit.html", campaign=campaign_record, revision=revision, categories=categories), 503
+            return render_template(
+                "campaigns/edit.html",
+                campaign=campaign_record,
+                revision=revision,
+                categories=categories,
+                review=review,
+            ), 503
         values, error = _campaign_form_values()
         action = request.form.get("action", "save")
         if error:
             flash(error, "error")
-            return render_template("campaigns/edit.html", campaign=campaign_record, revision=revision, categories=categories), 400
+            return render_template(
+                "campaigns/edit.html",
+                campaign=campaign_record,
+                revision=revision,
+                categories=categories,
+                review=review,
+            ), 400
         if action not in {"save", "submit"}:
             flash("Choose whether to save or submit the campaign.", "error")
-            return render_template("campaigns/edit.html", campaign=campaign_record, revision=revision, categories=categories), 400
+            return render_template(
+                "campaigns/edit.html",
+                campaign=campaign_record,
+                revision=revision,
+                categories=categories,
+                review=review,
+            ), 400
         if revision.status in {"approved", "rejected", "superseded"}:
             revision = CampaignRevision(
                 campaign_id=campaign_record.id,
@@ -316,7 +558,13 @@ def edit():
         db.session.commit()
         flash("Your campaign changes were saved.", "success")
         return redirect(url_for("campaign.edit", campaign_id=campaign_record.id))
-    return render_template("campaigns/edit.html", campaign=campaign_record, revision=revision, categories=categories)
+    return render_template(
+        "campaigns/edit.html",
+        campaign=campaign_record,
+        revision=revision,
+        categories=categories,
+        review=review,
+    )
 
 
 @campaign.route("/evidence", methods=["GET", "POST"])
@@ -354,5 +602,5 @@ def post_update():
         )
         db.session.commit()
         flash("Your campaign update was published.", "success")
-        return redirect(url_for("campaign.my_campaigns"))
+        return redirect(url_for("campaign.manage", campaign_id=campaign_record.id))
     return render_template("campaigns/post_update.html", campaign=campaign_record)

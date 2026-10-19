@@ -1,9 +1,9 @@
 import os
 
-from flask import Flask
+from flask import Flask, session
 from flask_migrate import Migrate
 
-from packages.models import db
+from packages.models import User, db
 from packages.config import DevelopmentConfig
 
 from dotenv import load_dotenv
@@ -21,6 +21,17 @@ def create_app(config_object=None):
     app = Flask(__name__)
     app.config.from_object(config_object or DevelopmentConfig)
 
+    @app.context_processor
+    def inject_signed_in_account():
+        user_id = (
+            session.get("admin_user_id")
+            if session.get("admin_logged_in")
+            else session.get("user_id")
+        )
+        account = db.session.get(User, user_id) if user_id else None
+        if account and (account.account_status != "active" or account.deleted_at is not None):
+            account = None
+        return {"signed_in_account": account}
 
     db.init_app(app)
 

@@ -5,60 +5,65 @@
 {% block topbar %}
   <div class="min-w-0 flex-1">
     <h1 class="truncate font-display text-xl font-bold text-brand-950 sm:text-2xl">Donations monitor</h1>
-    <p class="hidden truncate text-sm text-slate-500 sm:block">Every payment, with its gateway reference.</p>
+    <p class="hidden truncate text-sm text-slate-500 sm:block">Donation records and payment-provider status.</p>
   </div>
-  <div class="flex items-center gap-2"></div>
-
 {% endblock %}
 
 {% block content %}
   <main id="main" class="flex-1 px-4 py-6 sm:px-6 lg:py-8">
-  <div class="mx-auto max-w-6xl space-y-6">
-    <div class="grid grid-cols-1 gap-4 sm:grid-cols-3">
-      <div class="rounded-2xl border border-slate-200 bg-white shadow-sm p-5">
-    <p class="text-xs font-medium uppercase tracking-wide text-slate-500">Gross volume</p>
-    <p class="mt-2 font-display text-3xl font-bold text-brand-800">₦12.4M</p>
+    <div class="mx-auto max-w-6xl space-y-6">
+      <section class="grid grid-cols-1 gap-4 sm:grid-cols-3" aria-label="Donation totals">
+        <div class="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
+          <p class="text-xs font-medium uppercase tracking-wide text-slate-500">Successful gross volume</p>
+          <p class="mt-2 font-display text-3xl font-bold text-brand-800">₦{{ '{:,.2f}'.format(gross_total / 100) }}</p>
+        </div>
+        <div class="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
+          <p class="text-xs font-medium uppercase tracking-wide text-slate-500">Recorded provider fees</p>
+          <p class="mt-2 font-display text-3xl font-bold text-gold-600">₦{{ '{:,.2f}'.format(fee_total / 100) }}</p>
+        </div>
+        <div class="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
+          <p class="text-xs font-medium uppercase tracking-wide text-slate-500">Donation records</p>
+          <p class="mt-2 font-display text-3xl font-bold text-slate-900">{{ donation_count }}</p>
+        </div>
+      </section>
 
-  </div>
-      <div class="rounded-2xl border border-slate-200 bg-white shadow-sm p-5">
-    <p class="text-xs font-medium uppercase tracking-wide text-slate-500">Platform fees</p>
-    <p class="mt-2 font-display text-3xl font-bold text-gold-600">₦620K</p>
+      <nav class="flex flex-wrap gap-2 text-sm font-medium" aria-label="Donation status filter">
+        {% for status, label in [('all', 'All'), ('succeeded', 'Successful'), ('pending', 'Pending'), ('failed', 'Failed'), ('refunded', 'Refunded'), ('partially_refunded', 'Partially refunded'), ('disputed', 'Disputed')] %}
+          <a href="{{ url_for('admin.donations', status=status) }}" class="whitespace-nowrap rounded-full px-4 py-2 {{ 'bg-brand-700 text-white' if selected_status == status else 'bg-white text-slate-600 ring-1 ring-slate-200 hover:bg-slate-50' }}">{{ label }}</a>
+        {% endfor %}
+      </nav>
 
-  </div>
-      <div class="rounded-2xl border border-slate-200 bg-white shadow-sm p-5">
-    <p class="text-xs font-medium uppercase tracking-wide text-slate-500">Donations</p>
-    <p class="mt-2 font-display text-3xl font-bold text-slate-900">842</p>
-
-  </div>
+      <div class="overflow-x-auto rounded-2xl border border-slate-200 bg-white shadow-sm">
+        <table class="min-w-full divide-y divide-slate-200">
+          <thead class="bg-slate-50"><tr>
+            <th class="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide text-slate-500">When</th>
+            <th class="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide text-slate-500">Donor</th>
+            <th class="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide text-slate-500">Campaign</th>
+            <th class="px-4 py-3 text-right text-xs font-semibold uppercase tracking-wide text-slate-500">Amount</th>
+            <th class="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide text-slate-500">Provider</th>
+            <th class="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide text-slate-500">Reference</th>
+            <th class="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide text-slate-500">Status</th>
+          </tr></thead>
+          <tbody class="divide-y divide-slate-100">
+            {% for donation in donations %}
+              {% set attempt = latest_attempts.get(donation.id) %}
+              {% set revision = donation.campaign.revisions|sort(attribute='version_number', reverse=true)|first if donation.campaign.revisions else none %}
+              <tr class="hover:bg-slate-50">
+                <td class="whitespace-nowrap px-4 py-3.5 text-sm text-slate-700">{{ donation.created_at.strftime('%d %b %Y, %H:%M') }}</td>
+                <td class="px-4 py-3.5 text-sm text-slate-700">{{ donation.donor.display_name if donation.donor else ('Anonymous donor' if donation.is_anonymous else donation.guest_email or 'Guest donor') }}</td>
+                <td class="max-w-[14rem] truncate px-4 py-3.5 text-sm text-slate-700">{{ revision.title if revision else donation.campaign.slug }}</td>
+                <td class="whitespace-nowrap px-4 py-3.5 text-right text-sm font-semibold text-slate-700">{{ donation.campaign_currency_code }} {{ '{:,.2f}'.format(donation.intended_amount_minor / 100) }}</td>
+                <td class="px-4 py-3.5 text-sm capitalize text-slate-700">{{ attempt.provider if attempt else 'Not started' }}</td>
+                <td class="px-4 py-3.5 font-mono text-xs text-slate-700">{{ attempt.provider_reference if attempt and attempt.provider_reference else donation.receipt_id }}</td>
+                <td class="px-4 py-3.5 text-sm capitalize text-slate-700">{{ donation.status.replace('_', ' ') }}</td>
+              </tr>
+            {% else %}
+              <tr><td colspan="7" class="px-4 py-8 text-center text-sm text-slate-500">No donation records match this filter.</td></tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+      <p class="text-sm text-slate-500">Showing up to 100 records. Payment status comes from the stored donation record; no payment is initiated from this page.</p>
     </div>
-    <div class="flex gap-2 overflow-x-auto text-sm font-medium">
-      <a href="{{ url_for('admin.donations') }}" class="whitespace-nowrap rounded-full px-4 py-2 bg-brand-700 text-white">All</a>
-      <a href="{{ url_for('admin.donations') }}" class="whitespace-nowrap rounded-full px-4 py-2 bg-white text-slate-600 ring-1 ring-slate-200 hover:bg-slate-50">Successful</a>
-      <a href="{{ url_for('admin.donations') }}" class="whitespace-nowrap rounded-full px-4 py-2 bg-white text-slate-600 ring-1 ring-slate-200 hover:bg-slate-50">Pending</a>
-      <a href="{{ url_for('admin.donations') }}" class="whitespace-nowrap rounded-full px-4 py-2 bg-white text-slate-600 ring-1 ring-slate-200 hover:bg-slate-50">Failed</a>
-      <a href="{{ url_for('admin.donations') }}" class="whitespace-nowrap rounded-full px-4 py-2 bg-white text-slate-600 ring-1 ring-slate-200 hover:bg-slate-50">Refunded</a></div>
-
-    <div class="rounded-2xl border border-slate-200 bg-white shadow-sm overflow-hidden"><div class="relative overflow-x-auto"><table class="min-w-full divide-y divide-slate-200">
-      <thead class="bg-slate-50"><tr><th class="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide text-slate-500">When</th><th class="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide text-slate-500">Donor</th><th class="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide text-slate-500">Campaign</th><th class="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide text-slate-500 text-right">Gross</th><th class="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide text-slate-500 text-right">Fee</th><th class="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide text-slate-500">Gateway</th><th class="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide text-slate-500">Reference</th><th class="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide text-slate-500">Status</th></tr></thead>
-      <tbody class="divide-y divide-slate-100 bg-white">
-        <tr class="hover:bg-slate-50"><td class="px-4 py-3.5 text-sm text-slate-700 whitespace-nowrap">09 Oct, 06:11</td><td class="px-4 py-3.5 text-sm text-slate-700">Amaka Obi</td>
-          <td class="px-4 py-3.5 text-sm text-slate-700 max-w-[12rem] truncate">Help Ada walk again: spinal surgery fund</td><td class="px-4 py-3.5 text-sm text-slate-700 text-right font-semibold">₦25,000</td><td class="px-4 py-3.5 text-sm text-slate-700 text-right">₦1,250</td><td class="px-4 py-3.5 text-sm text-slate-700 capitalize">paystack</td>
-          <td class="px-4 py-3.5 text-slate-700 font-mono text-xs">DON_29dk3j</td><td class="px-4 py-3.5 text-sm text-slate-700"><span class="inline-flex items-center gap-1 rounded-full px-2.5 py-0.5 text-xs font-medium bg-progress/10 text-progress">Successful</span></td></tr><tr class="hover:bg-slate-50"><td class="px-4 py-3.5 text-sm text-slate-700 whitespace-nowrap">09 Oct, 06:11</td><td class="px-4 py-3.5 text-sm text-slate-700">Amaka Obi</td>
-          <td class="px-4 py-3.5 text-sm text-slate-700 max-w-[12rem] truncate">Help Ada walk again: spinal surgery fund</td><td class="px-4 py-3.5 text-sm text-slate-700 text-right font-semibold">₦25,000</td><td class="px-4 py-3.5 text-sm text-slate-700 text-right">₦1,250</td><td class="px-4 py-3.5 text-sm text-slate-700 capitalize">paystack</td>
-          <td class="px-4 py-3.5 text-slate-700 font-mono text-xs">DON_29dk3j</td><td class="px-4 py-3.5 text-sm text-slate-700"><span class="inline-flex items-center gap-1 rounded-full px-2.5 py-0.5 text-xs font-medium bg-progress/10 text-progress">Successful</span></td></tr>
-      </tbody></table></div></div>
-
-  <nav class="mt-10 flex items-center justify-center gap-1" aria-label="Pagination">
-
-        <a href="{{ url_for('admin.donations') }}" class="grid h-9 w-9 place-items-center rounded-lg text-sm font-medium bg-brand-700 text-white" aria-current="page">1</a>
-
-        <a href="{{ url_for('admin.donations') }}" class="grid h-9 w-9 place-items-center rounded-lg text-sm font-medium text-slate-600 hover:bg-brand-50" >2</a>
-
-        <a href="{{ url_for('admin.donations') }}" class="grid h-9 w-9 place-items-center rounded-lg text-sm font-medium text-slate-600 hover:bg-brand-50" >3</a>
-
-    <a class="inline-flex items-center justify-center gap-2 rounded-xl font-semibold transition focus:outline-none focus-visible:ring-4 disabled:cursor-not-allowed disabled:opacity-50 border border-slate-300 bg-white text-slate-700 hover:bg-slate-50 focus-visible:ring-slate-200 px-3.5 py-2 text-xs" href="{{ url_for('admin.donations') }}">Next</a>
-  </nav>
-
-  </div>
   </main>
 {% endblock %}

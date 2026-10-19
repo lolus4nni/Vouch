@@ -5,54 +5,84 @@
 {% block topbar %}
   <div class="min-w-0 flex-1">
     <h1 class="truncate font-display text-xl font-bold text-brand-950 sm:text-2xl">Payouts</h1>
-    <p class="hidden truncate text-sm text-slate-500 sm:block">Send approved expenses straight to recipients.</p>
+    <p class="hidden truncate text-sm text-slate-500 sm:block">Review approved requests and recorded payout history.</p>
   </div>
-  <div class="flex items-center gap-2"></div>
-
 {% endblock %}
 
 {% block content %}
   <main id="main" class="flex-1 px-4 py-6 sm:px-6 lg:py-8">
-  <div class="mx-auto max-w-6xl space-y-10">
-    <section>
-      <h2 class="mb-4 font-display text-xl font-bold text-brand-950">Ready to send (1)</h2>
+    <div class="mx-auto max-w-6xl space-y-8">
+      <p class="rounded-2xl border border-gold-200 bg-gold-50 p-4 text-sm text-gold-800">
+        Payouts cannot be sent until a payment provider is configured. This page only displays saved records.
+      </p>
 
-      <div class="rounded-2xl border border-slate-200 bg-white shadow-sm overflow-hidden"><div class="relative overflow-x-auto"><table class="min-w-full divide-y divide-slate-200">
-        <thead class="bg-slate-50"><tr><th class="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide text-slate-500">Expense</th><th class="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide text-slate-500">Recipient</th><th class="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide text-slate-500">Bank</th><th class="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide text-slate-500 text-right">Amount</th><th class="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide text-slate-500"></th></tr></thead>
-        <tbody class="divide-y divide-slate-100 bg-white">
+      <section>
+        <h2 class="mb-4 font-display text-xl font-bold text-brand-950">Approved expenses awaiting payout ({{ approved_expenses|length }})</h2>
+        <div class="overflow-x-auto rounded-2xl border border-slate-200 bg-white shadow-sm">
+          <table class="min-w-full divide-y divide-slate-200">
+            <thead class="bg-slate-50"><tr>
+              <th class="px-4 py-3 text-left text-xs font-semibold uppercase text-slate-500">Expense</th>
+              <th class="px-4 py-3 text-left text-xs font-semibold uppercase text-slate-500">Recipient</th>
+              <th class="px-4 py-3 text-left text-xs font-semibold uppercase text-slate-500">Provider</th>
+              <th class="px-4 py-3 text-right text-xs font-semibold uppercase text-slate-500">Amount</th>
+              <th class="px-4 py-3"></th>
+            </tr></thead>
+            <tbody class="divide-y divide-slate-100">
+              {% for expense in approved_expenses %}
+                {% set revision = expense.campaign.revisions|sort(attribute='version_number', reverse=true)|first if expense.campaign.revisions else none %}
+                <tr>
+                  <td class="px-4 py-3.5 text-sm text-slate-700">
+                    <p class="font-medium text-slate-900">{{ expense.title }}</p>
+                    <p class="max-w-xs truncate text-xs text-slate-500">{{ revision.title if revision else expense.campaign.slug }}</p>
+                  </td>
+                  <td class="px-4 py-3.5 text-sm text-slate-700">{{ expense.recipient.display_name }}</td>
+                  <td class="px-4 py-3.5 text-sm capitalize text-slate-700">{{ expense.recipient.provider }}</td>
+                  <td class="whitespace-nowrap px-4 py-3.5 text-right text-sm font-semibold text-slate-700">{{ expense.currency_code }} {{ '{:,.2f}'.format(expense.amount_minor / 100) }}</td>
+                  <td class="px-4 py-3.5 text-right"><a href="{{ url_for('admin.expense_review', expense_id=expense.id) }}" class="rounded-xl border border-slate-300 bg-white px-3.5 py-2 text-xs font-semibold text-slate-700">Review</a></td>
+                </tr>
+              {% else %}
+                <tr><td colspan="5" class="px-4 py-8 text-center text-sm text-slate-500">No approved expenses are waiting for payout.</td></tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+      </section>
 
-          <tr><td class="px-4 py-3.5 text-sm text-slate-700"><a href="{{ url_for('admin.expense_review') }}" class="font-medium text-slate-900 hover:text-brand-700">Hospital admission deposit</a><p class="max-w-xs truncate text-xs text-slate-500">Help Ada walk again: spinal surgery fund</p></td>
-            <td class="px-4 py-3.5 text-sm text-slate-700">Lagos City Hospital</td><td class="px-4 py-3.5 text-slate-700 font-mono text-xs">0123456789 · 058</td><td class="px-4 py-3.5 text-sm text-slate-700 text-right font-semibold">₦450,000</td>
-            <td class="px-4 py-3.5 text-sm text-slate-700 text-right"><form action="{{ url_for('admin.disbursals') }}" method="post" onsubmit="return confirm('Send 450000 NGN to Lagos City Hospital? This cannot be undone.');"><button class="inline-flex items-center justify-center gap-2 rounded-xl font-semibold transition focus:outline-none focus-visible:ring-4 disabled:cursor-not-allowed disabled:opacity-50 bg-gold-400 text-brand-950 shadow-sm hover:bg-accent-600 focus-visible:ring-accent-200 px-3.5 py-2 text-xs"><svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 10l9-6 9 6M5 10v8m4-8v8m6-8v8m4-8v8M3 21h18"/></svg> Send payout</button></form></td></tr>
-
-        </tbody></table></div></div>
-      <p class="mt-2 text-xs text-slate-500">The gateway transfer fee is deducted and recorded as <code>disbursal_fee</code>; the recipient receives <code>net_disbursed</code>.</p>
-
-    </section>
-
-    <section>
-      <h2 class="mb-4 font-display text-xl font-bold text-brand-950">History</h2>
-
-      <div class="rounded-2xl border border-slate-200 bg-white shadow-sm overflow-hidden"><div class="relative overflow-x-auto"><table class="min-w-full divide-y divide-slate-200">
-        <thead class="bg-slate-50"><tr><th class="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide text-slate-500">Processed</th><th class="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide text-slate-500">Expense</th><th class="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide text-slate-500 text-right">Disbursed</th><th class="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide text-slate-500 text-right">Fee</th><th class="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide text-slate-500 text-right">Net</th><th class="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide text-slate-500">Reference</th><th class="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide text-slate-500">Status</th></tr></thead>
-        <tbody class="divide-y divide-slate-100 bg-white">
-          <tr><td class="px-4 py-3.5 text-sm text-slate-700 whitespace-nowrap">09 Oct, 06:11</td><td class="px-4 py-3.5 text-sm text-slate-700 max-w-[14rem] truncate">Hospital admission deposit</td>
-            <td class="px-4 py-3.5 text-sm text-slate-700 text-right">₦450,000</td><td class="px-4 py-3.5 text-sm text-slate-700 text-right">₦100</td><td class="px-4 py-3.5 text-sm text-slate-700 text-right font-semibold">₦449,900</td>
-            <td class="px-4 py-3.5 text-slate-700 font-mono text-xs">TRF_8hs72kd9</td><td class="px-4 py-3.5 text-sm text-slate-700"><span class="inline-flex items-center gap-1 rounded-full px-2.5 py-0.5 text-xs font-medium bg-progress/10 text-progress">Completed</span></td></tr>
-        </tbody></table></div></div>
-
-  <nav class="mt-10 flex items-center justify-center gap-1" aria-label="Pagination">
-
-        <a href="{{ url_for('admin.disbursals') }}" class="grid h-9 w-9 place-items-center rounded-lg text-sm font-medium bg-brand-700 text-white" aria-current="page">1</a>
-
-        <a href="{{ url_for('admin.disbursals') }}" class="grid h-9 w-9 place-items-center rounded-lg text-sm font-medium text-slate-600 hover:bg-brand-50" >2</a>
-
-        <a href="{{ url_for('admin.disbursals') }}" class="grid h-9 w-9 place-items-center rounded-lg text-sm font-medium text-slate-600 hover:bg-brand-50" >3</a>
-
-    <a class="inline-flex items-center justify-center gap-2 rounded-xl font-semibold transition focus:outline-none focus-visible:ring-4 disabled:cursor-not-allowed disabled:opacity-50 border border-slate-300 bg-white text-slate-700 hover:bg-slate-50 focus-visible:ring-slate-200 px-3.5 py-2 text-xs" href="{{ url_for('admin.disbursals') }}">Next</a>
-  </nav>
-
-    </section>
-  </div>
+      <section>
+        <h2 class="mb-4 font-display text-xl font-bold text-brand-950">Payout history</h2>
+        <div class="overflow-x-auto rounded-2xl border border-slate-200 bg-white shadow-sm">
+          <table class="min-w-full divide-y divide-slate-200">
+            <thead class="bg-slate-50"><tr>
+              <th class="px-4 py-3 text-left text-xs font-semibold uppercase text-slate-500">Created</th>
+              <th class="px-4 py-3 text-left text-xs font-semibold uppercase text-slate-500">Expense</th>
+              <th class="px-4 py-3 text-left text-xs font-semibold uppercase text-slate-500">Recipient</th>
+              <th class="px-4 py-3 text-right text-xs font-semibold uppercase text-slate-500">Amount</th>
+              <th class="px-4 py-3 text-left text-xs font-semibold uppercase text-slate-500">Provider reference</th>
+              <th class="px-4 py-3 text-left text-xs font-semibold uppercase text-slate-500">Status</th>
+            </tr></thead>
+            <tbody class="divide-y divide-slate-100">
+              {% for disbursement in disbursements %}
+                <tr>
+                  <td class="whitespace-nowrap px-4 py-3.5 text-sm text-slate-700">{{ disbursement.created_at.strftime('%d %b %Y, %H:%M') }}</td>
+                  <td class="px-4 py-3.5 text-sm text-slate-700">{{ disbursement.expense_request.title }}</td>
+                  <td class="px-4 py-3.5 text-sm text-slate-700">{{ disbursement.recipient.display_name }}</td>
+                  <td class="whitespace-nowrap px-4 py-3.5 text-right text-sm text-slate-700">{{ disbursement.currency_code }} {{ '{:,.2f}'.format(disbursement.amount_minor / 100) }}</td>
+                  <td class="px-4 py-3.5 font-mono text-xs text-slate-700">
+                    {% for attempt in disbursement.attempts %}
+                      {% if attempt.provider_reference %}{{ attempt.provider_reference }}{% else %}{{ attempt.status }}{% endif %}{% if not loop.last %}<br>{% endif %}
+                    {% else %}
+                      No provider attempt
+                    {% endfor %}
+                  </td>
+                  <td class="px-4 py-3.5 text-sm capitalize text-slate-700">{{ disbursement.status }}</td>
+                </tr>
+              {% else %}
+                <tr><td colspan="6" class="px-4 py-8 text-center text-sm text-slate-500">No payout records have been saved.</td></tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+      </section>
+    </div>
   </main>
 {% endblock %}

@@ -5,44 +5,46 @@
 {% block topbar %}
   <div class="min-w-0 flex-1">
     <h1 class="truncate font-display text-xl font-bold text-brand-950 sm:text-2xl">Expense reviews</h1>
-    <p class="hidden truncate text-sm text-slate-500 sm:block">Verify documents and recipient details before any money moves.</p>
+    <p class="hidden truncate text-sm text-slate-500 sm:block">Review saved expense requests.</p>
   </div>
-  <div class="flex items-center gap-2"></div>
-
 {% endblock %}
 
 {% block content %}
   <main id="main" class="flex-1 px-4 py-6 sm:px-6 lg:py-8">
-  <div class="mx-auto max-w-6xl">
-    <div class="mb-6 flex gap-2 text-sm font-medium">
-      <a href="{{ url_for('admin.expense_queue') }}" class="rounded-full px-4 py-2 bg-brand-700 text-white">Waiting</a>
-      <a href="{{ url_for('admin.expense_queue') }}" class="rounded-full px-4 py-2 bg-white text-slate-600 ring-1 ring-slate-200 hover:bg-slate-50">Approved</a>
-      <a href="{{ url_for('admin.expense_queue') }}" class="rounded-full px-4 py-2 bg-white text-slate-600 ring-1 ring-slate-200 hover:bg-slate-50">Rejected</a>
-      <a href="{{ url_for('admin.expense_queue') }}" class="rounded-full px-4 py-2 bg-white text-slate-600 ring-1 ring-slate-200 hover:bg-slate-50">All</a></div>
-
-    <div class="rounded-2xl border border-slate-200 bg-white shadow-sm overflow-hidden"><div class="relative overflow-x-auto"><table class="min-w-full divide-y divide-slate-200">
-      <thead class="bg-slate-50"><tr><th class="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide text-slate-500">Expense</th><th class="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide text-slate-500">Campaign</th><th class="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide text-slate-500">Recipient</th><th class="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide text-slate-500 text-right">Amount</th><th class="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide text-slate-500">Submitted</th><th class="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide text-slate-500">State</th><th class="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide text-slate-500"></th></tr></thead>
-      <tbody class="divide-y divide-slate-100 bg-white">
-
-        <tr class="hover:bg-slate-50"><td class="px-4 py-3.5 text-sm font-medium text-slate-900">Hospital admission deposit</td><td class="px-4 py-3.5 text-sm text-slate-700 max-w-[12rem] truncate">Help Ada walk again: spinal surgery fund</td><td class="px-4 py-3.5 text-sm text-slate-700">Lagos City Hospital</td>
-          <td class="px-4 py-3.5 text-sm text-slate-700 text-right font-semibold">₦450,000</td><td class="px-4 py-3.5 text-sm text-slate-700 whitespace-nowrap">09 Oct 2026</td><td class="px-4 py-3.5 text-sm text-slate-700"><span class="inline-flex items-center gap-1 rounded-full px-2.5 py-0.5 text-xs font-medium bg-progress/10 text-progress">Verified</span></td>
-          <td class="px-4 py-3.5 text-sm text-slate-700 text-right"><a href="{{ url_for('admin.expense_review') }}" class="inline-flex items-center justify-center gap-2 rounded-xl font-semibold transition focus:outline-none focus-visible:ring-4 disabled:cursor-not-allowed disabled:opacity-50 bg-accent-500 text-ink shadow-sm hover:bg-accent-600 focus-visible:ring-accent-200 px-3.5 py-2 text-xs">Review</a></td></tr>
-        <tr class="hover:bg-slate-50"><td class="px-4 py-3.5 text-sm font-medium text-slate-900">Hospital admission deposit</td><td class="px-4 py-3.5 text-sm text-slate-700 max-w-[12rem] truncate">Help Ada walk again: spinal surgery fund</td><td class="px-4 py-3.5 text-sm text-slate-700">Lagos City Hospital</td>
-          <td class="px-4 py-3.5 text-sm text-slate-700 text-right font-semibold">₦450,000</td><td class="px-4 py-3.5 text-sm text-slate-700 whitespace-nowrap">09 Oct 2026</td><td class="px-4 py-3.5 text-sm text-slate-700"><span class="inline-flex items-center gap-1 rounded-full px-2.5 py-0.5 text-xs font-medium bg-progress/10 text-progress">Verified</span></td>
-          <td class="px-4 py-3.5 text-sm text-slate-700 text-right"><a href="{{ url_for('admin.expense_review') }}" class="inline-flex items-center justify-center gap-2 rounded-xl font-semibold transition focus:outline-none focus-visible:ring-4 disabled:cursor-not-allowed disabled:opacity-50 bg-accent-500 text-ink shadow-sm hover:bg-accent-600 focus-visible:ring-accent-200 px-3.5 py-2 text-xs">Review</a></td></tr>
-      </tbody></table></div></div>
-
-  <nav class="mt-10 flex items-center justify-center gap-1" aria-label="Pagination">
-
-        <a href="{{ url_for('admin.expense_queue') }}" class="grid h-9 w-9 place-items-center rounded-lg text-sm font-medium bg-brand-700 text-white" aria-current="page">1</a>
-
-        <a href="{{ url_for('admin.expense_queue') }}" class="grid h-9 w-9 place-items-center rounded-lg text-sm font-medium text-slate-600 hover:bg-brand-50" >2</a>
-
-        <a href="{{ url_for('admin.expense_queue') }}" class="grid h-9 w-9 place-items-center rounded-lg text-sm font-medium text-slate-600 hover:bg-brand-50" >3</a>
-
-    <a class="inline-flex items-center justify-center gap-2 rounded-xl font-semibold transition focus:outline-none focus-visible:ring-4 disabled:cursor-not-allowed disabled:opacity-50 border border-slate-300 bg-white text-slate-700 hover:bg-slate-50 focus-visible:ring-slate-200 px-3.5 py-2 text-xs" href="{{ url_for('admin.expense_queue') }}">Next</a>
-  </nav>
-
-  </div>
+    <div class="mx-auto max-w-6xl">
+      <nav class="mb-6 flex gap-2 text-sm font-medium" aria-label="Expense status filter">
+        {% for status, label in [('waiting', 'Waiting'), ('approved', 'Approved'), ('rejected', 'Rejected'), ('all', 'All')] %}
+          <a href="{{ url_for('admin.expense_queue', status=status) }}" class="rounded-full px-4 py-2 {{ 'bg-brand-700 text-white' if selected_status == status else 'bg-white text-slate-600 ring-1 ring-slate-200 hover:bg-slate-50' }}">{{ label }}</a>
+        {% endfor %}
+      </nav>
+      <div class="overflow-x-auto rounded-2xl border border-slate-200 bg-white shadow-sm">
+        <table class="min-w-full divide-y divide-slate-200">
+          <thead class="bg-slate-50"><tr>
+            <th class="px-4 py-3 text-left text-xs font-semibold uppercase text-slate-500">Expense</th>
+            <th class="px-4 py-3 text-left text-xs font-semibold uppercase text-slate-500">Campaign</th>
+            <th class="px-4 py-3 text-left text-xs font-semibold uppercase text-slate-500">Recipient</th>
+            <th class="px-4 py-3 text-right text-xs font-semibold uppercase text-slate-500">Amount</th>
+            <th class="px-4 py-3 text-left text-xs font-semibold uppercase text-slate-500">Submitted</th>
+            <th class="px-4 py-3 text-left text-xs font-semibold uppercase text-slate-500">Status</th>
+            <th class="px-4 py-3"></th>
+          </tr></thead>
+          <tbody class="divide-y divide-slate-100">
+            {% for expense in expenses %}
+              <tr>
+                <td class="px-4 py-3.5 text-sm font-medium text-slate-900">{{ expense.title }}</td>
+                <td class="max-w-[12rem] truncate px-4 py-3.5 text-sm text-slate-700">{{ expense.campaign.revisions|sort(attribute='version_number', reverse=true)|first|attr('title') if expense.campaign.revisions else 'Campaign' }}</td>
+                <td class="px-4 py-3.5 text-sm text-slate-700">{{ expense.recipient.display_name }}</td>
+                <td class="px-4 py-3.5 text-right text-sm font-semibold text-slate-700">₦{{ '{:,.2f}'.format(expense.amount_minor / 100) }}</td>
+                <td class="whitespace-nowrap px-4 py-3.5 text-sm text-slate-700">{{ expense.submitted_at.strftime('%d %b %Y') }}</td>
+                <td class="px-4 py-3.5 text-sm capitalize text-slate-700">{{ expense.status.replace('_', ' ') }}</td>
+                <td class="px-4 py-3.5 text-right"><a href="{{ url_for('admin.expense_review', expense_id=expense.id) }}" class="rounded-xl bg-accent-500 px-3.5 py-2 text-xs font-semibold text-ink">View</a></td>
+              </tr>
+            {% else %}
+              <tr><td colspan="7" class="px-4 py-8 text-center text-sm text-slate-500">No expense requests match this filter.</td></tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
   </main>
 {% endblock %}

@@ -5,96 +5,61 @@
 {% block topbar %}
   <div class="min-w-0 flex-1">
     <h1 class="truncate font-display text-xl font-bold text-brand-950 sm:text-2xl">Request an expense</h1>
-    <p class="hidden truncate text-sm text-slate-500 sm:block">Help Ada walk again: spinal surgery fund</p>
+    <p class="hidden truncate text-sm text-slate-500 sm:block">{{ revision.title }}</p>
   </div>
-  <div class="flex items-center gap-2"><a href="{{ url_for('campaign.manage') }}" class="inline-flex items-center justify-center gap-2 rounded-xl font-semibold transition focus:outline-none focus-visible:ring-4 disabled:cursor-not-allowed disabled:opacity-50 border border-slate-300 bg-white text-slate-700 hover:bg-slate-50 focus-visible:ring-slate-200 px-3.5 py-2 text-xs">Cancel</a></div>
-
+  <div class="flex items-center gap-2"><a href="{{ url_for('campaign.manage', campaign_id=campaign.id) }}" class="text-sm text-slate-600 hover:text-brand-700">Cancel</a></div>
 {% endblock %}
 
 {% block content %}
   <main id="main" class="flex-1 px-4 py-6 sm:px-6 lg:py-8">
-  <form action="{{ url_for('finance.expense_new') }}" method="post" enctype="multipart/form-data" class="mx-auto grid grid-cols-1 max-w-6xl gap-8 lg:grid-cols-3" novalidate>
-
-    <div class="space-y-6 lg:col-span-2">
-      <section class="rounded-2xl border border-slate-200 bg-white shadow-sm space-y-5 p-6 sm:p-8">
-        <h2 class="font-display text-xl font-bold text-brand-950">What is the money for?</h2>
-        <div>
-    <label for="title" class="mb-1.5 block text-sm font-medium text-slate-700">Expense title <span class="text-rose-500" aria-hidden="true">*</span></label>
-    <input id="title" name="title" type="text" value="" placeholder="e.g. Hospital admission deposit"
-           required  maxlength="150"
-           class="block w-full rounded-xl border border-slate-300 bg-white px-4 py-3 text-sm text-slate-900 placeholder:text-slate-400 focus:border-brand-600 focus:outline-none focus:ring-4 focus:ring-brand-100"
-           >
-
-  </div>
-        <div>
-    <label for="description" class="mb-1.5 block text-sm font-medium text-slate-700">Description <span class="text-rose-500" aria-hidden="true">*</span></label>
-    <textarea id="description" name="description" rows="4" placeholder="Explain what this pays for and why it&#39;s needed now." required 
-              class="block w-full rounded-xl border border-slate-300 bg-white px-4 py-3 text-sm text-slate-900 placeholder:text-slate-400 focus:border-brand-600 focus:outline-none focus:ring-4 focus:ring-brand-100"></textarea>
-
-  </div>
-        <div>
-          <label for="amount" class="mb-1.5 block text-sm font-medium text-slate-700">Amount (₦) <span class="text-rose-500">*</span></label>
-          <div class="relative"><span class="pointer-events-none absolute inset-y-0 left-4 grid place-items-center text-sm font-semibold text-slate-500">₦</span>
-            <input id="amount" name="amount" type="number" min="1" max="1211000" step="1" required class="block w-full rounded-xl border border-slate-300 bg-white px-4 py-3 text-sm text-slate-900 placeholder:text-slate-400 focus:border-brand-600 focus:outline-none focus:ring-4 focus:ring-brand-100 pl-9"></div>
-          <p class="mt-1.5 text-xs text-slate-500">You can request up to ₦1,211,000. Payout fees are deducted when sent.</p>
-
-        </div>
-      </section>
-
-      <section class="rounded-2xl border border-slate-200 bg-white shadow-sm space-y-5 p-6 sm:p-8">
-        <div><h2 class="font-display text-xl font-bold text-brand-950">Who gets paid?</h2><p class="mt-1 text-sm text-slate-500">Money goes straight to the recipient, not to you. Use the name on their bank account.</p></div>
-        <div>
-          <label for="payout_destination" class="mb-1.5 block text-sm font-medium text-slate-700">Recipient type</label>
-          <select id="payout_destination" name="payout_destination" class="block w-full rounded-xl border border-slate-300 bg-white px-4 py-3 text-sm text-slate-900 placeholder:text-slate-400 focus:border-brand-600 focus:outline-none focus:ring-4 focus:ring-brand-100">
-            <option value="vendor">Supplier / vendor</option><option value="institution">Hospital / school / institution</option><option value="beneficiary">Beneficiary</option>
-          </select>
-        </div>
-        <div>
-    <label for="recipient_name" class="mb-1.5 block text-sm font-medium text-slate-700">Recipient name <span class="text-rose-500" aria-hidden="true">*</span></label>
-    <input id="recipient_name" name="recipient_name" type="text" value="" placeholder="Account name exactly as at the bank"
-           required  
-           class="block w-full rounded-xl border border-slate-300 bg-white px-4 py-3 text-sm text-slate-900 placeholder:text-slate-400 focus:border-brand-600 focus:outline-none focus:ring-4 focus:ring-brand-100"
-           >
-
-  </div>
-        <div class="grid grid-cols-1 gap-5 sm:grid-cols-2">
+    <form action="{{ url_for('finance.expense_new', campaign_id=campaign.id) }}" method="post" class="mx-auto grid max-w-6xl gap-8 lg:grid-cols-3">
+      <input type="hidden" name="campaign_id" value="{{ campaign.id }}">
+      <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+      <div class="space-y-6 lg:col-span-2">
+        <section class="space-y-5 rounded-2xl border border-slate-200 bg-white p-6 shadow-sm sm:p-8">
+          <h2 class="font-display text-xl font-bold text-brand-950">What is the money for?</h2>
           <div>
-    <label for="recipient_bank_account" class="mb-1.5 block text-sm font-medium text-slate-700">Account number <span class="text-rose-500" aria-hidden="true">*</span></label>
-    <input id="recipient_bank_account" name="recipient_bank_account" type="text" value="" placeholder="0123456789"
-           required  inputmode="numeric" pattern="[0-9]{10}" maxlength="10"
-           class="block w-full rounded-xl border border-slate-300 bg-white px-4 py-3 text-sm text-slate-900 placeholder:text-slate-400 focus:border-brand-600 focus:outline-none focus:ring-4 focus:ring-brand-100"
-           >
-    <p class="mt-1.5 text-xs text-slate-500">10-digit NUBAN account number</p>
-
-  </div>
-          <div>
-            <label for="recipient_bank_code" class="mb-1.5 block text-sm font-medium text-slate-700">Bank <span class="text-rose-500">*</span></label>
-            <select id="recipient_bank_code" name="recipient_bank_code" required class="block w-full rounded-xl border border-slate-300 bg-white px-4 py-3 text-sm text-slate-900 placeholder:text-slate-400 focus:border-brand-600 focus:outline-none focus:ring-4 focus:ring-brand-100">
-              <option value="" disabled selected>Choose bank…</option>
-              <option value="058">GTBank</option><option value="044">Access Bank</option>
-            </select>
-
+            <label for="title" class="mb-1.5 block text-sm font-medium text-slate-700">Expense title</label>
+            <input id="title" name="title" type="text" value="{{ form_values.title }}" maxlength="150" required class="block w-full rounded-xl border border-slate-300 px-4 py-3 text-sm focus:border-brand-600 focus:outline-none focus:ring-4 focus:ring-brand-100">
           </div>
+          <div>
+            <label for="description" class="mb-1.5 block text-sm font-medium text-slate-700">Description</label>
+            <textarea id="description" name="description" rows="4" required class="block w-full rounded-xl border border-slate-300 px-4 py-3 text-sm focus:border-brand-600 focus:outline-none focus:ring-4 focus:ring-brand-100">{{ form_values.description }}</textarea>
+          </div>
+          <div>
+            <label for="amount" class="mb-1.5 block text-sm font-medium text-slate-700">Amount ({{ revision.currency_code }})</label>
+            <input id="amount" name="amount" type="number" min="1" max="{{ maximum_amount }}" step="1" value="{{ form_values.amount }}" required class="block w-full rounded-xl border border-slate-300 px-4 py-3 text-sm focus:border-brand-600 focus:outline-none focus:ring-4 focus:ring-brand-100">
+          </div>
+        </section>
+
+        <section class="space-y-4 rounded-2xl border border-slate-200 bg-white p-6 shadow-sm sm:p-8">
+          <div><h2 class="font-display text-xl font-bold text-brand-950">Saved payout recipient</h2><p class="mt-1 text-sm text-slate-500">Select a recipient already set up securely. Bank details are not collected here.</p></div>
+          {% if recipients %}
+            <label for="recipient_id" class="block text-sm font-medium text-slate-700">Recipient</label>
+            <select id="recipient_id" name="recipient_id" required class="block w-full rounded-xl border border-slate-300 bg-white px-4 py-3 text-sm">
+              <option value="">Choose a saved recipient</option>
+              {% for recipient in recipients %}
+                <option value="{{ recipient.id }}" {% if form_values.recipient_id == recipient.id|string %}selected{% endif %}>{{ recipient.display_name }} ({{ recipient.recipient_type }})</option>
+              {% endfor %}
+            </select>
+          {% else %}
+            <p class="rounded-xl bg-amber-50 p-4 text-sm text-amber-900">You do not have an active secure payout recipient. An expense request cannot be submitted until one is configured.</p>
+          {% endif %}
+        </section>
+
+        <div class="flex justify-end">
+          <button type="submit" {% if not recipients or maximum_amount < 1 %}disabled{% endif %} class="rounded-xl bg-brand-700 px-5 py-3 text-sm font-semibold text-white hover:bg-brand-800 disabled:cursor-not-allowed disabled:opacity-50">Submit for review</button>
         </div>
-      </section>
+      </div>
 
-      <section class="rounded-2xl border border-slate-200 bg-white shadow-sm p-6 sm:p-8">
-        <h2 class="font-display text-xl font-bold text-brand-950">Supporting document</h2>
-        <p class="mt-1 text-sm text-slate-500">Invoice, quotation, bill or receipt. We compare it to the recipient details above.</p>
-        <input name="file" type="file" required accept=".pdf,.jpg,.jpeg,.png" class="mt-4 block w-full rounded-xl border border-dashed border-slate-300 bg-slate-50 px-4 py-3 text-sm file:mr-4 file:rounded-lg file:border-0 file:bg-brand-700 file:px-3 file:py-1.5 file:text-xs file:font-semibold file:text-white">
-
-        <label class="mt-4 flex items-start gap-3 text-sm text-slate-600"><input type="checkbox" name="is_public" value="1" checked class="mt-0.5 h-4 w-4 rounded border-slate-300 text-brand-700"> Show this document to donors on the public ledger</label>
-      </section>
-
-      <div class="flex justify-end"><button class="inline-flex items-center justify-center gap-2 rounded-xl px-5 py-3 text-sm font-semibold transition focus:outline-none focus-visible:ring-4 disabled:cursor-not-allowed disabled:opacity-50 bg-brand-700 text-white shadow-sm hover:bg-brand-800 focus-visible:ring-brand-200">Submit for review <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M13 7l5 5m0 0l-5 5m5-5H6"/></svg></button></div>
-    </div>
-
-    <aside class="space-y-4 lg:sticky lg:top-24 lg:self-start">
-      <div class="rounded-2xl border border-slate-200 bg-white shadow-sm p-5"><p class="text-xs font-medium uppercase tracking-wide text-slate-500">Available to request</p><p class="mt-1 font-display text-3xl font-bold text-gold-600">₦1,211,000</p>
-        <p class="mt-1 text-xs text-slate-500">Raised ₦1.2M · Spent ₦375K</p></div>
-      <div class="rounded-2xl bg-brand-50 p-5 text-sm text-brand-900"><p class="font-semibold">What happens next</p>
-        <ol class="mt-3 list-decimal space-y-2 pl-5 text-brand-800"><li>Our team checks the document and account details.</li><li>You're told the decision (usually within 2 working days).</li><li>Approved? We send the money to the recipient and log it publicly.</li></ol></div>
-    </aside>
-  </form>
+      <aside class="space-y-4 lg:sticky lg:top-24 lg:self-start">
+        <div class="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
+          <p class="text-xs font-medium uppercase tracking-wide text-slate-500">Available to request</p>
+          <p class="mt-1 font-display text-2xl font-bold text-gold-600">{{ revision.currency_code }} {{ "{:,.2f}".format(available_minor / (10 ** (currency.minor_unit_exponent if currency else 2))) }}</p>
+          <p class="mt-2 text-xs text-slate-500">Raised {{ revision.currency_code }} {{ "{:,.2f}".format(raised_minor / (10 ** (currency.minor_unit_exponent if currency else 2))) }}; paid out {{ revision.currency_code }} {{ "{:,.2f}".format(paid_minor / (10 ** (currency.minor_unit_exponent if currency else 2))) }}.</p>
+        </div>
+        <p class="rounded-2xl bg-brand-50 p-5 text-sm text-brand-900">Requests are reviewed first. Approval does not send a payout; payouts remain unavailable until a provider is configured.</p>
+      </aside>
+    </form>
   </main>
 {% endblock %}

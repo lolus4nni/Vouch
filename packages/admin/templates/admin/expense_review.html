@@ -1,86 +1,99 @@
 {% extends "layouts/admin.html" %}
 
-{% block title %}Expense: Hospital admission deposit{% endblock %}
+{% block title %}Expense: {{ expense.title }}{% endblock %}
 
 {% block topbar %}
   <div class="min-w-0 flex-1">
-    <h1 class="truncate font-display text-xl font-bold text-brand-950 sm:text-2xl">Expense: Hospital admission deposit</h1>
-    <p class="hidden truncate text-sm text-slate-500 sm:block">Help Ada walk again: spinal surgery fund</p>
+    <h1 class="truncate font-display text-xl font-bold text-brand-950 sm:text-2xl">{{ expense.title }}</h1>
+    <p class="hidden truncate text-sm text-slate-500 sm:block">{{ expense.campaign.revisions|sort(attribute='version_number', reverse=true)|first|attr('title') if expense.campaign.revisions else 'Campaign expense' }}</p>
   </div>
-  <div class="flex items-center gap-2"><span class="inline-flex items-center gap-1 rounded-full px-2.5 py-0.5 text-xs font-medium bg-progress/10 text-progress">Verified</span><a href="{{ url_for('admin.expense_queue') }}" class="inline-flex items-center justify-center gap-2 rounded-xl font-semibold transition focus:outline-none focus-visible:ring-4 disabled:cursor-not-allowed disabled:opacity-50 border border-slate-300 bg-white text-slate-700 hover:bg-slate-50 focus-visible:ring-slate-200 px-3.5 py-2 text-xs">Queue</a></div>
-
+  <a href="{{ url_for('admin.expense_queue') }}" class="rounded-xl border border-slate-300 bg-white px-3.5 py-2 text-xs font-semibold text-slate-700">Back to queue</a>
 {% endblock %}
 
 {% block content %}
   <main id="main" class="flex-1 px-4 py-6 sm:px-6 lg:py-8">
-  <div class="mx-auto grid grid-cols-1 max-w-6xl gap-8 lg:grid-cols-5">
-    <div class="space-y-6 lg:col-span-3">
-      <section class="rounded-2xl border border-slate-200 bg-white shadow-sm p-6">
-        <p class="text-xs font-medium uppercase tracking-wide text-slate-500">Amount requested</p>
-        <p class="font-display text-4xl font-bold text-brand-800">₦450,000</p>
-        <p class="mt-1 text-sm text-slate-500">Campaign balance available: ₦737,500</p>
-        <p class="mt-5 whitespace-pre-line text-sm leading-7 text-slate-700">Deposit required before surgery.</p>
-      </section>
+    <div class="mx-auto grid max-w-6xl gap-8 lg:grid-cols-3">
+      <div class="space-y-6 lg:col-span-2">
+        <section class="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+          <div class="flex items-start justify-between gap-4">
+            <div><p class="text-xs font-medium uppercase text-slate-500">Amount requested</p><p class="mt-1 font-display text-3xl font-bold text-brand-800">₦{{ '{:,.2f}'.format(expense.amount_minor / 100) }}</p></div>
+            <span class="rounded-full bg-slate-100 px-3 py-1 text-xs capitalize text-slate-700">{{ expense.status.replace('_', ' ') }}</span>
+          </div>
+          <p class="mt-5 whitespace-pre-line text-sm leading-7 text-slate-700">{{ expense.description }}</p>
+          <dl class="mt-5 grid gap-4 border-t border-slate-100 pt-5 text-sm sm:grid-cols-2">
+            <div><dt class="text-slate-500">Submitted by</dt><dd class="font-medium">{{ expense.submitter.display_name }}</dd></div>
+            <div><dt class="text-slate-500">Submitted</dt><dd class="font-medium">{{ expense.submitted_at.strftime('%d %b %Y') }}</dd></div>
+            <div><dt class="text-slate-500">Campaign</dt><dd class="font-medium">{{ expense.campaign.revisions|sort(attribute='version_number', reverse=true)|first|attr('title') if expense.campaign.revisions else 'Campaign' }}</dd></div>
+          </dl>
+        </section>
 
-      <section class="rounded-2xl border border-slate-200 bg-white shadow-sm p-6">
-        <h2 class="font-display text-lg font-bold text-brand-950">Recipient & bank details</h2>
-        <dl class="mt-4 grid grid-cols-1 gap-4 text-sm sm:grid-cols-2">
-          <div><dt class="text-slate-500">Recipient name</dt><dd class="font-semibold">Lagos City Hospital</dd></div>
-          <div><dt class="text-slate-500">Type</dt><dd class="font-semibold capitalize">institution</dd></div>
-          <div><dt class="text-slate-500">Account number</dt><dd class="font-mono font-semibold">0123456789</dd></div>
-          <div><dt class="text-slate-500">Bank code</dt><dd class="font-mono font-semibold">058</dd></div>
-        </dl>
+        <section class="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+          <h2 class="font-display text-lg font-bold text-brand-950">Supporting documents</h2>
+          {% if expense.evidence %}
+            <ul class="mt-3 divide-y divide-slate-100">
+              {% for document in expense.evidence %}
+                <li class="py-3 text-sm text-slate-700">{{ document.file_asset.original_filename or 'Uploaded document' }}{% if document.is_public %} · Public{% else %} · Private{% endif %}</li>
+              {% endfor %}
+            </ul>
+            <p class="mt-2 text-xs text-slate-500">Secure file viewing is unavailable until file storage is configured.</p>
+          {% else %}
+            <p class="mt-3 text-sm text-slate-500">No documents are attached.</p>
+          {% endif %}
+        </section>
 
-        <p class="mt-4 flex items-center gap-2 rounded-xl p-3 text-sm bg-brand-50 text-brand-900"><svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>Bank account name matches the recipient.</p>
-      </section>
+        <section class="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+          <h2 class="font-display text-lg font-bold text-brand-950">Review history</h2>
+          {% if expense.reviews %}
+            <ol class="mt-4 space-y-3">
+              {% for review in expense.reviews|sort(attribute='decided_at', reverse=true) %}
+                <li class="border-l-2 border-slate-100 pl-4 text-sm">
+                  <p class="text-xs text-slate-500">{{ review.decided_at.strftime('%d %b %Y, %H:%M') }} · {{ review.reviewer.display_name }}</p>
+                  <p class="font-semibold capitalize">{{ review.decision.replace('_', ' ') }}</p>
+                  {% if review.public_notes %}<p class="mt-1">{{ review.public_notes }}</p>{% endif %}
+                  {% if review.internal_notes %}<p class="mt-1 rounded-lg bg-slate-50 p-2 text-slate-600">Staff note: {{ review.internal_notes }}</p>{% endif %}
+                </li>
+              {% endfor %}
+            </ol>
+          {% else %}
+            <p class="mt-3 text-sm text-slate-500">No review decisions have been recorded.</p>
+          {% endif %}
+        </section>
+      </div>
 
-      <section class="rounded-2xl border border-slate-200 bg-white shadow-sm p-6">
-        <h2 class="font-display text-lg font-bold text-brand-950">Supporting documents</h2>
-        <ul class="mt-3 space-y-2"><li><a href="#" target="_blank" rel="noopener" class="inline-flex items-center gap-2 text-sm font-medium text-brand-700 hover:underline"><svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.6a1 1 0 01.7.3l5.4 5.4a1 1 0 01.3.7V19a2 2 0 01-2 2z"/></svg>Medical report<span class="font-mono text-[10px] text-slate-400">aaaaaaaaaa…</span></a></li></ul>
-
-      </section>
-
-      <section class="rounded-2xl border border-slate-200 bg-white shadow-sm p-6"><h2 class="font-display text-lg font-bold text-brand-950">History</h2><ol class="mt-4 space-y-3 text-sm"><li><span class="text-xs text-slate-500">09 Oct 2026, 06:11</span> · <strong class="capitalize">approved</strong><p class="mt-1 rounded-lg bg-slate-50 p-2 text-slate-600">Called hospital billing, matched.</p></li></ol></section>
+      <aside class="space-y-6 lg:self-start">
+        <section class="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+          <h2 class="font-display text-lg font-bold text-brand-950">Recipient</h2>
+          <p class="mt-3 font-semibold">{{ expense.recipient.display_name }}</p>
+          <p class="text-sm capitalize text-slate-500">{{ expense.recipient.recipient_type }} · {{ expense.recipient.provider }}</p>
+          {% if expense.recipient.bank_code %}<p class="mt-2 text-sm text-slate-600">Bank code: {{ expense.recipient.bank_code }}</p>{% endif %}
+          <p class="mt-3 text-xs text-slate-500">Private recipient account details are not displayed.</p>
+        </section>
+        {% if expense.status in ['submitted', 'in_review', 'changes_requested'] %}
+          <form action="{{ url_for('admin.expense_review', expense_id=expense.id) }}" method="post" class="space-y-5 rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+            <div>
+              <h2 class="font-display text-lg font-bold text-brand-950">Your decision</h2>
+              <p class="mt-1 text-sm text-slate-500">Approval does not send a payout. A note is required when requesting changes or rejecting.</p>
+            </div>
+            <div>
+              <label for="public_notes" class="mb-1.5 block text-sm font-medium text-slate-700">Note to the organiser</label>
+              <textarea id="public_notes" name="public_notes" rows="3" class="block w-full rounded-xl border border-slate-300 px-4 py-3 text-sm">{{ public_notes or '' }}</textarea>
+            </div>
+            <div>
+              <label for="internal_notes" class="mb-1.5 block text-sm font-medium text-slate-700">Staff notes (optional)</label>
+              <textarea id="internal_notes" name="internal_notes" rows="3" class="block w-full rounded-xl border border-slate-300 px-4 py-3 text-sm">{{ internal_notes or '' }}</textarea>
+            </div>
+            <div class="flex flex-wrap gap-2 border-t border-slate-100 pt-5">
+              <button type="submit" name="action_taken" value="approved" class="rounded-xl bg-accent-500 px-3.5 py-2 text-xs font-semibold text-ink">Approve request</button>
+              <button type="submit" name="action_taken" value="request_changes" class="rounded-xl bg-gold-400 px-3.5 py-2 text-xs font-semibold text-brand-950">Request changes</button>
+              <button type="submit" name="action_taken" value="rejected" class="rounded-xl bg-error px-3.5 py-2 text-xs font-semibold text-white">Reject</button>
+            </div>
+          </form>
+        {% else %}
+          <section class="rounded-2xl border border-slate-200 bg-white p-5 text-sm text-slate-600">
+            This request has already been reviewed and cannot be changed here.
+          </section>
+        {% endif %}
+      </aside>
     </div>
-
-    <aside class="space-y-6 lg:col-span-2 lg:self-start">
-      <a href="{{ url_for('admin.campaign_review') }}" class="rounded-2xl border border-slate-200 bg-white shadow-sm block p-5 hover:border-brand-300"><p class="text-xs text-slate-500">Campaign</p><p class="mt-1 font-semibold text-slate-900">Help Ada walk again: spinal surgery fund</p><p class="mt-1 text-xs text-slate-500">Raised ₦1.2M · Spent ₦375K</p></a>
-
-  <form action="{{ url_for('admin.expense_review') }}" method="post" class="rounded-2xl border border-slate-200 bg-white shadow-sm space-y-5 p-6" id="decision-form">
-
-    <div><h2 class="font-display text-lg font-bold text-brand-950">Your decision</h2><p class="mt-1 text-sm text-slate-500">Recorded permanently in the audit trail with your name and time.</p></div>
-
-    <div>
-      <label for="public_notes" class="mb-1.5 block text-sm font-medium text-slate-700">Note to the organiser <span class="text-xs font-normal text-slate-400">(visible to them)</span></label>
-      <textarea id="public_notes" name="public_notes" rows="3" class="block w-full rounded-xl border border-slate-300 bg-white px-4 py-3 text-sm text-slate-900 placeholder:text-slate-400 focus:border-brand-600 focus:outline-none focus:ring-4 focus:ring-brand-100" placeholder="Explain the decision clearly and kindly. Required when requesting changes or rejecting."></textarea>
-    </div>
-    <div>
-      <label for="internal_notes" class="mb-1.5 block text-sm font-medium text-slate-700">Internal notes <span class="text-xs font-normal text-slate-400">(staff only)</span></label>
-      <textarea id="internal_notes" name="internal_notes" rows="3" class="block w-full rounded-xl border border-slate-300 bg-white px-4 py-3 text-sm text-slate-900 placeholder:text-slate-400 focus:border-brand-600 focus:outline-none focus:ring-4 focus:ring-brand-100" placeholder="Checks performed, concerns, links to cases…"></textarea>
-    </div>
-
-    <div class="flex flex-wrap gap-2 border-t border-slate-100 pt-5">
-
-      <button type="submit" name="action_taken" value="approved" data-needs-note="0"
-              class="inline-flex items-center justify-center gap-2 rounded-xl font-semibold transition focus:outline-none focus-visible:ring-4 disabled:cursor-not-allowed disabled:opacity-50 px-3.5 py-2 text-xs bg-accent-500 text-ink shadow-sm hover:bg-accent-600 focus-visible:ring-accent-200">Approve for payout</button>
-
-      <button type="submit" name="action_taken" value="needs_info" data-needs-note="1"
-              class="inline-flex items-center justify-center gap-2 rounded-xl font-semibold transition focus:outline-none focus-visible:ring-4 disabled:cursor-not-allowed disabled:opacity-50 px-3.5 py-2 text-xs bg-gold-400 text-brand-950 shadow-sm hover:bg-accent-600 focus-visible:ring-accent-200">Ask for more info</button>
-
-      <button type="submit" name="action_taken" value="rejected" data-needs-note="1"
-              class="inline-flex items-center justify-center gap-2 rounded-xl font-semibold transition focus:outline-none focus-visible:ring-4 disabled:cursor-not-allowed disabled:opacity-50 px-3.5 py-2 text-xs bg-error text-white hover:bg-error/90 focus-visible:ring-error/20">Reject</button>
-
-    </div>
-  </form>
-  <script>
-    document.getElementById('decision-form').addEventListener('submit', function(e){
-      var b = e.submitter; if (!b) return;
-      if (b.dataset.needsNote === '1' && !document.getElementById('public_notes').value.trim()) {
-        e.preventDefault(); alert('Please add a note explaining this decision.'); document.getElementById('public_notes').focus();
-      }
-    });
-  </script>
-    </aside>
-  </div>
   </main>
 {% endblock %}

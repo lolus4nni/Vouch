@@ -62,9 +62,14 @@
 
     {% with messages = get_flashed_messages(with_categories=true) %}
       {% if messages %}
-        <div class="fixed right-4 top-4 z-50 space-y-2" role="status" aria-live="polite">
+        <div class="fixed inset-x-4 top-4 z-50 mx-auto max-w-md space-y-2 sm:left-auto sm:right-4 sm:w-full" aria-label="Notifications">
           {% for category, message in messages %}
-            <p class="max-w-md rounded-xl px-4 py-3 text-sm shadow-lg {{ 'bg-rose-100 text-rose-900' if category == 'error' else 'bg-brand-100 text-brand-900' }}">{{ message }}</p>
+            <p
+              class="rounded-xl px-4 py-3 text-sm shadow-lg {{ 'bg-rose-100 text-rose-900' if category == 'error' else 'bg-gold-100 text-ink' if category == 'warning' else 'bg-slate-100 text-ink' if category == 'info' else 'bg-brand-100 text-brand-900' }}"
+              role="{{ 'alert' if category == 'error' else 'status' }}"
+              aria-live="{{ 'assertive' if category == 'error' else 'polite' }}"
+              aria-atomic="true"
+            >{{ message }}</p>
           {% endfor %}
         </div>
       {% endif %}

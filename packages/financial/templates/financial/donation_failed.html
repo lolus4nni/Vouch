@@ -1,21 +1,11 @@
 {% extends "layouts/public.html" %}
-{% set signed_in = true %}
 
-{% block title %}Payment not completed{% endblock %}
+{% block title %}Payment unavailable{% endblock %}
 
 {% block content %}
-    <main id="main">
-  <section class="mx-auto max-w-xl px-4 py-20 text-center">
-    <span class="mx-auto grid h-16 w-16 place-items-center rounded-full bg-rose-100 text-rose-600"><svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 9v4m0 4h.01M10.3 3.9L1.8 18a2 2 0 001.7 3h17a2 2 0 001.7-3L13.7 3.9a2 2 0 00-3.4 0z"/></svg></span>
-    <h1 class="mt-6 font-display text-3xl font-bold text-brand-950">Your payment didn't go through</h1>
-    <p class="mt-3 text-slate-600">The payment was cancelled or declined by your bank. You haven't been charged. If money left your account, it will be returned automatically.</p>
-    <p class="mt-4 text-xs text-slate-500">Reference: <span class="font-mono">DON_29dk3j</span></p>
-    <div class="mt-8 flex flex-wrap justify-center gap-3">
-      <a href="{{ url_for('finance.donate') }}" class="inline-flex items-center justify-center gap-2 rounded-xl px-5 py-3 text-sm font-semibold transition focus:outline-none focus-visible:ring-4 disabled:cursor-not-allowed disabled:opacity-50 bg-accent text-ink shadow-sm hover:bg-[#F06A44] focus-visible:ring-gold-200">Try again</a>
-      <a href="{{ url_for('campaign.detail') }}" class="inline-flex items-center justify-center gap-2 rounded-xl px-5 py-3 text-sm font-semibold transition focus:outline-none focus-visible:ring-4 disabled:cursor-not-allowed disabled:opacity-50 border border-slate-300 bg-white text-slate-700 hover:bg-slate-50 focus-visible:ring-slate-200">Back to campaign</a>
-    </div>
-  </section>
+  <main id="main" class="mx-auto max-w-xl px-4 py-20 text-center">
+    <h1 class="font-display text-3xl font-bold text-brand-950">Payment is not available</h1>
+    <p class="mt-3 text-slate-600">No payment provider is configured, so no payment was attempted from this page. You have not been charged by Vouch.</p>
+    <a href="{{ url_for('campaign.explore') }}" class="mt-8 inline-block rounded-xl bg-brand-700 px-5 py-3 text-sm font-semibold text-white hover:bg-brand-800">Browse campaigns</a>
   </main>
-
-
 {% endblock %}

@@ -1,46 +1,54 @@
 {% extends "layouts/public.html" %}
 
-{% block title %}Ledger · Help Ada walk again: spinal surgery fund{% endblock %}
+{% block title %}Public ledger · {{ revision.title }}{% endblock %}
 
 {% block content %}
-    <main id="main">
-  <section class="mx-auto max-w-5xl px-4 py-10 sm:px-6">
-    <a href="{{ url_for('campaign.detail') }}" class="inline-flex items-center gap-1 text-sm text-slate-500 hover:text-brand-700"><svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M11 17l-5-5m0 0l5-5m-5 5h12"/></svg> Back to campaign</a>
-    <p class="text-xs font-semibold uppercase tracking-widest text-brand-600 mt-4">Public ledger</p>
-    <h1 class="mt-1 font-display text-3xl font-bold text-brand-950 sm:text-4xl">Help Ada walk again: spinal surgery fund</h1>
-    <p class="mt-2 max-w-2xl text-slate-600">Every naira in, every naira out. Nothing hidden, nothing rounded away.</p>
+  <main id="main">
+    <section class="mx-auto max-w-5xl px-4 py-10 sm:px-6">
+      <a href="{{ url_for('campaign.detail', slug=campaign.slug) }}" class="text-sm text-slate-500 hover:text-brand-700">Back to campaign</a>
+      <p class="mt-4 text-xs font-semibold uppercase tracking-widest text-brand-600">Public ledger</p>
+      <h1 class="mt-1 font-display text-3xl font-bold text-brand-950 sm:text-4xl">{{ revision.title }}</h1>
+      <p class="mt-2 text-slate-600">Only completed payments and paid disbursements appear below. Pending donation intentions are not counted.</p>
 
-    <div class="mt-8 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
-      <div class="rounded-2xl border border-slate-200 bg-white shadow-sm p-5"><p class="text-xs text-slate-500">Donations (gross)</p><p class="mt-1 font-display text-2xl font-bold text-slate-900">₦1,250,000</p></div>
-      <div class="rounded-2xl border border-slate-200 bg-white shadow-sm p-5"><p class="text-xs text-slate-500">Platform fees</p><p class="mt-1 font-display text-2xl font-bold text-slate-900">− ₦62,500</p></div>
-      <div class="rounded-2xl border border-slate-200 bg-white shadow-sm p-5"><p class="text-xs text-slate-500">Received by campaign</p><p class="mt-1 font-display text-2xl font-bold text-brand-800">₦1,187,500</p></div>
-      <div class="rounded-2xl border border-slate-200 bg-white shadow-sm p-5"><p class="text-xs text-slate-500">Still available</p><p class="mt-1 font-display text-2xl font-bold text-gold-600">₦737,500</p></div>
-    </div>
-    <div class="mt-4"><div class="w-full overflow-hidden rounded-full bg-brand-100 h-2.5" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="38">
-    <div class="h-full rounded-full bg-[#22A06B]" style="width: 37.9%"></div>
-  </div><p class="mt-1 text-xs text-slate-500">₦450,000 paid out so far · ₦100 in transfer fees</p></div>
+      {% set exponent = revision.currency.minor_unit_exponent %}
+      <div class="mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+        <div class="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm"><p class="text-xs text-slate-500">Completed donations (gross)</p><p class="mt-1 font-display text-xl font-bold text-slate-900">{{ revision.currency_code }} {{ "{:,.2f}".format(gross_minor / (10 ** exponent)) }}</p></div>
+        <div class="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm"><p class="text-xs text-slate-500">Difference recorded</p><p class="mt-1 font-display text-xl font-bold text-slate-900">{{ revision.currency_code }} {{ "{:,.2f}".format(difference_minor / (10 ** exponent)) }}</p></div>
+        <div class="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm"><p class="text-xs text-slate-500">Credited to campaign</p><p class="mt-1 font-display text-xl font-bold text-brand-800">{{ revision.currency_code }} {{ "{:,.2f}".format(credited_minor / (10 ** exponent)) }}</p></div>
+        <div class="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm"><p class="text-xs text-slate-500">Available balance</p><p class="mt-1 font-display text-xl font-bold text-gold-600">{{ revision.currency_code }} {{ "{:,.2f}".format(available_minor / (10 ** exponent)) }}</p></div>
+      </div>
+      <div class="mt-4">
+        <div class="h-2.5 overflow-hidden rounded-full bg-brand-100" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="{{ progress }}"><div class="h-full bg-brand-600" style="width: {{ progress }}%"></div></div>
+        <p class="mt-1 text-xs text-slate-500">{{ revision.currency_code }} {{ "{:,.2f}".format(paid_minor / (10 ** exponent)) }} paid out</p>
+      </div>
 
-    <h2 class="mt-12 font-display text-2xl font-bold text-brand-950">Money out</h2>
+      <h2 class="mt-12 font-display text-2xl font-bold text-brand-950">Money out</h2>
+      <div class="mt-4 overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm">
+        <div class="overflow-x-auto"><table class="min-w-full divide-y divide-slate-200">
+          <thead class="bg-slate-50"><tr><th class="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide text-slate-500">Date</th><th class="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide text-slate-500">Purpose</th><th class="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide text-slate-500">Recipient</th><th class="px-4 py-3 text-right text-xs font-semibold uppercase tracking-wide text-slate-500">Amount</th></tr></thead>
+          <tbody class="divide-y divide-slate-100">
+            {% for disbursement in disbursements %}
+              <tr><td class="whitespace-nowrap px-4 py-3.5 text-sm text-slate-700">{{ (disbursement.paid_at or disbursement.created_at).strftime("%d %b %Y") }}</td><td class="px-4 py-3.5 text-sm font-medium text-slate-900">{{ disbursement.expense_request.title }}</td><td class="px-4 py-3.5 text-sm text-slate-700">Verified recipient</td><td class="whitespace-nowrap px-4 py-3.5 text-right text-sm font-semibold">{{ disbursement.currency_code }} {{ "{:,.2f}".format(disbursement.amount_minor / (10 ** disbursement.currency.minor_unit_exponent)) }}</td></tr>
+            {% else %}
+              <tr><td colspan="4" class="px-4 py-8 text-center text-sm text-slate-500">No paid disbursements have been recorded.</td></tr>
+            {% endfor %}
+          </tbody>
+        </table></div>
+      </div>
 
-    <div class="rounded-2xl border border-slate-200 bg-white shadow-sm mt-4 overflow-hidden"><div class="relative overflow-x-auto"><table class="min-w-full divide-y divide-slate-200">
-      <thead class="bg-slate-50"><tr><th class="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide text-slate-500">Date</th><th class="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide text-slate-500">Purpose</th><th class="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide text-slate-500">Recipient</th><th class="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide text-slate-500 text-right">Amount</th><th class="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide text-slate-500 text-right">Fee</th><th class="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide text-slate-500">Status</th></tr></thead>
-      <tbody class="divide-y divide-slate-100 bg-white">
-
-        <tr><td class="px-4 py-3.5 text-sm text-slate-700 whitespace-nowrap">09 Oct 2026</td><td class="px-4 py-3.5 text-sm font-medium text-slate-900">Hospital admission deposit</td><td class="px-4 py-3.5 text-sm text-slate-700">Lagos City Hospital</td>
-          <td class="px-4 py-3.5 text-sm text-slate-700 text-right font-semibold">₦450,000</td><td class="px-4 py-3.5 text-sm text-slate-700 text-right">₦100</td><td class="px-4 py-3.5 text-sm text-slate-700"><span class="inline-flex items-center gap-1 rounded-full px-2.5 py-0.5 text-xs font-medium bg-brand-100 text-brand-800">Completed</span></td></tr>
-
-      </tbody></table></div></div>
-
-    <h2 class="mt-12 font-display text-2xl font-bold text-brand-950">Money in</h2>
-
-    <div class="rounded-2xl border border-slate-200 bg-white shadow-sm mt-4 overflow-hidden"><div class="relative overflow-x-auto"><table class="min-w-full divide-y divide-slate-200">
-      <thead class="bg-slate-50"><tr><th class="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide text-slate-500">Date</th><th class="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide text-slate-500">Donor</th><th class="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide text-slate-500 text-right">Gross</th><th class="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide text-slate-500 text-right">Fee</th><th class="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide text-slate-500 text-right">Net</th></tr></thead>
-      <tbody class="divide-y divide-slate-100 bg-white">
-        <tr><td class="px-4 py-3.5 text-sm text-slate-700 whitespace-nowrap">09 Oct 2026</td><td class="px-4 py-3.5 text-sm text-slate-700">Amaka Obi</td><td class="px-4 py-3.5 text-sm text-slate-700 text-right">₦25,000</td><td class="px-4 py-3.5 text-sm text-slate-700 text-right">₦1,250</td><td class="px-4 py-3.5 text-sm text-right font-semibold text-brand-800">₦23,750</td></tr>
-      </tbody></table></div></div>
-
-  </section>
+      <h2 class="mt-12 font-display text-2xl font-bold text-brand-950">Money in</h2>
+      <div class="mt-4 overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm">
+        <div class="overflow-x-auto"><table class="min-w-full divide-y divide-slate-200">
+          <thead class="bg-slate-50"><tr><th class="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide text-slate-500">Date</th><th class="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide text-slate-500">Donor</th><th class="px-4 py-3 text-right text-xs font-semibold uppercase tracking-wide text-slate-500">Gross</th><th class="px-4 py-3 text-right text-xs font-semibold uppercase tracking-wide text-slate-500">Credited</th></tr></thead>
+          <tbody class="divide-y divide-slate-100">
+            {% for donation in donations %}
+              <tr><td class="whitespace-nowrap px-4 py-3.5 text-sm text-slate-700">{{ donation.created_at.strftime("%d %b %Y") }}</td><td class="px-4 py-3.5 text-sm text-slate-700">{% if donation.is_anonymous %}Anonymous donor{% elif donation.donor %}{{ donation.donor.display_name }}{% else %}Guest donor{% endif %}</td><td class="whitespace-nowrap px-4 py-3.5 text-right text-sm">{{ donation.campaign_currency_code }} {{ "{:,.2f}".format(donation.intended_amount_minor / (10 ** donation.campaign_currency.minor_unit_exponent)) }}</td><td class="whitespace-nowrap px-4 py-3.5 text-right text-sm font-semibold text-brand-800">{{ donation.campaign_currency_code }} {{ "{:,.2f}".format((donation.credited_amount_minor or 0) / (10 ** donation.campaign_currency.minor_unit_exponent)) }}</td></tr>
+            {% else %}
+              <tr><td colspan="4" class="px-4 py-8 text-center text-sm text-slate-500">No successful donations have been recorded.</td></tr>
+            {% endfor %}
+          </tbody>
+        </table></div>
+      </div>
+    </section>
   </main>
-
-
 {% endblock %}

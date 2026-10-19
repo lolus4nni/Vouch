@@ -4,279 +4,166 @@
 {% block title %}Explore campaigns{% endblock %}
 
 {% block content %}
-    <main id="main">
-  <section class="relative overflow-hidden bg-brand-900">
-    <div class="absolute inset-0 bg-gradient-to-br from-brand-700 to-brand-950"><img src="{{ url_for('campaign.static', filename='images/explore-banner.jpg') }}" alt="" class="h-full w-full object-cover opacity-25 mix-blend-luminosity" loading="lazy" onerror="this.style.display='none'"></div>
-    <div class="relative mx-auto max-w-7xl px-4 py-14 sm:px-6 lg:px-8">
-      <h1 class="font-display text-4xl font-bold text-white sm:text-5xl">Find a cause worth backing</h1>
-      <p class="mt-3 max-w-2xl text-lg text-brand-100">Every campaign below has been reviewed. Look for the green shield: it means identity and evidence are verified.</p>
-      <form action="{{ url_for('campaign.explore') }}" method="get" role="search" class="mt-8 flex max-w-2xl gap-2 rounded-2xl bg-surface p-2 shadow-xl">
-        <label class="sr-only" for="q">Search campaigns</label>
-        <span class="grid place-items-center pl-3 text-slate-400"><svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 21l-4.3-4.3M10 18a8 8 0 100-16 8 8 0 000 16z"/></svg></span>
-        <input id="q" name="q" value="{{ search }}" placeholder="Search by title, place or keyword" class="min-w-0 flex-1 border-0 bg-transparent px-2 py-3 text-sm focus:outline-none focus:ring-0">
-
-        <button class="inline-flex items-center justify-center gap-2 rounded-xl px-5 py-3 text-sm font-semibold transition focus:outline-none focus-visible:ring-4 disabled:cursor-not-allowed disabled:opacity-50 bg-accent text-ink shadow-sm hover:bg-accent-600 focus-visible:ring-accent-200">Search</button>
-      </form>
-    </div>
-  </section>
-
-  <div class="mx-auto grid grid-cols-1 max-w-7xl gap-8 px-4 py-10 sm:px-6 lg:grid-cols-4 lg:px-8">
-
-    <aside class="lg:col-span-1">
-      <form id="campaign-filters" action="{{ url_for('campaign.search') }}" method="get" class="rounded-2xl border border-border bg-surface shadow-sm space-y-6 p-5 lg:sticky lg:top-24">
-        <div>
-          <label for="category_id" class="text-sm font-semibold text-ink">Category</label>
-          <select id="category_id" name="category_id" class="mt-2 block w-full rounded-xl border border-slate-300 bg-surface px-4 py-3 text-sm">
-            <option value="">All categories</option>
-            {% for category in categories %}
-              <option value="{{ category.id }}" {{ 'selected' if selected_category|string == category.id|string else '' }}>{{ category.name }}</option>
-            {% endfor %}
-          </select>
-        </div>
-
-        <div>
-          <label for="sort" class="text-sm font-semibold text-ink">Sort by</label>
-          <select id="sort" name="sort" class="block w-full rounded-xl border border-slate-300 bg-surface px-4 py-3 text-sm text-ink placeholder:text-slate-400 focus:border-brand-600 focus:outline-none focus:ring-4 focus:ring-brand-100 mt-2">
-
-            <option value="newest" {{ 'selected' if selected_sort == 'newest' else '' }}>Newest</option>
-            <option value="ending" {{ 'selected' if selected_sort == 'ending' else '' }}>Ending soon</option>
-            <option value="funded" {{ 'selected' if selected_sort == 'funded' else '' }}>Most funded</option>
-            <option value="goal" {{ 'selected' if selected_sort == 'goal' else '' }}>Nearest to goal</option>
-          </select>
-        </div>
-        <label class="flex items-center gap-3 text-sm text-slate-700">
-          <input type="checkbox" name="verified" value="1" class="h-4 w-4 rounded border-slate-300 text-brand-700 focus:ring-brand-200" {{ 'checked' if verified else '' }}>
-          Verified campaigns only
-        </label>
-
-      </form>
-    </aside>
-
-    <section class="lg:col-span-3" aria-live="polite">
-      <p id="campaign-count" class="mb-5 text-sm text-muted">{{ campaigns|length }} campaigns</p>
-
-        <div id="campaign-results" class="grid grid-cols-1 gap-6 sm:grid-cols-2 xl:grid-cols-3"><article class="rounded-2xl border border-border bg-surface shadow-sm group overflow-hidden transition hover:-translate-y-0.5 hover:shadow-lg">
-    <a href="{{ url_for('campaign.detail') }}" class="block">
-      <div class="relative aspect-[16/10] overflow-hidden bg-gradient-to-br from-brand-200 via-brand-100 to-gold-100">
-
-        <span class="inline-flex items-center gap-1 rounded-full px-2.5 py-0.5 text-xs font-medium absolute left-3 top-3 bg-surface/90 text-brand-800 backdrop-blur">Health &amp; Medical</span>
-        <span class="inline-flex items-center gap-1 rounded-full px-2.5 py-0.5 text-xs font-medium absolute right-3 top-3 bg-brand-700 text-white"><svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 12l2 2 4-4m5.6-4A12 12 0 0112 3a12 12 0 01-8.6 3A12 12 0 003 12c0 5.6 3.8 10.3 9 11.6 5.2-1.3 9-6 9-11.6 0-1.9-.3-3.7-.4-6z"/></svg>Verified</span>
+  <main id="main">
+    <section class="bg-brand-900">
+      <div class="mx-auto max-w-7xl px-4 py-14 sm:px-6 lg:px-8">
+        <h1 class="font-display text-4xl font-bold text-white sm:text-5xl">Find a cause worth backing</h1>
+        <p class="mt-3 max-w-2xl text-lg text-brand-100">Browse active campaigns and see how much each one has raised.</p>
+        <form action="{{ url_for('campaign.explore') }}" method="get" role="search" class="mt-8 flex max-w-2xl gap-2 rounded-2xl bg-surface p-2 shadow-xl">
+          <label class="sr-only" for="q">Search campaigns</label>
+          <input id="q" name="q" value="{{ search }}" placeholder="Search by title or keyword" class="min-w-0 flex-1 rounded-xl border-0 bg-transparent px-3 py-3 text-sm focus:outline-none focus:ring-0">
+          <button class="rounded-xl bg-accent px-5 py-3 text-sm font-semibold text-ink hover:bg-accent-600">Search</button>
+        </form>
       </div>
-      <div class="p-5">
-        <h3 class="line-clamp-2 font-display text-lg font-bold leading-snug text-brand-950 group-hover:text-brand-700">Help Ada walk again: spinal surgery fund</h3>
-        <p class="mt-2 line-clamp-2 text-sm text-slate-600">Ada is 9 and needs urgent spinal surgery. Her family has done everything they can. With your help she will walk back...</p>
-        <div class="mt-5">
-          <div class="w-full overflow-hidden rounded-full bg-brand-100 h-2.5" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="42">
-    <div class="h-full rounded-full bg-progress" style="width: 41.7%"></div>
-  </div>
-          <div class="mt-2 flex items-end justify-between text-sm">
-            <p><span class="font-semibold text-brand-800">₦1.2M</span> <span class="text-muted">raised of ₦3.0M</span></p>
-            <p class="font-semibold text-slate-700">42%</p>
-          </div>
-        </div>
-      </div>
-    </a>
-  </article><article class="rounded-2xl border border-border bg-surface shadow-sm group overflow-hidden transition hover:-translate-y-0.5 hover:shadow-lg">
-    <a href="{{ url_for('campaign.detail') }}" class="block">
-      <div class="relative aspect-[16/10] overflow-hidden bg-gradient-to-br from-brand-200 via-brand-100 to-gold-100">
-
-        <span class="inline-flex items-center gap-1 rounded-full px-2.5 py-0.5 text-xs font-medium absolute left-3 top-3 bg-surface/90 text-brand-800 backdrop-blur">Health &amp; Medical</span>
-        <span class="inline-flex items-center gap-1 rounded-full px-2.5 py-0.5 text-xs font-medium absolute right-3 top-3 bg-brand-700 text-white"><svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 12l2 2 4-4m5.6-4A12 12 0 0112 3a12 12 0 01-8.6 3A12 12 0 003 12c0 5.6 3.8 10.3 9 11.6 5.2-1.3 9-6 9-11.6 0-1.9-.3-3.7-.4-6z"/></svg>Verified</span>
-      </div>
-      <div class="p-5">
-        <h3 class="line-clamp-2 font-display text-lg font-bold leading-snug text-brand-950 group-hover:text-brand-700">Rebuild Ikorodu Community Library</h3>
-        <p class="mt-2 line-clamp-2 text-sm text-slate-600">Ada is 9 and needs urgent spinal surgery. Her family has done everything they can. With your help she will walk back...</p>
-        <div class="mt-5">
-          <div class="w-full overflow-hidden rounded-full bg-brand-100 h-2.5" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="60">
-    <div class="h-full rounded-full bg-progress" style="width: 60.0%"></div>
-  </div>
-          <div class="mt-2 flex items-end justify-between text-sm">
-            <p><span class="font-semibold text-brand-800">₦480K</span> <span class="text-muted">raised of ₦800K</span></p>
-            <p class="font-semibold text-slate-700">60%</p>
-          </div>
-        </div>
-      </div>
-    </a>
-  </article><article class="rounded-2xl border border-border bg-surface shadow-sm group overflow-hidden transition hover:-translate-y-0.5 hover:shadow-lg">
-    <a href="{{ url_for('campaign.detail') }}" class="block">
-      <div class="relative aspect-[16/10] overflow-hidden bg-gradient-to-br from-brand-200 via-brand-100 to-gold-100">
-
-        <span class="inline-flex items-center gap-1 rounded-full px-2.5 py-0.5 text-xs font-medium absolute left-3 top-3 bg-surface/90 text-brand-800 backdrop-blur">Health &amp; Medical</span>
-        <span class="inline-flex items-center gap-1 rounded-full px-2.5 py-0.5 text-xs font-medium absolute right-3 top-3 bg-brand-700 text-white"><svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 12l2 2 4-4m5.6-4A12 12 0 0112 3a12 12 0 01-8.6 3A12 12 0 003 12c0 5.6 3.8 10.3 9 11.6 5.2-1.3 9-6 9-11.6 0-1.9-.3-3.7-.4-6z"/></svg>Verified</span>
-      </div>
-      <div class="p-5">
-        <h3 class="line-clamp-2 font-display text-lg font-bold leading-snug text-brand-950 group-hover:text-brand-700">Clean water borehole for Ogbese village</h3>
-        <p class="mt-2 line-clamp-2 text-sm text-slate-600">Ada is 9 and needs urgent spinal surgery. Her family has done everything they can. With your help she will walk back...</p>
-        <div class="mt-5">
-          <div class="w-full overflow-hidden rounded-full bg-brand-100 h-2.5" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="97">
-    <div class="h-full rounded-full bg-progress" style="width: 96.7%"></div>
-  </div>
-          <div class="mt-2 flex items-end justify-between text-sm">
-            <p><span class="font-semibold text-brand-800">₦2.9M</span> <span class="text-muted">raised of ₦3.0M</span></p>
-            <p class="font-semibold text-slate-700">97%</p>
-          </div>
-        </div>
-      </div>
-    </a>
-  </article><article class="rounded-2xl border border-border bg-surface shadow-sm group overflow-hidden transition hover:-translate-y-0.5 hover:shadow-lg">
-    <a href="{{ url_for('campaign.detail') }}" class="block">
-      <div class="relative aspect-[16/10] overflow-hidden bg-gradient-to-br from-brand-200 via-brand-100 to-gold-100">
-
-        <span class="inline-flex items-center gap-1 rounded-full px-2.5 py-0.5 text-xs font-medium absolute left-3 top-3 bg-surface/90 text-brand-800 backdrop-blur">Health &amp; Medical</span>
-        <span class="inline-flex items-center gap-1 rounded-full px-2.5 py-0.5 text-xs font-medium absolute right-3 top-3 bg-brand-700 text-white"><svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 12l2 2 4-4m5.6-4A12 12 0 0112 3a12 12 0 01-8.6 3A12 12 0 003 12c0 5.6 3.8 10.3 9 11.6 5.2-1.3 9-6 9-11.6 0-1.9-.3-3.7-.4-6z"/></svg>Verified</span>
-      </div>
-      <div class="p-5">
-        <h3 class="line-clamp-2 font-display text-lg font-bold leading-snug text-brand-950 group-hover:text-brand-700">Help Ada walk again: spinal surgery fund</h3>
-        <p class="mt-2 line-clamp-2 text-sm text-slate-600">Ada is 9 and needs urgent spinal surgery. Her family has done everything they can. With your help she will walk back...</p>
-        <div class="mt-5">
-          <div class="w-full overflow-hidden rounded-full bg-brand-100 h-2.5" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="42">
-    <div class="h-full rounded-full bg-progress" style="width: 41.7%"></div>
-  </div>
-          <div class="mt-2 flex items-end justify-between text-sm">
-            <p><span class="font-semibold text-brand-800">₦1.2M</span> <span class="text-muted">raised of ₦3.0M</span></p>
-            <p class="font-semibold text-slate-700">42%</p>
-          </div>
-        </div>
-      </div>
-    </a>
-  </article><article class="rounded-2xl border border-border bg-surface shadow-sm group overflow-hidden transition hover:-translate-y-0.5 hover:shadow-lg">
-    <a href="{{ url_for('campaign.detail') }}" class="block">
-      <div class="relative aspect-[16/10] overflow-hidden bg-gradient-to-br from-brand-200 via-brand-100 to-gold-100">
-
-        <span class="inline-flex items-center gap-1 rounded-full px-2.5 py-0.5 text-xs font-medium absolute left-3 top-3 bg-surface/90 text-brand-800 backdrop-blur">Health &amp; Medical</span>
-        <span class="inline-flex items-center gap-1 rounded-full px-2.5 py-0.5 text-xs font-medium absolute right-3 top-3 bg-brand-700 text-white"><svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 12l2 2 4-4m5.6-4A12 12 0 0112 3a12 12 0 01-8.6 3A12 12 0 003 12c0 5.6 3.8 10.3 9 11.6 5.2-1.3 9-6 9-11.6 0-1.9-.3-3.7-.4-6z"/></svg>Verified</span>
-      </div>
-      <div class="p-5">
-        <h3 class="line-clamp-2 font-display text-lg font-bold leading-snug text-brand-950 group-hover:text-brand-700">Rebuild Ikorodu Community Library</h3>
-        <p class="mt-2 line-clamp-2 text-sm text-slate-600">Ada is 9 and needs urgent spinal surgery. Her family has done everything they can. With your help she will walk back...</p>
-        <div class="mt-5">
-          <div class="w-full overflow-hidden rounded-full bg-brand-100 h-2.5" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="60">
-    <div class="h-full rounded-full bg-progress" style="width: 60.0%"></div>
-  </div>
-          <div class="mt-2 flex items-end justify-between text-sm">
-            <p><span class="font-semibold text-brand-800">₦480K</span> <span class="text-muted">raised of ₦800K</span></p>
-            <p class="font-semibold text-slate-700">60%</p>
-          </div>
-        </div>
-      </div>
-    </a>
-  </article><article class="rounded-2xl border border-border bg-surface shadow-sm group overflow-hidden transition hover:-translate-y-0.5 hover:shadow-lg">
-    <a href="{{ url_for('campaign.detail') }}" class="block">
-      <div class="relative aspect-[16/10] overflow-hidden bg-gradient-to-br from-brand-200 via-brand-100 to-gold-100">
-
-        <span class="inline-flex items-center gap-1 rounded-full px-2.5 py-0.5 text-xs font-medium absolute left-3 top-3 bg-surface/90 text-brand-800 backdrop-blur">Health &amp; Medical</span>
-        <span class="inline-flex items-center gap-1 rounded-full px-2.5 py-0.5 text-xs font-medium absolute right-3 top-3 bg-brand-700 text-white"><svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 12l2 2 4-4m5.6-4A12 12 0 0112 3a12 12 0 01-8.6 3A12 12 0 003 12c0 5.6 3.8 10.3 9 11.6 5.2-1.3 9-6 9-11.6 0-1.9-.3-3.7-.4-6z"/></svg>Verified</span>
-      </div>
-      <div class="p-5">
-        <h3 class="line-clamp-2 font-display text-lg font-bold leading-snug text-brand-950 group-hover:text-brand-700">Clean water borehole for Ogbese village</h3>
-        <p class="mt-2 line-clamp-2 text-sm text-slate-600">Ada is 9 and needs urgent spinal surgery. Her family has done everything they can. With your help she will walk back...</p>
-        <div class="mt-5">
-          <div class="w-full overflow-hidden rounded-full bg-brand-100 h-2.5" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="97">
-    <div class="h-full rounded-full bg-progress" style="width: 96.7%"></div>
-  </div>
-          <div class="mt-2 flex items-end justify-between text-sm">
-            <p><span class="font-semibold text-brand-800">₦2.9M</span> <span class="text-muted">raised of ₦3.0M</span></p>
-            <p class="font-semibold text-slate-700">97%</p>
-          </div>
-        </div>
-      </div>
-    </a>
-  </article></div>
-
-  <nav class="mt-10 flex items-center justify-center gap-1" aria-label="Pagination">
-
-        <a href="{{ url_for('campaign.explore') }}" class="grid h-9 w-9 place-items-center rounded-lg text-sm font-medium bg-brand-700 text-white" aria-current="page">1</a>
-
-        <a href="{{ url_for('campaign.explore') }}" class="grid h-9 w-9 place-items-center rounded-lg text-sm font-medium text-slate-600 hover:bg-brand-50" >2</a>
-
-        <a href="{{ url_for('campaign.explore') }}" class="grid h-9 w-9 place-items-center rounded-lg text-sm font-medium text-slate-600 hover:bg-brand-50" >3</a>
-
-    <a class="inline-flex items-center justify-center gap-2 rounded-xl font-semibold transition focus:outline-none focus-visible:ring-4 disabled:cursor-not-allowed disabled:opacity-50 border border-slate-300 bg-surface text-slate-700 hover:bg-background focus-visible:ring-slate-200 px-3.5 py-2 text-xs" href="{{ url_for('campaign.explore') }}">Next</a>
-  </nav>
-
     </section>
-  </div>
+
+    <div class="mx-auto grid max-w-7xl grid-cols-1 gap-8 px-4 py-10 sm:px-6 lg:grid-cols-4 lg:px-8">
+      <aside class="lg:col-span-1">
+        <form id="campaign-filters" action="{{ url_for('campaign.search') }}" method="get" class="space-y-6 rounded-2xl border border-border bg-surface p-5 shadow-sm lg:sticky lg:top-24">
+          <div>
+            <label for="category_id" class="text-sm font-semibold text-ink">Category</label>
+            <select id="category_id" name="category_id" class="mt-2 block w-full rounded-xl border border-slate-300 bg-surface px-4 py-3 text-sm">
+              <option value="">All categories</option>
+              {% for category in categories %}
+                <option value="{{ category.id }}" {{ 'selected' if selected_category|string == category.id|string else '' }}>{{ category.name }}</option>
+              {% endfor %}
+            </select>
+          </div>
+          <div>
+            <label for="sort" class="text-sm font-semibold text-ink">Sort by</label>
+            <select id="sort" name="sort" class="mt-2 block w-full rounded-xl border border-slate-300 bg-surface px-4 py-3 text-sm">
+              <option value="newest" {{ 'selected' if selected_sort == 'newest' else '' }}>Newest</option>
+              <option value="ending" {{ 'selected' if selected_sort == 'ending' else '' }}>Ending soon</option>
+              <option value="funded" {{ 'selected' if selected_sort == 'funded' else '' }}>Most funded</option>
+              <option value="goal" {{ 'selected' if selected_sort == 'goal' else '' }}>Nearest to goal</option>
+            </select>
+          </div>
+          <label class="flex items-center gap-3 text-sm text-slate-700">
+            <input type="checkbox" name="verified" value="1" {{ 'checked' if verified else '' }} class="h-4 w-4 rounded border-slate-300 text-brand-700 focus:ring-brand-200">
+            Verified campaigns only
+          </label>
+        </form>
+      </aside>
+
+      <section class="lg:col-span-3" aria-live="polite">
+        <p id="campaign-count" class="mb-5 text-sm text-muted">{{ campaigns|length }} campaigns</p>
+        <div id="campaign-results" class="grid grid-cols-1 gap-6 sm:grid-cols-2 xl:grid-cols-3">
+          {% for revision, campaign_record, raised_minor, is_verified in campaigns %}
+            {% set progress = [100, ((raised_minor * 100 / revision.goal_amount_minor)|round|int)]|min %}
+            <article class="overflow-hidden rounded-2xl border border-border bg-surface shadow-sm transition hover:-translate-y-0.5 hover:shadow-lg">
+              <a href="{{ url_for('campaign.detail', slug=campaign_record.slug) }}" class="block">
+                <div class="relative aspect-[16/10] bg-gradient-to-br from-brand-200 via-brand-100 to-gold-100">
+                  {% if revision.category %}
+                    <span class="absolute left-3 top-3 rounded-full bg-surface/90 px-2.5 py-0.5 text-xs font-medium text-brand-800">{{ revision.category.name }}</span>
+                  {% endif %}
+                  {% if is_verified %}
+                    <span class="absolute right-3 top-3 rounded-full bg-brand-700 px-2.5 py-0.5 text-xs font-medium text-white">Verified</span>
+                  {% endif %}
+                </div>
+                <div class="p-5">
+                  <h2 class="line-clamp-2 font-display text-lg font-bold leading-snug text-brand-950">{{ revision.title }}</h2>
+                  <p class="mt-2 line-clamp-2 text-sm text-slate-600">{{ revision.description }}</p>
+                  <div class="mt-5 h-2.5 overflow-hidden rounded-full bg-brand-100" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="{{ progress }}">
+                    <div class="h-full bg-progress" style="width: {{ progress }}%"></div>
+                  </div>
+                  <div class="mt-2 flex items-end justify-between text-sm">
+                    <p><span class="font-semibold text-brand-800">₦{{ '{:,.2f}'.format(raised_minor / 100) }}</span><span class="text-muted"> of ₦{{ '{:,.2f}'.format(revision.goal_amount_minor / 100) }}</span></p>
+                    <span class="font-semibold text-slate-700">{{ progress }}%</span>
+                  </div>
+                </div>
+              </a>
+            </article>
+          {% else %}
+            <p class="rounded-xl bg-surface p-6 text-sm text-muted">No active campaigns match these filters.</p>
+          {% endfor %}
+        </div>
+      </section>
+    </div>
   </main>
-
-
 {% endblock %}
 
 {% block scripts %}
-<script>
-  (function () {
-    var searchForm = document.querySelector('form[role="search"]');
-    var filterForm = document.getElementById('campaign-filters');
-    var results = document.getElementById('campaign-results');
-    var count = document.getElementById('campaign-count');
-    var timer;
+  <script>
+    (function () {
+      var searchForm = document.querySelector('form[role="search"]');
+      var filterForm = document.getElementById('campaign-filters');
+      var results = document.getElementById('campaign-results');
+      var count = document.getElementById('campaign-count');
+      var timer;
 
-    function addText(parent, tag, className, text) {
-      var element = document.createElement(tag);
-      element.className = className;
-      element.textContent = text;
-      parent.appendChild(element);
-      return element;
-    }
-
-    function showCampaigns(campaigns) {
-      results.replaceChildren();
-      campaigns.forEach(function (campaign) {
-        var card = document.createElement('article');
-        card.className = 'rounded-2xl border border-border bg-surface shadow-sm group overflow-hidden transition hover:-translate-y-0.5 hover:shadow-lg';
-        var link = document.createElement('a');
-        link.className = 'block';
-        link.href = '/campaigns/detail?slug=' + encodeURIComponent(campaign.slug);
-        var content = document.createElement('div');
-        content.className = 'p-5';
-        addText(content, 'p', 'text-xs font-medium text-brand-700', campaign.category);
-        addText(content, 'h3', 'mt-2 line-clamp-2 font-display text-lg font-bold text-brand-950', campaign.title);
-        addText(content, 'p', 'mt-2 line-clamp-2 text-sm text-slate-600', campaign.description);
-        var goal = campaign.goal_minor || 0;
-        var raised = campaign.raised_minor || 0;
-        var percent = goal ? Math.min(100, Math.round(raised * 100 / goal)) : 0;
-        var progress = document.createElement('div');
-        progress.className = 'mt-5 h-2.5 overflow-hidden rounded-full bg-brand-100';
-        var fill = document.createElement('div');
-        fill.className = 'h-full rounded-full bg-progress';
-        fill.style.width = percent + '%';
-        progress.appendChild(fill);
-        content.appendChild(progress);
-        addText(content, 'p', 'mt-2 text-sm text-muted', '₦' + Math.floor(raised / 100).toLocaleString() + ' raised of ₦' + Math.floor(goal / 100).toLocaleString());
-        link.appendChild(content);
-        card.appendChild(link);
-        results.appendChild(card);
-      });
-      if (!campaigns.length) {
-        addText(results, 'p', 'rounded-xl bg-surface p-6 text-sm text-muted', 'No active campaigns match these filters.');
+      function addText(parent, tag, className, text) {
+        var element = document.createElement(tag);
+        element.className = className;
+        element.textContent = text;
+        parent.appendChild(element);
+        return element;
       }
-      count.textContent = campaigns.length + ' campaigns';
-    }
 
-    async function loadCampaigns() {
-      var values = new FormData(filterForm);
-      new FormData(searchForm).forEach(function (value, key) {
-        values.set(key, value);
-      });
-      values.set('verified', filterForm.elements.verified.checked ? '1' : '');
-      try {
-        var response = await fetch(filterForm.action + '?' + new URLSearchParams(values));
-        if (!response.ok) throw new Error('Could not load campaigns.');
-        showCampaigns(await response.json());
-      } catch (error) {
-        count.textContent = error.message;
+      function showCampaigns(campaigns) {
+        results.replaceChildren();
+        campaigns.forEach(function (campaign) {
+          var card = document.createElement('article');
+          card.className = 'overflow-hidden rounded-2xl border border-border bg-surface shadow-sm';
+          var link = document.createElement('a');
+          link.className = 'block';
+          link.href = '/campaigns/detail?slug=' + encodeURIComponent(campaign.slug);
+          var image = document.createElement('div');
+          image.className = 'relative aspect-[16/10] bg-gradient-to-br from-brand-200 via-brand-100 to-gold-100';
+          addText(image, 'span', 'absolute left-3 top-3 rounded-full bg-surface/90 px-2.5 py-0.5 text-xs font-medium text-brand-800', campaign.category);
+          if (campaign.verified) {
+            addText(image, 'span', 'absolute right-3 top-3 rounded-full bg-brand-700 px-2.5 py-0.5 text-xs font-medium text-white', 'Verified');
+          }
+          link.appendChild(image);
+          var content = document.createElement('div');
+          content.className = 'p-5';
+          addText(content, 'p', 'text-xs font-medium text-brand-700', campaign.category);
+          addText(content, 'h2', 'mt-2 font-display text-lg font-bold text-brand-950', campaign.title);
+          addText(content, 'p', 'mt-2 text-sm text-slate-600', campaign.description);
+          var goal = campaign.goal_minor || 0;
+          var raised = campaign.raised_minor || 0;
+          var progress = goal ? Math.min(100, Math.round(raised * 100 / goal)) : 0;
+          var bar = document.createElement('div');
+          bar.className = 'mt-5 h-2.5 overflow-hidden rounded-full bg-brand-100';
+          var fill = document.createElement('div');
+          fill.className = 'h-full bg-progress';
+          fill.style.width = progress + '%';
+          bar.appendChild(fill);
+          content.appendChild(bar);
+          addText(content, 'p', 'mt-2 text-sm text-muted', '₦' + (raised / 100).toLocaleString() + ' raised of ₦' + (goal / 100).toLocaleString());
+          link.appendChild(content);
+          card.appendChild(link);
+          results.appendChild(card);
+        });
+        if (!campaigns.length) {
+          addText(results, 'p', 'rounded-xl bg-surface p-6 text-sm text-muted', 'No active campaigns match these filters.');
+        }
+        count.textContent = campaigns.length + ' campaigns';
       }
-    }
 
-    searchForm.addEventListener('submit', function (event) {
-      event.preventDefault();
+      async function loadCampaigns() {
+        var values = new FormData(filterForm);
+        new FormData(searchForm).forEach(function (value, key) {
+          values.set(key, value);
+        });
+        try {
+          var response = await fetch(filterForm.action + '?' + new URLSearchParams(values));
+          if (!response.ok) throw new Error('Campaign search failed. Please try again.');
+          showCampaigns(await response.json());
+        } catch (error) {
+          count.textContent = error.message;
+        }
+      }
+
+      searchForm.addEventListener('submit', function (event) {
+        event.preventDefault();
+        loadCampaigns();
+      });
+      searchForm.elements.q.addEventListener('input', function () {
+        clearTimeout(timer);
+        timer = setTimeout(loadCampaigns, 250);
+      });
+      filterForm.addEventListener('change', loadCampaigns);
       loadCampaigns();
-    });
-    searchForm.elements.q.addEventListener('input', function () {
-      clearTimeout(timer);
-      timer = setTimeout(loadCampaigns, 250);
-    });
-    filterForm.addEventListener('change', loadCampaigns);
-    loadCampaigns();
-  })();
-</script>
+    })();
+  </script>
 {% endblock %}

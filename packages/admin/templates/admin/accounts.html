@@ -22,6 +22,7 @@
         </select>
         <button class="inline-flex items-center justify-center gap-2 rounded-xl px-5 py-3 text-sm font-semibold transition focus:outline-none focus-visible:ring-4 disabled:cursor-not-allowed disabled:opacity-50 bg-accent-500 text-ink shadow-sm hover:bg-accent-600 focus-visible:ring-accent-200">Search</button>
       </form>
+      <p id="account-result-count" class="mb-3 text-sm text-slate-500">Showing {{ accounts|length }} accounts.</p>
 
       <div class="rounded-2xl border border-slate-200 bg-white shadow-sm overflow-hidden"><div class="relative overflow-x-auto"><table class="min-w-full divide-y divide-slate-200">
         <thead class="bg-slate-50"><tr><th class="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide text-slate-500">User</th><th class="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide text-slate-500">Role</th><th class="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide text-slate-500">Verification</th><th class="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide text-slate-500">Joined</th><th class="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide text-slate-500">Status</th><th class="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide text-slate-500"></th></tr></thead>
@@ -29,8 +30,8 @@
           {% for account in accounts %}
             <tr class="hover:bg-slate-50">
               <td class="px-4 py-3.5 text-sm text-slate-700"><p class="font-medium text-slate-900">{{ account.display_name }}</p><p class="text-xs text-slate-500">{{ account.email or '' }}</p></td>
-              <td class="px-4 py-3.5 text-sm capitalize text-slate-700">{{ 'campaigner' if account.campaigner_enabled else 'donor' }}</td>
-              <td class="px-4 py-3.5 text-sm text-slate-700">Not verified</td>
+              <td class="px-4 py-3.5 text-sm capitalize text-slate-700">{{ account_roles.get(account.id, 'donor') }}</td>
+              <td class="px-4 py-3.5 text-sm capitalize text-slate-700">{{ verification_statuses.get(account.id, 'not_submitted').replace('_', ' ') }}</td>
               <td class="px-4 py-3.5 whitespace-nowrap text-sm text-slate-700">{{ account.created_at.strftime('%d %b %Y') }}</td>
               <td class="px-4 py-3.5 text-sm capitalize text-slate-700">{{ account.account_status }}</td>
               <td class="px-4 py-3.5 text-right text-sm text-slate-700">
@@ -46,17 +47,6 @@
             <tr><td colspan="6" class="px-4 py-8 text-center text-sm text-slate-500">No accounts found.</td></tr>
           {% endfor %}
         </tbody></table></div></div>
-
-    <nav class="mt-10 flex items-center justify-center gap-1" aria-label="Pagination">
-
-          <a href="{{ url_for('admin.accounts') }}" class="grid h-9 w-9 place-items-center rounded-lg text-sm font-medium bg-brand-700 text-white" aria-current="page">1</a>
-
-          <a href="{{ url_for('admin.accounts') }}" class="grid h-9 w-9 place-items-center rounded-lg text-sm font-medium text-slate-600 hover:bg-brand-50" >2</a>
-
-          <a href="{{ url_for('admin.accounts') }}" class="grid h-9 w-9 place-items-center rounded-lg text-sm font-medium text-slate-600 hover:bg-brand-50" >3</a>
-
-      <a class="inline-flex items-center justify-center gap-2 rounded-xl font-semibold transition focus:outline-none focus-visible:ring-4 disabled:cursor-not-allowed disabled:opacity-50 border border-slate-300 bg-white text-slate-700 hover:bg-slate-50 focus-visible:ring-slate-200 px-3.5 py-2 text-xs" href="{{ url_for('admin.accounts') }}">Next</a>
-    </nav>
 
     </div>
     </main>
@@ -98,7 +88,7 @@
           identity.append(name, email);
           row.appendChild(identity);
           addCell(row, account.role);
-          addCell(row, 'Review in progress');
+          addCell(row, account.verification.replace('_', ' '));
           addCell(row, account.joined);
           addCell(row, account.status);
           var actionCell = document.createElement('td');
@@ -107,6 +97,9 @@
             var deactivateForm = document.createElement('form');
             deactivateForm.action = form.action;
             deactivateForm.method = 'post';
+            deactivateForm.onsubmit = function () {
+              return confirm('Deactivate this account?');
+            };
             var accountId = document.createElement('input');
             accountId.type = 'hidden';
             accountId.name = 'account_id';
@@ -130,6 +123,8 @@
           row.appendChild(cell);
           results.appendChild(row);
         }
+        document.getElementById('account-result-count').textContent =
+          'Showing ' + data.accounts.length + ' accounts (up to 100).';
       } catch (error) {
         results.replaceChildren();
         var row = document.createElement('tr');

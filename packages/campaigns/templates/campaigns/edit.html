@@ -1,13 +1,13 @@
 {% extends "layouts/member.html" %}
 
-{% block title %}Edit campaign{% endblock %}
+{% block title %}Edit {{ revision.title }}{% endblock %}
 
 {% block topbar %}
   <div class="min-w-0 flex-1">
     <h1 class="truncate font-display text-xl font-bold text-brand-950 sm:text-2xl">Edit campaign</h1>
-    <p class="hidden truncate text-sm text-muted sm:block">Help Ada walk again: spinal surgery fund</p>
+    <p class="hidden truncate text-sm text-muted sm:block">{{ revision.title }}</p>
   </div>
-  <div class="flex items-center gap-2"><span class="inline-flex items-center gap-1 rounded-full px-2.5 py-0.5 text-xs font-medium bg-brand-100 text-brand-800">Active</span><a href="{{ url_for('campaign.manage') }}" class="inline-flex items-center justify-center gap-2 rounded-xl font-semibold transition focus:outline-none focus-visible:ring-4 disabled:cursor-not-allowed disabled:opacity-50 border border-slate-300 bg-surface text-slate-700 hover:bg-background focus-visible:ring-slate-200 px-3.5 py-2 text-xs">Back</a></div>
+  <div class="flex items-center gap-2"><span class="inline-flex items-center gap-1 rounded-full px-2.5 py-0.5 text-xs font-medium bg-brand-100 text-brand-800">{{ campaign.status|replace('_', ' ')|title }}</span><a href="{{ url_for('campaign.manage', campaign_id=campaign.id) }}" class="inline-flex items-center justify-center gap-2 rounded-xl font-semibold transition focus:outline-none focus-visible:ring-4 disabled:cursor-not-allowed disabled:opacity-50 border border-slate-300 bg-surface text-slate-700 hover:bg-background focus-visible:ring-slate-200 px-3.5 py-2 text-xs">Back</a></div>
 
 {% endblock %}
 
@@ -15,7 +15,9 @@
   <main id="main" class="flex-1 px-4 py-6 sm:px-6 lg:py-8">
   <form action="{{ url_for('campaign.edit', campaign_id=campaign.id) }}" method="post" enctype="multipart/form-data" class="mx-auto max-w-3xl space-y-6" novalidate>
 
-    <div class="flex gap-3 rounded-2xl border border-rose-200 bg-rose-50 p-5 text-sm text-rose-900"><svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 9v4m0 4h.01M10.3 3.9L1.8 18a2 2 0 001.7 3h17a2 2 0 001.7-3L13.7 3.9a2 2 0 00-3.4 0z"/></svg><div><p class="font-semibold">Reviewer feedback</p><p class="mt-1">Please add the hospital&#39;s quotation.</p></div></div>
+    {% if review and review.public_notes %}
+      <div class="flex gap-3 rounded-2xl border border-rose-200 bg-rose-50 p-5 text-sm text-rose-900"><svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 9v4m0 4h.01M10.3 3.9L1.8 18a2 2 0 001.7 3h17a2 2 0 001.7-3L13.7 3.9a2 2 0 00-3.4 0z"/></svg><div><p class="font-semibold">Reviewer feedback</p><p class="mt-1">{{ review.public_notes }}</p></div></div>
+    {% endif %}
 
   <section class="rounded-2xl border border-border bg-surface shadow-sm p-6 sm:p-8">
     <p class="text-xs font-semibold uppercase tracking-widest text-brand-600">Part 1</p>
@@ -30,7 +32,7 @@
     <p class="mt-1.5 text-xs text-muted">Be specific. Clear titles raise more.</p>
 
   </div>
-      <p class="-mt-2 text-xs text-muted">Your link: <span class="font-mono text-brand-700">/campaigns/<span id="slug-preview">campaign-1</span></span></p>
+      <p class="-mt-2 text-xs text-muted">Your link: <span class="font-mono text-brand-700">/campaigns/<span id="slug-preview">{{ campaign.slug }}</span></span></p>
 
       <div class="grid grid-cols-1 gap-5 sm:grid-cols-2">
         <div>

@@ -7,7 +7,7 @@
     <h1 class="truncate font-display text-xl font-bold text-brand-950 sm:text-2xl">Post an update</h1>
     <p class="hidden truncate text-sm text-muted sm:block">Help Ada walk again: spinal surgery fund</p>
   </div>
-  <div class="flex items-center gap-2"><a href="{{ url_for('campaign.manage') }}" class="inline-flex items-center justify-center gap-2 rounded-xl font-semibold transition focus:outline-none focus-visible:ring-4 disabled:cursor-not-allowed disabled:opacity-50 border border-slate-300 bg-surface text-slate-700 hover:bg-background focus-visible:ring-slate-200 px-3.5 py-2 text-xs">Cancel</a></div>
+  <div class="flex items-center gap-2"><a href="{{ url_for('campaign.manage', campaign_id=campaign.id) }}" class="inline-flex items-center justify-center gap-2 rounded-xl font-semibold transition focus:outline-none focus-visible:ring-4 disabled:cursor-not-allowed disabled:opacity-50 border border-slate-300 bg-surface text-slate-700 hover:bg-background focus-visible:ring-slate-200 px-3.5 py-2 text-xs">Cancel</a></div>
 
 {% endblock %}
 
