@@ -1,11 +1,11 @@
 {% extends "layouts/member.html" %}
 
-{% block title %}My profile{% endblock %}
+{% block title %}{{ 'Organisation profile' if organization else 'My profile' }}{% endblock %}
 
 {% block topbar %}
           <div class="min-w-0 flex-1">
-            <h1 class="truncate font-display text-xl font-bold text-brand-950 sm:text-2xl">My profile</h1>
-            <p class="hidden truncate text-sm text-muted sm:block">Accurate details help us verify you faster and help donors trust you.</p>
+            <h1 class="truncate font-display text-xl font-bold text-brand-950 sm:text-2xl">{{ 'Organisation profile' if organization else 'My profile' }}</h1>
+            <p class="hidden truncate text-sm text-muted sm:block">{% if organization %}Manage your organisation details and public identity.{% else %}Accurate details help us verify you faster and help donors trust you.{% endif %}</p>
           </div>
           <div class="flex items-center gap-2">
     <span class="inline-flex items-center gap-1 rounded-full px-2.5 py-0.5 text-xs font-medium {{ 'bg-brand-100 text-brand-800' if verification_status == 'approved' else 'bg-gold-100 text-gold-700' if verification_status in ['submitted', 'in_review'] else 'bg-rose-100 text-rose-700' if verification_status in ['changes_requested', 'rejected'] else 'bg-slate-100 text-muted' }}">

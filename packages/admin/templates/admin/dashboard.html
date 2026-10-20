@@ -45,12 +45,24 @@
     <section class="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
       <div class="rounded-2xl border border-slate-200 bg-white shadow-sm p-5">
     <p class="text-xs font-medium uppercase tracking-wide text-slate-500">Volume, last 30 days</p>
-    <p class="mt-2 font-display text-3xl font-bold text-brand-800">₦{{ '{:,.2f}'.format(donation_total / 100) }}</p>
+    {% for currency_code, exponent, amount_minor in donation_totals %}
+      <p class="mt-2 font-display text-2xl font-bold text-brand-800">{{ currency_code }} {{ admin_minor_amount(amount_minor, exponent) }}</p>
+    {% else %}
+      <p class="mt-2 font-display text-2xl font-bold text-brand-800">—</p>
+    {% endfor %}
 
   </div>
       <div class="rounded-2xl border border-slate-200 bg-white shadow-sm p-5">
     <p class="text-xs font-medium uppercase tracking-wide text-slate-500">Platform fees, 30 days</p>
-    <p class="mt-2 font-display text-3xl font-bold text-gold-600">₦{{ '{:,.2f}'.format(platform_fees / 100) }}</p>
+    {% for currency_code, exponent, amount_minor in platform_fees %}
+      {% if currency_code and exponent is not none %}
+        <p class="mt-2 font-display text-2xl font-bold text-gold-600">{{ currency_code }} {{ admin_minor_amount(amount_minor, exponent) }}</p>
+      {% else %}
+        <p class="mt-2 font-display text-sm font-bold text-gold-600">Unknown currency: {{ amount_minor }} minor units</p>
+      {% endif %}
+    {% else %}
+      <p class="mt-2 font-display text-2xl font-bold text-gold-600">—</p>
+    {% endfor %}
 
   </div>
       <div class="rounded-2xl border border-slate-200 bg-white shadow-sm p-5">

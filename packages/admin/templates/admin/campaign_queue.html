@@ -34,7 +34,7 @@
                 <td class="px-4 py-3.5 text-sm text-slate-700">
                   {{ revision.campaign.owner_user.display_name if revision.campaign.owner_user else revision.campaign.owner_organization.display_name }}
                 </td>
-                <td class="px-4 py-3.5 text-right text-sm text-slate-700">₦{{ '{:,.0f}'.format(revision.goal_amount_minor / 100) }}</td>
+                <td class="px-4 py-3.5 text-right text-sm text-slate-700">{{ revision.currency.code }} {{ admin_minor_amount(revision.goal_amount_minor, revision.currency.minor_unit_exponent) }}</td>
                 <td class="px-4 py-3.5 whitespace-nowrap text-sm text-slate-700">
                   {{ revision.submitted_at.strftime('%d %b %Y') if revision.submitted_at else revision.created_at.strftime('%d %b %Y') }}
                 </td>
@@ -49,6 +49,7 @@
           </tbody>
         </table>
       </div>
+      <p class="mt-3 text-sm text-slate-500">Showing the 100 oldest campaigns awaiting review.</p>
       <a href="{{ url_for('admin.dashboard') }}" class="mt-6 inline-block text-sm text-brand-700 hover:underline">Back to dashboard</a>
     </div>
   </main>

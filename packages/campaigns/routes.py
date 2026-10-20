@@ -2,9 +2,11 @@
 import re
 import secrets
 from datetime import date, datetime, timezone
+from pathlib import Path
 
-from flask import Blueprint, flash, jsonify, redirect, render_template, request, session, url_for
+from flask import Blueprint, current_app, flash, jsonify, redirect, render_template, request, session, url_for
 from sqlalchemy import func, or_
+from sqlalchemy.exc import SQLAlchemyError
 
 from packages.models import (
     Campaign,
@@ -104,6 +106,7 @@ def _campaign_json(results):
             "goal_minor": revision.goal_amount_minor,
             "raised_minor": int(raised_minor or 0),
             "verified": bool(is_verified),
+            "cover_image_url": revision.cover_image_url,
         }
         for revision, campaign_record, raised_minor, is_verified in results
     ]
@@ -157,6 +160,38 @@ def _campaign_form_values():
 def _new_campaign_slug(title):
     prefix = re.sub(r"[^a-z0-9]+", "-", title.lower()).strip("-")[:160] or "campaign"
     return f"{prefix}-{secrets.token_hex(3)}"
+
+
+def _save_campaign_cover():
+    cover = request.files.get("cover")
+    if cover is None or not cover.filename:
+        return None, None, None
+
+    image_data = cover.read(5 * 1024 * 1024 + 1)
+    if len(image_data) > 5 * 1024 * 1024:
+        return None, None, "Campaign images must be 5 MB or smaller."
+
+    if image_data.startswith(b"\x89PNG\r\n\x1a\n"):
+        extension = ".png"
+    elif image_data.startswith(b"\xff\xd8\xff"):
+        extension = ".jpg"
+    elif image_data[:4] == b"RIFF" and image_data[8:12] == b"WEBP":
+        extension = ".webp"
+    else:
+        return None, None, "Choose a valid JPG, PNG, or WebP image."
+
+    upload_folder = Path(current_app.root_path).parent / "static" / "image_uploads"
+    upload_folder.mkdir(parents=True, exist_ok=True)
+    filename = f"{secrets.token_hex(16)}{extension}"
+    file_path = upload_folder / filename
+    with file_path.open("xb") as image_file:
+        image_file.write(image_data)
+    return url_for("uploaded_campaign_image", filename=filename), file_path, None
+
+
+def _remove_campaign_cover_file(file_path):
+    if file_path and file_path.exists():
+        file_path.unlink()
 
 
 # ---------- Public ----------
@@ -356,12 +391,11 @@ def create():
     account = _signed_in_user()
     if account is None:
         return redirect(url_for("user.login", next=request.path))
+    if not account.campaigner_enabled:
+        flash("Campaign creation is only available to campaigner accounts.", "error")
+        return redirect(url_for("user.dashboard"))
     categories = Category.query.filter_by(is_active=True).order_by(Category.name).all()
     if request.method == "POST":
-        cover = request.files.get("cover")
-        if cover and cover.filename:
-            flash("Campaign images cannot be saved until file storage is configured.", "error")
-            return render_template("campaigns/create.html", categories=categories), 503
         values, error = _campaign_form_values()
         currency = db.session.get(Currency, "NGN")
         if error or (currency is not None and not currency.is_enabled):
@@ -373,28 +407,42 @@ def create():
             db.session.flush()
 
         action = request.form.get("action", "draft")
-        if action not in {"draft", "evidence"}:
-            flash("Choose whether to save the draft or continue to evidence.", "error")
+        if action not in {"draft", "submit"}:
+            flash("Choose whether to save a draft or submit the campaign for review.", "error")
+            return render_template("campaigns/create.html", categories=categories), 400
+        cover_image_url, cover_file_path, cover_error = _save_campaign_cover()
+        if cover_error:
+            flash(cover_error, "error")
             return render_template("campaigns/create.html", categories=categories), 400
         campaign_record = Campaign(
             public_id=secrets.token_hex(16),
             slug=_new_campaign_slug(values["title"]),
             owner_user_id=account.id,
             created_by_user_id=account.id,
-            status="draft",
+            status="submitted" if action == "submit" else "draft",
         )
         revision = CampaignRevision(
             campaign=campaign_record,
             version_number=1,
             submitted_by_user_id=account.id,
-            status="draft",
+            status="submitted" if action == "submit" else "draft",
+            submitted_at=datetime.now(timezone.utc) if action == "submit" else None,
+            cover_image_url=cover_image_url,
             **values,
         )
         db.session.add_all([campaign_record, revision])
-        db.session.commit()
-        flash("Your campaign draft was saved.", "success")
-        if action == "evidence":
-            flash("Evidence upload is not enabled until file storage is configured.", "error")
+        try:
+            db.session.commit()
+        except SQLAlchemyError:
+            db.session.rollback()
+            _remove_campaign_cover_file(cover_file_path)
+            raise
+        flash(
+            "Your campaign was submitted for review."
+            if action == "submit"
+            else "Your campaign draft was saved.",
+            "success",
+        )
         return redirect(url_for("campaign.edit", campaign_id=campaign_record.id))
     return render_template("campaigns/create.html", categories=categories)
 
@@ -409,6 +457,9 @@ def my_campaigns():
     account = _signed_in_user()
     if account is None:
         return redirect(url_for("user.login", next=request.path))
+    if not account.campaigner_enabled:
+        flash("The campaign dashboard is only available to campaigner accounts.", "error")
+        return redirect(url_for("user.dashboard"))
     selected_status = request.args.get("status", "all")
     records_query = Campaign.query.filter_by(owner_user_id=account.id, deleted_at=None)
     status_filters = {
@@ -508,16 +559,6 @@ def edit():
     ).order_by(CampaignReview.decided_at.desc()).first()
     categories = Category.query.filter_by(is_active=True).order_by(Category.name).all()
     if request.method == "POST":
-        cover = request.files.get("cover")
-        if cover and cover.filename:
-            flash("Campaign images cannot be saved until file storage is configured.", "error")
-            return render_template(
-                "campaigns/edit.html",
-                campaign=campaign_record,
-                revision=revision,
-                categories=categories,
-                review=review,
-            ), 503
         values, error = _campaign_form_values()
         action = request.form.get("action", "save")
         if error:
@@ -538,24 +579,42 @@ def edit():
                 categories=categories,
                 review=review,
             ), 400
+        cover_image_url, cover_file_path, cover_error = _save_campaign_cover()
+        if cover_error:
+            flash(cover_error, "error")
+            return render_template(
+                "campaigns/edit.html",
+                campaign=campaign_record,
+                revision=revision,
+                categories=categories,
+                review=review,
+            ), 400
         if revision.status in {"approved", "rejected", "superseded"}:
             revision = CampaignRevision(
                 campaign_id=campaign_record.id,
                 version_number=revision.version_number + 1,
                 submitted_by_user_id=account.id,
                 status="draft",
+                cover_image_url=revision.cover_image_url,
                 **values,
             )
             db.session.add(revision)
         else:
             for field, value in values.items():
                 setattr(revision, field, value)
+        if cover_image_url:
+            revision.cover_image_url = cover_image_url
         if action == "submit":
             revision.status = "submitted"
             revision.submitted_at = datetime.now(timezone.utc)
             if campaign_record.status == "draft":
                 campaign_record.status = "submitted"
-        db.session.commit()
+        try:
+            db.session.commit()
+        except SQLAlchemyError:
+            db.session.rollback()
+            _remove_campaign_cover_file(cover_file_path)
+            raise
         flash("Your campaign changes were saved.", "success")
         return redirect(url_for("campaign.edit", campaign_id=campaign_record.id))
     return render_template(

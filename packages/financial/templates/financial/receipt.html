@@ -42,9 +42,16 @@
         {% if donation.status == "succeeded" %}
           Payment is recorded as successful.
         {% else %}
-          This is a saved donation intention only. No payment has been taken; this is not a payment receipt.
+          {% if donation.status == "failed" %}
+            The payment did not complete. No successful donation is recorded.
+          {% else %}
+            Paystack has not confirmed this payment yet. This is not a payment receipt.
+          {% endif %}
         {% endif %}
       </p>
+      {% if donation.status == "pending" and attempt and attempt.provider_reference %}
+        <a class="mt-4 inline-block text-sm font-semibold text-brand-700 hover:underline" href="{{ url_for('finance.donation_success', reference=attempt.provider_reference) }}">Check Paystack payment status</a>
+      {% endif %}
     </article>
   </main>
 {% endblock %}

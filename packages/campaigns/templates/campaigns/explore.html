@@ -53,6 +53,9 @@
             <article class="overflow-hidden rounded-2xl border border-border bg-surface shadow-sm transition hover:-translate-y-0.5 hover:shadow-lg">
               <a href="{{ url_for('campaign.detail', slug=campaign_record.slug) }}" class="block">
                 <div class="relative aspect-[16/10] bg-gradient-to-br from-brand-200 via-brand-100 to-gold-100">
+                  {% if revision.cover_image_url %}
+                    <img src="{{ revision.cover_image_url }}" alt="{{ revision.title }} cover photo" class="absolute inset-0 h-full w-full object-cover">
+                  {% endif %}
                   {% if revision.category %}
                     <span class="absolute left-3 top-3 rounded-full bg-surface/90 px-2.5 py-0.5 text-xs font-medium text-brand-800">{{ revision.category.name }}</span>
                   {% endif %}
@@ -109,6 +112,13 @@
           link.href = '/campaigns/detail?slug=' + encodeURIComponent(campaign.slug);
           var image = document.createElement('div');
           image.className = 'relative aspect-[16/10] bg-gradient-to-br from-brand-200 via-brand-100 to-gold-100';
+          if (campaign.cover_image_url) {
+            var cover = document.createElement('img');
+            cover.src = campaign.cover_image_url;
+            cover.alt = campaign.title + ' cover photo';
+            cover.className = 'absolute inset-0 h-full w-full object-cover';
+            image.appendChild(cover);
+          }
           addText(image, 'span', 'absolute left-3 top-3 rounded-full bg-surface/90 px-2.5 py-0.5 text-xs font-medium text-brand-800', campaign.category);
           if (campaign.verified) {
             addText(image, 'span', 'absolute right-3 top-3 rounded-full bg-brand-700 px-2.5 py-0.5 text-xs font-medium text-white', 'Verified');

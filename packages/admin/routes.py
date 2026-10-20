@@ -5,8 +5,10 @@ The admin login flag is stored in the same signed Flask session as member login.
 import re
 import secrets
 from datetime import datetime, timedelta, timezone
+from decimal import Decimal
+from pathlib import Path
 
-from flask import Blueprint, current_app, flash, redirect, render_template, request, session, url_for
+from flask import Blueprint, abort, current_app, flash, redirect, render_template, request, send_from_directory, session, url_for
 from sqlalchemy import or_
 from sqlalchemy.exc import IntegrityError
 from werkzeug.security import generate_password_hash
@@ -16,6 +18,7 @@ from packages.models import (
     CampaignReview,
     CampaignRevision,
     Category,
+    Currency,
     Disbursement,
     Donation,
     ExpenseRequest,
@@ -26,12 +29,34 @@ from packages.models import (
     StaffRole,
     User,
     VerificationCase,
+    VerificationDocument,
     VerificationReview,
     db,
 )
 
 
 admin = Blueprint("admin", __name__, template_folder="templates", static_folder="static")
+
+
+def _admin_csrf_token():
+    token = session.get("_admin_csrf_token")
+    if not token:
+        token = secrets.token_urlsafe(32)
+        session["_admin_csrf_token"] = token
+    return token
+
+
+def _format_minor_amount(amount_minor, exponent):
+    amount_minor = amount_minor or 0
+    return format(Decimal(amount_minor).scaleb(-exponent), f",.{exponent}f")
+
+
+@admin.context_processor
+def inject_admin_csrf_token():
+    return {
+        "admin_csrf_token": _admin_csrf_token(),
+        "admin_minor_amount": _format_minor_amount,
+    }
 
 
 @admin.before_request
@@ -52,6 +77,14 @@ def require_admin_login():
     ):
         session.clear()
         return redirect(url_for("admin.login", next=request.full_path))
+    if request.method == "POST":
+        expected_token = session.get("_admin_csrf_token", "")
+        submitted_token = request.form.get("csrf_token", "")
+        if not expected_token or not secrets.compare_digest(
+            expected_token.encode("utf-8"),
+            submitted_token.encode("utf-8"),
+        ):
+            abort(400)
     return None
 
 
@@ -169,18 +202,32 @@ def dashboard():
 
     since = datetime.now(timezone.utc) - timedelta(days=30)
     successful_donations = Donation.query.filter_by(status="succeeded")
-    donation_total = db.session.query(
-        db.func.coalesce(db.func.sum(Donation.credited_amount_minor), 0)
+    donation_totals = db.session.query(
+        Donation.campaign_currency_code,
+        Currency.minor_unit_exponent,
+        db.func.sum(Donation.credited_amount_minor),
+    ).join(
+        Currency, Currency.code == Donation.campaign_currency_code
     ).filter(
         Donation.status == "succeeded",
         Donation.created_at >= since,
-    ).scalar()
+    ).group_by(
+        Donation.campaign_currency_code,
+        Currency.minor_unit_exponent,
+    ).order_by(Donation.campaign_currency_code).all()
     platform_fees = db.session.query(
-        db.func.coalesce(db.func.sum(PaymentAttempt.provider_fee_minor), 0)
+        PaymentAttempt.provider_fee_currency_code,
+        Currency.minor_unit_exponent,
+        db.func.sum(PaymentAttempt.provider_fee_minor),
+    ).outerjoin(
+        Currency, Currency.code == PaymentAttempt.provider_fee_currency_code
     ).filter(
         PaymentAttempt.status == "succeeded",
         PaymentAttempt.created_at >= since,
-    ).scalar()
+    ).group_by(
+        PaymentAttempt.provider_fee_currency_code,
+        Currency.minor_unit_exponent,
+    ).order_by(PaymentAttempt.provider_fee_currency_code).all()
     donor_count = db.session.query(db.func.count(db.func.distinct(Donation.donor_user_id))).filter(
         Donation.status == "succeeded",
         Donation.donor_user_id.isnot(None),
@@ -198,8 +245,8 @@ def dashboard():
             VerificationCase.status.in_(("submitted", "in_review", "changes_requested"))
         ).count(),
         queued_payouts=Disbursement.query.filter_by(status="queued").count(),
-        donation_total=int(donation_total or 0),
-        platform_fees=int(platform_fees or 0),
+        donation_totals=donation_totals,
+        platform_fees=platform_fees,
         live_campaigns=Campaign.query.filter_by(status="active", deleted_at=None).count(),
         donor_count=int(donor_count or 0),
         recent_reviews=recent_reviews[:5],
@@ -446,6 +493,29 @@ def profile_review():
     return render_template("admin/profile_review.html", verification_case=verification_case)
 
 
+@admin.route("/verification_documents/<int:document_id>")
+def verification_document(document_id):
+    document = db.session.get(VerificationDocument, document_id)
+    if document is None:
+        abort(404)
+    storage_key = document.file_asset.storage_key
+    if not storage_key or not re.fullmatch(
+        r"verification/[0-9a-f]{32}\.(pdf|jpg|png)",
+        storage_key,
+    ):
+        abort(404)
+    response = send_from_directory(
+        Path(current_app.instance_path) / "private_uploads",
+        storage_key,
+        as_attachment=True,
+        download_name=document.file_asset.original_filename or "verification-document",
+        mimetype=document.file_asset.detected_content_type,
+    )
+    response.headers["Cache-Control"] = "private, no-store"
+    response.headers["X-Content-Type-Options"] = "nosniff"
+    return response
+
+
 # ---------- Money ----------
 
 @admin.route("/disbursals", methods=["GET", "POST"])
@@ -491,19 +561,37 @@ def donations():
         ).order_by(PaymentAttempt.created_at.desc()).all()
         for attempt in attempts:
             latest_attempts.setdefault(attempt.donation_id, attempt)
-    gross_total = db.session.query(db.func.coalesce(db.func.sum(Donation.intended_amount_minor), 0)).filter(
+    gross_totals = db.session.query(
+        Donation.campaign_currency_code,
+        Currency.minor_unit_exponent,
+        db.func.sum(Donation.intended_amount_minor),
+    ).join(
+        Currency, Currency.code == Donation.campaign_currency_code
+    ).filter(
         Donation.status == "succeeded"
-    ).scalar()
-    fee_total = db.session.query(db.func.coalesce(db.func.sum(PaymentAttempt.provider_fee_minor), 0)).filter(
+    ).group_by(
+        Donation.campaign_currency_code,
+        Currency.minor_unit_exponent,
+    ).order_by(Donation.campaign_currency_code).all()
+    fee_totals = db.session.query(
+        PaymentAttempt.provider_fee_currency_code,
+        Currency.minor_unit_exponent,
+        db.func.sum(PaymentAttempt.provider_fee_minor),
+    ).outerjoin(
+        Currency, Currency.code == PaymentAttempt.provider_fee_currency_code
+    ).filter(
         PaymentAttempt.status == "succeeded"
-    ).scalar()
+    ).group_by(
+        PaymentAttempt.provider_fee_currency_code,
+        Currency.minor_unit_exponent,
+    ).order_by(PaymentAttempt.provider_fee_currency_code).all()
     return render_template(
         "admin/donations.html",
         donations=donations,
         latest_attempts=latest_attempts,
         selected_status=selected_status,
-        gross_total=int(gross_total or 0),
-        fee_total=int(fee_total or 0),
+        gross_totals=gross_totals,
+        fee_totals=fee_totals,
         donation_count=Donation.query.count(),
     )
 

@@ -16,7 +16,7 @@
       <div class="space-y-6 lg:col-span-2">
         <section class="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
           <div class="flex items-start justify-between gap-4">
-            <div><p class="text-xs font-medium uppercase text-slate-500">Amount requested</p><p class="mt-1 font-display text-3xl font-bold text-brand-800">₦{{ '{:,.2f}'.format(expense.amount_minor / 100) }}</p></div>
+            <div><p class="text-xs font-medium uppercase text-slate-500">Amount requested</p><p class="mt-1 font-display text-3xl font-bold text-brand-800">{{ expense.currency_code }} {{ admin_minor_amount(expense.amount_minor, expense.currency.minor_unit_exponent) }}</p></div>
             <span class="rounded-full bg-slate-100 px-3 py-1 text-xs capitalize text-slate-700">{{ expense.status.replace('_', ' ') }}</span>
           </div>
           <p class="mt-5 whitespace-pre-line text-sm leading-7 text-slate-700">{{ expense.description }}</p>
@@ -70,6 +70,7 @@
         </section>
         {% if expense.status in ['submitted', 'in_review', 'changes_requested'] %}
           <form action="{{ url_for('admin.expense_review', expense_id=expense.id) }}" method="post" class="space-y-5 rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+            <input type="hidden" name="csrf_token" value="{{ admin_csrf_token }}">
             <div>
               <h2 class="font-display text-lg font-bold text-brand-950">Your decision</h2>
               <p class="mt-1 text-sm text-slate-500">Approval does not send a payout. A note is required when requesting changes or rejecting.</p>

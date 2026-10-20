@@ -21,7 +21,7 @@
           </div>
           <p class="mt-2 text-sm text-slate-500">{{ revision.category.name }}</p>
           <dl class="mt-5 grid gap-4 text-sm sm:grid-cols-3">
-            <div><dt class="text-slate-500">Goal</dt><dd class="font-semibold">₦{{ '{:,.0f}'.format(revision.goal_amount_minor / 100) }}</dd></div>
+            <div><dt class="text-slate-500">Goal</dt><dd class="font-semibold">{{ revision.currency.code }} {{ admin_minor_amount(revision.goal_amount_minor, revision.currency.minor_unit_exponent) }}</dd></div>
             <div><dt class="text-slate-500">Starts</dt><dd class="font-semibold">{{ revision.start_date.strftime('%d %b %Y') if revision.start_date else 'Not set' }}</dd></div>
             <div><dt class="text-slate-500">Ends</dt><dd class="font-semibold">{{ revision.end_date.strftime('%d %b %Y') if revision.end_date else 'Not set' }}</dd></div>
           </dl>
@@ -60,6 +60,7 @@
         </section>
 
         <form action="{{ url_for('admin.campaign_review', revision_id=revision.id) }}" method="post" class="space-y-5 rounded-2xl border border-slate-200 bg-white p-6 shadow-sm" id="decision-form">
+          <input type="hidden" name="csrf_token" value="{{ admin_csrf_token }}">
           <div>
             <h2 class="font-display text-lg font-bold text-brand-950">Your decision</h2>
             <p class="mt-1 text-sm text-slate-500">Add a note when requesting changes or rejecting.</p>

@@ -104,10 +104,10 @@
     <h2 class="mt-1 font-display text-2xl font-bold text-brand-950">Cover photo</h2>
     <p class="mt-1 text-sm text-muted">A real, well-lit photo. Landscape works best (1600×900).</p>
     <label for="cover" class="mt-5 flex cursor-pointer flex-col items-center justify-center rounded-2xl border-2 border-dashed border-slate-300 bg-background px-6 py-10 text-center transition hover:border-brand-400 hover:bg-brand-50">
-      <img id="cover-preview" alt="" class="mb-4 hidden max-h-48 rounded-xl object-cover">
+      <img id="cover-preview" src="{{ revision.cover_image_url or '' }}" alt="Campaign cover preview" class="mb-4 max-h-48 rounded-xl object-cover {{ 'hidden' if not revision.cover_image_url else '' }}">
       <span class="text-brand-700"><svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 16v2a2 2 0 002 2h12a2 2 0 002-2v-2M16 8l-4-4m0 0L8 8m4-4v12"/></svg></span>
-      <span class="mt-2 text-sm font-semibold text-ink">Click to upload</span>
-      <span class="text-xs text-muted">JPG, PNG or WebP up to 5 MB</span>
+      <span class="mt-2 text-sm font-semibold text-ink">Click to upload or replace the cover photo</span>
+      <span class="text-xs text-muted">JPG, PNG or WebP up to 5 MB. Leave empty to keep the current photo.</span>
       <input id="cover" name="cover" type="file" accept="image/png,image/jpeg,image/webp" class="sr-only">
     </label>
 

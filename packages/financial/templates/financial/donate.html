@@ -14,7 +14,10 @@
       <div>
         <p class="text-xs font-semibold uppercase tracking-widest text-brand-600">Support this campaign</p>
         <h1 class="mt-1 font-display text-3xl font-bold text-brand-950">{{ revision.title }}</h1>
-        <p class="mt-3 text-sm leading-6 text-slate-600">This form saves your intention to donate. Payment processing is not configured, so no money will be taken and this record is not a completed donation.</p>
+        <p class="mt-3 text-sm leading-6 text-slate-600">You will continue to Paystack’s secure checkout to choose a payment method enabled for this account.</p>
+        {% if not paystack_ready %}
+          <p class="mt-3 rounded-xl bg-amber-50 p-4 text-sm text-amber-900">Paystack test checkout is unavailable. This campaign must use NGN and the test secret key must be configured.</p>
+        {% endif %}
       </div>
 
       <form action="{{ url_for('finance.donate', campaign_id=campaign.id) }}" method="post" class="space-y-5 rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
@@ -23,7 +26,7 @@
         <div>
           <label for="amount" class="mb-1.5 block text-sm font-medium text-slate-700">Amount ({{ revision.currency_code }})</label>
           <input id="amount" name="amount" type="number" min="500" step="1" value="{{ amount or '' }}" required class="block w-full rounded-xl border border-slate-300 px-4 py-3 text-sm focus:border-brand-600 focus:outline-none focus:ring-4 focus:ring-brand-100">
-          <p class="mt-1.5 text-xs text-slate-500">Minimum amount: {{ revision.currency_code }} 500. The amount is recorded as pending until a payment provider is connected.</p>
+          <p class="mt-1.5 text-xs text-slate-500">Minimum amount: {{ revision.currency_code }} 500.</p>
         </div>
         {% if not account %}
           <div>
@@ -36,7 +39,7 @@
           <input type="checkbox" name="is_anonymous" value="1" {% if is_anonymous %}checked{% endif %} class="mt-0.5 h-4 w-4 rounded border-slate-300 text-brand-700">
           <span><strong class="text-slate-900">Give anonymously</strong><span class="block">Your name will not appear on the public ledger if this record is ever shown there.</span></span>
         </label>
-        <button type="submit" class="w-full rounded-xl bg-brand-700 px-5 py-3 font-semibold text-white hover:bg-brand-800">Save pending donation intention</button>
+        <button type="submit" {% if not paystack_ready %}disabled{% endif %} class="w-full rounded-xl bg-brand-700 px-5 py-3 font-semibold text-white hover:bg-brand-800 disabled:cursor-not-allowed disabled:opacity-50">Continue to Paystack</button>
       </form>
     </section>
 
@@ -48,7 +51,7 @@
         </div>
         <p class="mt-2 text-sm text-slate-600">{{ revision.currency_code }} {{ "{:,.2f}".format(raised_minor / (10 ** currency.minor_unit_exponent)) }} received of {{ revision.currency_code }} {{ "{:,.2f}".format(revision.goal_amount_minor / (10 ** currency.minor_unit_exponent)) }}</p>
       </div>
-      <p class="rounded-2xl bg-amber-50 p-4 text-sm text-amber-900">A saved intention is not a payment or tax receipt. You will not be charged from this page.</p>
+      <p class="rounded-2xl bg-amber-50 p-4 text-sm text-amber-900">Your donation is recorded only after Paystack verifies the payment.</p>
     </aside>
   </main>
 {% endblock %}

@@ -5,10 +5,12 @@
 {% block topbar %}
           <div class="min-w-0 flex-1">
             <h1 class="truncate font-display text-xl font-bold text-brand-950 sm:text-2xl">Hello, {{ account.display_name }}</h1>
-            <p class="hidden truncate text-sm text-muted sm:block">Here is what is happening with your giving and your campaigns.</p>
+            <p class="hidden truncate text-sm text-muted sm:block">{{ 'Here is what is happening with your giving and your campaigns.' if account.campaigner_enabled else 'Here is what is happening with your giving.' }}</p>
           </div>
           <div class="flex items-center gap-2">
-    <a href="{{ url_for('campaign.create') }}" class="inline-flex items-center justify-center gap-2 rounded-xl font-semibold transition focus:outline-none focus-visible:ring-4 disabled:cursor-not-allowed disabled:opacity-50 bg-accent text-ink shadow-sm hover:bg-accent/90 focus-visible:ring-accent/20 px-3.5 py-2 text-xs"><svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 4v16m8-8H4"/></svg> New campaign</a>
+    {% if account.campaigner_enabled %}
+      <a href="{{ url_for('campaign.create') }}" class="inline-flex items-center justify-center gap-2 rounded-xl font-semibold transition focus:outline-none focus-visible:ring-4 disabled:cursor-not-allowed disabled:opacity-50 bg-accent text-ink shadow-sm hover:bg-accent/90 focus-visible:ring-accent/20 px-3.5 py-2 text-xs"><svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 4v16m8-8H4"/></svg> New campaign</a>
+    {% endif %}
     <a href="{{ url_for('campaign.explore') }}" class="inline-flex items-center justify-center gap-2 rounded-xl font-semibold transition focus:outline-none focus-visible:ring-4 disabled:cursor-not-allowed disabled:opacity-50 border border-border bg-surface text-ink hover:bg-background focus-visible:ring-slate-200 px-3.5 py-2 text-xs">Explore</a>
   </div>
 
@@ -34,6 +36,7 @@
     </div>
     {% endif %}
 
+    {% if account.campaigner_enabled %}
     <section aria-labelledby="creator-h">
       <h2 id="creator-h" class="sr-only">Campaign overview</h2>
       <div class="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
@@ -86,6 +89,7 @@
       </div>
 
     </section>
+    {% endif %}
 
     <section aria-labelledby="giving-h">
       <h2 id="giving-h" class="mb-4 font-display text-xl font-bold text-brand-950">Your giving</h2>

@@ -57,6 +57,7 @@
             </tbody>
           </table>
         </div>
+        <p class="mt-3 text-sm text-slate-500">Showing up to 100 matching identity cases, oldest submissions first.</p>
       </div>
     </main>
   {% else %}
@@ -98,10 +99,10 @@
                   <li class="py-3 text-sm text-slate-700">
                     <span class="font-medium">{{ document.file_asset.original_filename or 'Uploaded document' }}</span>
                     <span class="text-slate-500"> · {{ document.document_type.replace('_', ' ') }} · {{ document.received_at.strftime('%d %b %Y') }}</span>
+                    <a href="{{ url_for('admin.verification_document', document_id=document.id) }}" class="ml-2 font-semibold text-brand-700 hover:underline">Download securely</a>
                   </li>
                 {% endfor %}
               </ul>
-              <p class="mt-2 text-xs text-slate-500">Secure document viewing is unavailable until file storage is configured.</p>
             {% else %}
               <p class="mt-3 text-sm text-slate-500">No documents are attached.</p>
             {% endif %}
@@ -129,6 +130,7 @@
         <aside class="lg:col-span-2 lg:self-start">
           {% if verification_case.status in ['submitted', 'in_review', 'changes_requested'] %}
             <form action="{{ url_for('admin.profile_review', case_id=verification_case.id) }}" method="post" class="space-y-5 rounded-2xl border border-slate-200 bg-white p-6 shadow-sm" id="decision-form">
+              <input type="hidden" name="csrf_token" value="{{ admin_csrf_token }}">
               <div><h2 class="font-display text-lg font-bold text-brand-950">Your decision</h2><p class="mt-1 text-sm text-slate-500">Recorded in the audit trail with your name and time. Add a note when requesting changes or rejecting.</p></div>
               <div><label for="public_notes" class="mb-1.5 block text-sm font-medium text-slate-700">Note to the user</label><textarea id="public_notes" name="public_notes" rows="3" class="block w-full rounded-xl border border-slate-300 bg-white px-4 py-3 text-sm">{{ public_notes or '' }}</textarea></div>
               <div><label for="internal_notes" class="mb-1.5 block text-sm font-medium text-slate-700">Internal notes</label><textarea id="internal_notes" name="internal_notes" rows="3" class="block w-full rounded-xl border border-slate-300 bg-white px-4 py-3 text-sm">{{ internal_notes or '' }}</textarea></div>

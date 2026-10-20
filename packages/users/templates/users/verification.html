@@ -15,56 +15,27 @@
   <main id="main" class="flex-1 px-4 py-6 sm:px-6 lg:py-8">
     <div class="mx-auto max-w-5xl space-y-6">
       <section class="overflow-hidden rounded-3xl border border-border bg-surface shadow-sm">
-        <div class="relative overflow-hidden bg-primary-dark px-6 py-7 text-white sm:px-8 sm:py-9">
-          <div class="absolute -right-12 -top-20 h-64 w-64 rounded-full border-[32px] border-white/5" aria-hidden="true"></div>
-          <div class="relative flex flex-col gap-6 sm:flex-row sm:items-start sm:justify-between">
-            <div class="max-w-xl">
-              <span class="inline-flex items-center gap-2 rounded-full bg-surface/10 px-3 py-1 text-xs font-semibold uppercase tracking-wide text-teal-100">
-                <span class="h-2 w-2 rounded-full bg-highlight"></span>Verification status
-              </span>
-              <h2 class="mt-4 font-display text-2xl font-bold sm:text-3xl">Your details are being reviewed</h2>
-              <p class="mt-2 max-w-lg text-sm leading-6 text-teal-100">We have everything we need for now. Reviews usually take 1–3 working days, and we'll email you as soon as there's a decision.</p>
-            </div>
-            <span class="inline-flex shrink-0 items-center gap-2 self-start rounded-full bg-highlight/15 px-3.5 py-2 text-sm font-semibold text-amber-100 ring-1 ring-inset ring-highlight/30">
-              <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 7v5l3 2m6-2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
-              Review in progress
-            </span>
+        <div class="flex flex-col gap-4 bg-primary-dark px-6 py-7 text-white sm:flex-row sm:items-center sm:justify-between sm:px-8">
+          <div>
+            <span class="inline-flex items-center gap-2 rounded-full bg-surface/10 px-3 py-1 text-xs font-semibold uppercase tracking-wide text-teal-100">Verification status</span>
+            <h2 class="mt-4 font-display text-2xl font-bold sm:text-3xl">{{ verification_case.status|replace('_', ' ')|title if verification_case else 'Not submitted' }}</h2>
+            <p class="mt-2 max-w-lg text-sm leading-6 text-teal-100">
+              {% if verification_case and verification_case.status in ['submitted', 'in_review'] %}
+                Your documents are with our review team.
+              {% elif verification_case and verification_case.status == 'changes_requested' %}
+                Please upload the requested documents or updated information.
+              {% elif verification_case and verification_case.status == 'approved' %}
+                Your verification is complete.
+              {% elif verification_case and verification_case.status == 'rejected' %}
+                Your verification was not approved. Contact support if you need help.
+              {% else %}
+                Upload a document to submit your verification for review.
+              {% endif %}
+            </p>
           </div>
-        </div>
-
-        <div class="px-6 py-6 sm:px-8">
-          <div class="flex items-center justify-between gap-4">
-            <div>
-              <p class="text-sm font-semibold text-ink">Verification progress</p>
-              <p class="mt-1 text-xs text-muted">4 of 5 steps complete</p>
-            </div>
-            <span class="text-sm font-bold text-primary">80%</span>
-          </div>
-          <div class="mt-3 h-2 overflow-hidden rounded-full bg-primary/10" role="progressbar" aria-label="Verification progress" aria-valuenow="80" aria-valuemin="0" aria-valuemax="100">
-            <div class="h-full w-4/5 rounded-full bg-progress"></div>
-          </div>
-          <ol class="mt-6 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-5">
-            <li class="flex items-center gap-3 text-sm text-ink">
-              <span class="grid h-7 w-7 shrink-0 place-items-center rounded-full bg-progress text-white"><svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 13l4 4L19 7"/></svg></span>
-              <span>Legal name</span>
-            </li>
-            <li class="flex items-center gap-3 text-sm text-ink">
-              <span class="grid h-7 w-7 shrink-0 place-items-center rounded-full bg-progress text-white"><svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 13l4 4L19 7"/></svg></span>
-              <span>Phone number</span>
-            </li>
-            <li class="flex items-center gap-3 text-sm text-ink">
-              <span class="grid h-7 w-7 shrink-0 place-items-center rounded-full bg-progress text-white"><svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 13l4 4L19 7"/></svg></span>
-              <span>Home address</span>
-            </li>
-            <li class="flex items-center gap-3 text-sm text-ink">
-              <span class="grid h-7 w-7 shrink-0 place-items-center rounded-full bg-progress text-white"><svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 13l4 4L19 7"/></svg></span>
-              <span>Identity document</span>
-            </li>
-            <li class="flex items-center gap-3 text-sm text-muted">
-              <span class="grid h-7 w-7 shrink-0 place-items-center rounded-full border border-border bg-background text-muted">5</span>
-              <span>Reviewer sign-off</span>
-            </li>
-          </ol>
+          <span class="inline-flex shrink-0 items-center rounded-full bg-highlight/15 px-3.5 py-2 text-sm font-semibold text-amber-100 ring-1 ring-inset ring-highlight/30">
+            {{ verification_case.status|replace('_', ' ')|title if verification_case else 'Not submitted' }}
+          </span>
         </div>
       </section>
 
@@ -76,15 +47,18 @@
             </span>
             <div>
               <h2 class="font-display text-xl font-bold text-ink">Identity documents</h2>
-              <p class="mt-1 text-sm leading-6 text-muted">Upload a government ID or proof of address. Only reviewers can see these documents.</p>
+              <p class="mt-1 text-sm leading-6 text-muted">Upload a government ID, proof of address{% if organization %}, or organization registration document{% endif %}. Only you and authorized reviewers can access these files.</p>
             </div>
           </div>
           <form action="{{ url_for('user.verification') }}" method="post" enctype="multipart/form-data" class="mt-6 space-y-5">
             <div>
               <label class="mb-2 block text-sm font-semibold text-ink" for="doc_type">Document type</label>
               <select id="doc_type" name="doc_type" class="block w-full rounded-xl border border-border bg-surface px-4 py-3 text-sm text-ink focus:border-primary focus:outline-none focus:ring-4 focus:ring-primary/10">
-                <option value="id_card">National ID / Passport</option>
+                <option value="identity">National ID / Passport</option>
                 <option value="proof_of_address">Proof of address</option>
+                {% if organization %}
+                  <option value="organization_registration">Organization registration</option>
+                {% endif %}
               </select>
             </div>
             <div>
@@ -107,19 +81,23 @@
           <div class="mt-8">
             <div class="flex items-center justify-between gap-3">
               <h3 class="text-sm font-semibold text-ink">Uploaded documents</h3>
-              <span class="rounded-full bg-primary/10 px-2.5 py-1 text-xs font-semibold text-primary">1 file</span>
+              <span class="rounded-full bg-primary/10 px-2.5 py-1 text-xs font-semibold text-primary">{{ verification_case.documents|length if verification_case else 0 }} files</span>
             </div>
             <ul class="mt-3 divide-y divide-border rounded-2xl border border-border">
-              <li class="flex items-center gap-3 px-4 py-4 text-sm">
-                <span class="grid h-10 w-10 shrink-0 place-items-center rounded-xl bg-background text-primary">
-                  <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.6a1 1 0 01.7.3l5.4 5.4a1 1 0 01.3.7V19a2 2 0 01-2 2z"/></svg>
-                </span>
-                <span class="min-w-0 flex-1">
-                  <span class="block truncate font-medium capitalize text-ink">medical report</span>
-                  <span class="mt-0.5 block text-xs text-muted">Uploaded 09 Oct 2026</span>
-                </span>
-                <span class="rounded-full bg-progress/10 px-2.5 py-1 text-xs font-medium text-progress">Received</span>
-              </li>
+              {% if verification_case and verification_case.documents %}
+                {% for document in verification_case.documents %}
+                  <li class="flex items-center gap-3 px-4 py-4 text-sm">
+                    <span class="grid h-10 w-10 shrink-0 place-items-center rounded-xl bg-background text-xs font-bold uppercase text-primary" aria-hidden="true">{{ document.file_asset.detected_content_type.split('/')[-1] }}</span>
+                    <span class="min-w-0 flex-1">
+                      <span class="block truncate font-medium text-ink">{{ document.file_asset.original_filename or 'Uploaded document' }}</span>
+                      <span class="mt-0.5 block text-xs capitalize text-muted">{{ document.document_type|replace('_', ' ') }} · Uploaded {{ document.received_at.strftime('%d %b %Y') }}</span>
+                    </span>
+                    <a href="{{ url_for('user.verification_document', document_id=document.id) }}" class="shrink-0 rounded-lg border border-border px-3 py-2 text-xs font-semibold text-primary hover:bg-primary/5">Download</a>
+                  </li>
+                {% endfor %}
+              {% else %}
+                <li class="px-4 py-4 text-sm text-muted">No documents uploaded yet.</li>
+              {% endif %}
             </ul>
           </div>
         </section>
@@ -134,16 +112,20 @@
               <p class="mt-1 text-sm leading-6 text-muted">Notes from the team handling your verification.</p>
             </div>
           </div>
-          <ol class="mt-6 space-y-5 border-l-2 border-primary/15 pl-6">
-            <li class="relative">
-              <span class="absolute -left-[31px] top-1 h-3 w-3 rounded-full border-2 border-white bg-progress ring-2 ring-progress/20"></span>
-              <p class="text-xs text-muted">09 Oct 2026, 06:11 <span class="mx-1 text-border">·</span><span class="font-semibold capitalize text-progress">approved</span></p>
-              <p class="mt-2 rounded-2xl bg-background p-4 text-sm leading-6 text-ink">Hospital letter and invoice checked and confirmed with the hospital.</p>
-            </li>
-          </ol>
+          {% if latest_review and latest_review.public_notes %}
+            <ol class="mt-6 space-y-5 border-l-2 border-primary/15 pl-6">
+              <li class="relative">
+                <span class="absolute -left-[31px] top-1 h-3 w-3 rounded-full border-2 border-white bg-progress ring-2 ring-progress/20"></span>
+                <p class="text-xs text-muted">{{ latest_review.decided_at.strftime('%d %b %Y') }} · <span class="font-semibold capitalize text-progress">{{ latest_review.decision|replace('_', ' ') }}</span></p>
+                <p class="mt-2 rounded-2xl bg-background p-4 text-sm leading-6 text-ink">{{ latest_review.public_notes }}</p>
+              </li>
+            </ol>
+          {% else %}
+            <p class="mt-6 text-sm text-muted">There are no reviewer updates yet.</p>
+          {% endif %}
           <div class="mt-8 rounded-2xl bg-primary/5 p-4">
             <p class="text-sm font-semibold text-primary-dark">What happens next?</p>
-            <p class="mt-1 text-sm leading-6 text-muted">A reviewer will finish the final check. We'll let you know by email once your verification is complete.</p>
+            <p class="mt-1 text-sm leading-6 text-muted">{% if verification_case and verification_case.status == 'approved' %}Your verification is complete.{% elif verification_case and verification_case.status == 'rejected' %}Contact support if you have questions about this decision.{% elif verification_case %}A reviewer will finish the check. You can upload additional documents if needed.{% else %}Upload a document to send your verification for review.{% endif %}</p>
           </div>
         </section>
       </div>

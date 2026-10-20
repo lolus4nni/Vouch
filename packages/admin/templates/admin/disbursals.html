@@ -37,7 +37,7 @@
                   </td>
                   <td class="px-4 py-3.5 text-sm text-slate-700">{{ expense.recipient.display_name }}</td>
                   <td class="px-4 py-3.5 text-sm capitalize text-slate-700">{{ expense.recipient.provider }}</td>
-                  <td class="whitespace-nowrap px-4 py-3.5 text-right text-sm font-semibold text-slate-700">{{ expense.currency_code }} {{ '{:,.2f}'.format(expense.amount_minor / 100) }}</td>
+                  <td class="whitespace-nowrap px-4 py-3.5 text-right text-sm font-semibold text-slate-700">{{ expense.currency_code }} {{ admin_minor_amount(expense.amount_minor, expense.currency.minor_unit_exponent) }}</td>
                   <td class="px-4 py-3.5 text-right"><a href="{{ url_for('admin.expense_review', expense_id=expense.id) }}" class="rounded-xl border border-slate-300 bg-white px-3.5 py-2 text-xs font-semibold text-slate-700">Review</a></td>
                 </tr>
               {% else %}
@@ -66,7 +66,7 @@
                   <td class="whitespace-nowrap px-4 py-3.5 text-sm text-slate-700">{{ disbursement.created_at.strftime('%d %b %Y, %H:%M') }}</td>
                   <td class="px-4 py-3.5 text-sm text-slate-700">{{ disbursement.expense_request.title }}</td>
                   <td class="px-4 py-3.5 text-sm text-slate-700">{{ disbursement.recipient.display_name }}</td>
-                  <td class="whitespace-nowrap px-4 py-3.5 text-right text-sm text-slate-700">{{ disbursement.currency_code }} {{ '{:,.2f}'.format(disbursement.amount_minor / 100) }}</td>
+                  <td class="whitespace-nowrap px-4 py-3.5 text-right text-sm text-slate-700">{{ disbursement.currency_code }} {{ admin_minor_amount(disbursement.amount_minor, disbursement.currency.minor_unit_exponent) }}</td>
                   <td class="px-4 py-3.5 font-mono text-xs text-slate-700">
                     {% for attempt in disbursement.attempts %}
                       {% if attempt.provider_reference %}{{ attempt.provider_reference }}{% else %}{{ attempt.status }}{% endif %}{% if not loop.last %}<br>{% endif %}
@@ -83,6 +83,7 @@
           </table>
         </div>
       </section>
+      <p class="text-sm text-slate-500">Each payout list shows up to 100 records: oldest approved requests first and newest payout records first.</p>
     </div>
   </main>
 {% endblock %}

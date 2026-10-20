@@ -3,13 +3,18 @@
 Member accounts are stored in the existing users table. A signed-in user's ID
 is kept in Flask's session until they log out.
 """
+import hashlib
+import re
+import secrets
 from datetime import date, datetime, timezone
 from functools import wraps
+from pathlib import Path
 
-from flask import Blueprint, current_app, flash, redirect, render_template, request, session, url_for
+from flask import Blueprint, abort, current_app, flash, redirect, render_template, request, send_from_directory, session, url_for
 from sqlalchemy import func, or_
-from sqlalchemy.exc import IntegrityError
+from sqlalchemy.exc import IntegrityError, SQLAlchemyError
 from werkzeug.security import check_password_hash, generate_password_hash
+from werkzeug.utils import secure_filename
 
 from packages.models import (
     Campaign,
@@ -17,14 +22,23 @@ from packages.models import (
     CampaignUpdate,
     Donation,
     ExpenseRequest,
+    FileAsset,
     Organization,
     User,
     VerificationCase,
+    VerificationDocument,
     db,
 )
 
 
 user = Blueprint("user", __name__, template_folder="templates", static_folder="static", static_url_path="/users/static")
+
+MAX_VERIFICATION_FILE_SIZE = 5 * 1024 * 1024
+VERIFICATION_FILE_TYPES = {
+    "identity": "National ID / Passport",
+    "proof_of_address": "Proof of address",
+    "organization_registration": "Organization registration",
+}
 
 
 def login_required(view):
@@ -561,7 +575,152 @@ def settings():
 @user.route("/verification", methods=["GET", "POST"])
 @login_required
 def verification():
+    account = _signed_in_user()
+    if account is None:
+        session.clear()
+        return redirect(url_for("user.login"))
+    if not account.campaigner_enabled:
+        abort(403)
+
+    organization = Organization.query.filter_by(
+        owner_user_id=account.id,
+        deleted_at=None,
+    ).first()
+    verification_subject = (
+        {"subject_organization_id": organization.id}
+        if organization
+        else {"subject_user_id": account.id}
+    )
+    verification_case = VerificationCase.query.filter_by(
+        **verification_subject,
+    ).order_by(VerificationCase.submitted_at.desc()).first()
+
     if request.method == "POST":
-        flash("Identity documents cannot be saved until secure file storage is configured.", "error")
-        return render_template("users/verification.html"), 503
-    return render_template("users/verification.html")
+        document_type = request.form.get("doc_type", "")
+        if document_type not in VERIFICATION_FILE_TYPES or (
+            document_type == "organization_registration" and organization is None
+        ):
+            flash("Choose a valid document type for your account.", "error")
+            return redirect(url_for("user.verification"))
+
+        uploaded_file = request.files.get("file")
+        if uploaded_file is None or not uploaded_file.filename:
+            flash("Choose a verification document to upload.", "error")
+            return redirect(url_for("user.verification"))
+
+        file_data = uploaded_file.stream.read(MAX_VERIFICATION_FILE_SIZE + 1)
+        if len(file_data) > MAX_VERIFICATION_FILE_SIZE:
+            flash("Verification documents must be 5 MB or smaller.", "error")
+            return redirect(url_for("user.verification"))
+        if not file_data:
+            flash("The selected verification document is empty.", "error")
+            return redirect(url_for("user.verification"))
+
+        if file_data.startswith(b"%PDF-"):
+            extension, content_type = ".pdf", "application/pdf"
+        elif file_data.startswith(b"\xff\xd8\xff"):
+            extension, content_type = ".jpg", "image/jpeg"
+        elif file_data.startswith(b"\x89PNG\r\n\x1a\n"):
+            extension, content_type = ".png", "image/png"
+        else:
+            flash("Choose a valid PDF, JPG, or PNG document.", "error")
+            return redirect(url_for("user.verification"))
+
+        upload_folder = Path(current_app.instance_path) / "private_uploads" / "verification"
+        upload_folder.mkdir(parents=True, exist_ok=True)
+        filename = f"{secrets.token_hex(16)}{extension}"
+        file_path = upload_folder / filename
+        with file_path.open("xb") as saved_file:
+            saved_file.write(file_data)
+
+        try:
+            if verification_case is None or verification_case.status not in {
+                "submitted",
+                "in_review",
+                "changes_requested",
+            }:
+                verification_case = VerificationCase(
+                    **verification_subject,
+                    status="submitted",
+                )
+                db.session.add(verification_case)
+                db.session.flush()
+            else:
+                verification_case.status = "submitted"
+                verification_case.submitted_at = datetime.now(timezone.utc)
+                verification_case.closed_at = None
+
+            file_asset = FileAsset(
+                storage_key=f"verification/{filename}",
+                original_filename=secure_filename(uploaded_file.filename)[:255] or "verification-document",
+                detected_content_type=content_type,
+                byte_size=len(file_data),
+                sha256_hex=hashlib.sha256(file_data).hexdigest(),
+                uploaded_by_user_id=account.id,
+            )
+            document = VerificationDocument(
+                case=verification_case,
+                file_asset=file_asset,
+                document_type=document_type,
+            )
+            db.session.add_all([file_asset, document])
+            db.session.commit()
+        except SQLAlchemyError:
+            db.session.rollback()
+            if file_path.exists():
+                file_path.unlink()
+            raise
+
+        flash("Your document was uploaded and sent for verification review.", "success")
+        return redirect(url_for("user.verification"))
+
+    latest_review = (
+        max(verification_case.reviews, key=lambda review: review.decided_at)
+        if verification_case and verification_case.reviews
+        else None
+    )
+    return render_template(
+        "users/verification.html",
+        account=account,
+        organization=organization,
+        verification_case=verification_case,
+        latest_review=latest_review,
+        document_types=VERIFICATION_FILE_TYPES,
+    )
+
+
+@user.route("/verification/documents/<int:document_id>")
+@login_required
+def verification_document(document_id):
+    account = _signed_in_user()
+    document = db.session.get(VerificationDocument, document_id)
+    if account is None or document is None:
+        abort(404)
+
+    organization = Organization.query.filter_by(
+        owner_user_id=account.id,
+        deleted_at=None,
+    ).first()
+    is_owner = document.case.subject_user_id == account.id or (
+        organization is not None
+        and document.case.subject_organization_id == organization.id
+    )
+    if not is_owner:
+        abort(404)
+
+    storage_key = document.file_asset.storage_key
+    if not storage_key or not re.fullmatch(
+        r"verification/[0-9a-f]{32}\.(pdf|jpg|png)",
+        storage_key,
+    ):
+        abort(404)
+    response = send_from_directory(
+        Path(current_app.instance_path) / "private_uploads",
+        storage_key,
+        as_attachment=True,
+        download_name=document.file_asset.original_filename or "verification-document",
+        mimetype=document.file_asset.detected_content_type,
+    )
+    response.headers["Cache-Control"] = "private, no-store"
+    response.headers["X-Content-Type-Options"] = "nosniff"
+    return response

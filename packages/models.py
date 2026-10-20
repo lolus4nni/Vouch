@@ -451,6 +451,7 @@ class CampaignRevision(db.Model):
         db.ForeignKey("file_assets.id", ondelete="RESTRICT"),
         nullable=True,
     )
+    cover_image_url = db.Column(db.String(512), nullable=True)
     submitted_by_user_id = db.Column(db.BigInteger, db.ForeignKey("users.id", ondelete="RESTRICT"), nullable=False)
     status = db.Column(
         db.String(24),

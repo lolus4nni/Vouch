@@ -21,6 +21,7 @@
         {% for category in categories %}
           <li class="p-5">
             <form action="{{ url_for('admin.categories') }}" method="post" class="grid grid-cols-1 gap-3 sm:grid-cols-6 sm:items-end">
+              <input type="hidden" name="csrf_token" value="{{ admin_csrf_token }}">
               <input type="hidden" name="category_id" value="{{ category.id }}">
               <div class="sm:col-span-2"><label class="mb-1.5 block text-sm font-medium text-slate-700" for="name-{{ category.id }}">Name</label><input id="name-{{ category.id }}" name="name" value="{{ category.name }}" required maxlength="100" class="block w-full rounded-xl border border-slate-300 bg-white px-4 py-3 text-sm text-slate-900"></div>
               <div class="sm:col-span-3"><label class="mb-1.5 block text-sm font-medium text-slate-700" for="description-{{ category.id }}">Description</label><input id="description-{{ category.id }}" name="description" value="{{ category.description or '' }}" maxlength="500" class="block w-full rounded-xl border border-slate-300 bg-white px-4 py-3 text-sm text-slate-900"></div>
@@ -36,6 +37,7 @@
     </section>
     <aside>
       <form action="{{ url_for('admin.categories') }}" method="post" class="rounded-2xl border border-slate-200 bg-white shadow-sm space-y-4 p-6 lg:sticky lg:top-24">
+        <input type="hidden" name="csrf_token" value="{{ admin_csrf_token }}">
 
         <h2 class="font-display text-lg font-bold text-brand-950">New category</h2>
         <div>
