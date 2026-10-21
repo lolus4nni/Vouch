@@ -30,7 +30,8 @@
         <div class="rounded-2xl border border-border bg-surface p-5 shadow-sm">
           <p class="text-xs font-medium uppercase tracking-wide text-muted">Raised</p>
           <p class="mt-2 font-display text-3xl font-bold text-brand-800">₦{{ '{:,.2f}'.format(raised_minor / 100) }}</p>
-          <p class="mt-1 text-xs text-muted">{{ progress }}% of ₦{{ '{:,.2f}'.format(revision.goal_amount_minor / 100) }}</p>
+          <p class="mt-1 text-xs text-muted">{{ progress }}% of ₦{{ '{:,.2f}'.format(revision.goal_amount_minor / 100) }} target</p>
+          <p class="mt-1 text-xs text-muted">Your need: ₦{{ '{:,.2f}'.format((revision.goal_amount_minor * 10 // 11) / 100) }} · Includes 10% platform fee</p>
         </div>
         <div class="rounded-2xl border border-border bg-surface p-5 shadow-sm">
           <p class="text-xs font-medium uppercase tracking-wide text-muted">Paid expenses</p>
@@ -39,7 +40,7 @@
         <div class="rounded-2xl border border-border bg-surface p-5 shadow-sm">
           <p class="text-xs font-medium uppercase tracking-wide text-muted">Available</p>
           <p class="mt-2 font-display text-3xl font-bold text-gold-600">₦{{ '{:,.2f}'.format(available_minor / 100) }}</p>
-          <p class="mt-1 text-xs text-muted">After approved and paid expenses</p>
+          <p class="mt-1 text-xs text-muted">Capped at your stated need, after approved and paid expenses</p>
         </div>
         <div class="rounded-2xl border border-border bg-surface p-5 shadow-sm">
           <p class="text-xs font-medium uppercase tracking-wide text-muted">Campaign end</p>

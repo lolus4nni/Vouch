@@ -21,7 +21,9 @@
           </div>
           <p class="mt-2 text-sm text-slate-500">{{ revision.category.name }}</p>
           <dl class="mt-5 grid gap-4 text-sm sm:grid-cols-3">
-            <div><dt class="text-slate-500">Goal</dt><dd class="font-semibold">{{ revision.currency.code }} {{ admin_minor_amount(revision.goal_amount_minor, revision.currency.minor_unit_exponent) }}</dd></div>
+            <div><dt class="text-slate-500">Campaigner needs</dt><dd class="font-semibold">{{ revision.currency.code }} {{ admin_minor_amount(revision.goal_amount_minor * 10 // 11, revision.currency.minor_unit_exponent) }}</dd></div>
+            <div><dt class="text-slate-500">10% platform fee</dt><dd class="font-semibold">{{ revision.currency.code }} {{ admin_minor_amount(revision.goal_amount_minor - revision.goal_amount_minor * 10 // 11, revision.currency.minor_unit_exponent) }}</dd></div>
+            <div><dt class="text-slate-500">Public target</dt><dd class="font-semibold">{{ revision.currency.code }} {{ admin_minor_amount(revision.goal_amount_minor, revision.currency.minor_unit_exponent) }}</dd></div>
             <div><dt class="text-slate-500">Starts</dt><dd class="font-semibold">{{ revision.start_date.strftime('%d %b %Y') if revision.start_date else 'Not set' }}</dd></div>
             <div><dt class="text-slate-500">Ends</dt><dd class="font-semibold">{{ revision.end_date.strftime('%d %b %Y') if revision.end_date else 'Not set' }}</dd></div>
           </dl>

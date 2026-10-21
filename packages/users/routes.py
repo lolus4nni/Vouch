@@ -143,10 +143,18 @@ def public_profile(user_id=None):
         })
 
     total_raised_minor = sum(item["raised_minor"] for item in public_campaigns)
+    profile_type = (
+        "organisation"
+        if organization
+        else "campaigner"
+        if profile.campaigner_enabled
+        else "donor"
+    )
     return render_template(
         "users/public_profile.html",
         profile=profile,
         organization=organization,
+        profile_type=profile_type,
         is_verified=verification_case is not None,
         campaigns=public_campaigns,
         total_raised_minor=total_raised_minor,

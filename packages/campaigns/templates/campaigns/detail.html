@@ -169,7 +169,8 @@
         <div class="space-y-4 lg:sticky lg:top-24">
           <div class="rounded-2xl border border-border bg-surface p-6 shadow-lg">
             <p class="font-display text-4xl font-bold text-brand-800">₦{{ '{:,.2f}'.format(raised_minor / 100) }}</p>
-            <p class="mt-1 text-sm text-muted">raised of ₦{{ '{:,.2f}'.format(revision.goal_amount_minor / 100) }} goal</p>
+            <p class="mt-1 text-sm text-muted">raised of ₦{{ '{:,.2f}'.format(revision.goal_amount_minor / 100) }} target</p>
+            <p class="mt-1 text-xs text-muted">₦{{ '{:,.2f}'.format((revision.goal_amount_minor * 10 // 11) / 100) }} needed + ₦{{ '{:,.2f}'.format((revision.goal_amount_minor - revision.goal_amount_minor * 10 // 11) / 100) }} platform fee</p>
             <div class="mt-4">
               <div class="h-3 overflow-hidden rounded-full bg-brand-100" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="{{ progress }}">
                 <div class="h-full bg-progress" style="width: {{ progress }}%"></div>

@@ -9,7 +9,9 @@
   {% else %}
     {{ ui.nav_link('campaign.explore', 'Explore campaigns', 'M21 21l-4.3-4.3m1.3-5.2a6.5 6.5 0 11-13 0 6.5 6.5 0 0113 0z') }}
   {% endif %}
-  {{ ui.nav_link('finance.my_donations', 'My donations', 'M4.3 6.3a4.5 4.5 0 016.4 0L12 7.6l1.3-1.3a4.5 4.5 0 116.4 6.4L12 20.4l-7.7-7.7a4.5 4.5 0 010-6.4z') }}
+  {% if not signed_in_account or not signed_in_account.campaigner_enabled %}
+    {{ ui.nav_link('finance.my_donations', 'My donations', 'M4.3 6.3a4.5 4.5 0 016.4 0L12 7.6l1.3-1.3a4.5 4.5 0 116.4 6.4L12 20.4l-7.7-7.7a4.5 4.5 0 010-6.4z') }}
+  {% endif %}
   {% if signed_in_account and signed_in_account.campaigner_enabled %}
     {{ ui.nav_link('finance.my_payouts', 'Expenses & payouts', 'M3 10l9-6 9 6M5 10v8m4-8v8m6-8v8m4-8v8M3 21h18') }}
   {% endif %}

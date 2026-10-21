@@ -1,6 +1,6 @@
 import os
 
-from flask import Flask, send_from_directory, session
+from flask import Flask, render_template, send_from_directory, session
 from flask_migrate import Migrate
 
 from packages.models import Organization, User, db
@@ -20,6 +20,10 @@ migrate = Migrate()
 def create_app(config_object=None):
     app = Flask(__name__)
     app.config.from_object(config_object or DevelopmentConfig)
+
+    @app.errorhandler(404)
+    def page_not_found(_error):
+        return render_template("errors/404.html"), 404
 
     @app.get("/static/image_uploads/<path:filename>")
     def uploaded_campaign_image(filename):

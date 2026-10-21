@@ -42,7 +42,7 @@
 
     </section>
 
-    <section class="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
+    <section class="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-5">
       <div class="rounded-2xl border border-slate-200 bg-white shadow-sm p-5">
     <p class="text-xs font-medium uppercase tracking-wide text-slate-500">Volume, last 30 days</p>
     {% for currency_code, exponent, amount_minor in donation_totals %}
@@ -53,8 +53,16 @@
 
   </div>
       <div class="rounded-2xl border border-slate-200 bg-white shadow-sm p-5">
-    <p class="text-xs font-medium uppercase tracking-wide text-slate-500">Platform fees, 30 days</p>
-    {% for currency_code, exponent, amount_minor in platform_fees %}
+    <p class="text-xs font-medium uppercase tracking-wide text-slate-500">Platform fee portions in live targets</p>
+    {% for currency_code, exponent, amount_minor in campaign_platform_fees %}
+      <p class="mt-2 font-display text-2xl font-bold text-gold-600">{{ currency_code }} {{ admin_minor_amount(amount_minor, exponent) }}</p>
+    {% else %}
+      <p class="mt-2 font-display text-2xl font-bold text-gold-600">—</p>
+    {% endfor %}
+  </div>
+      <div class="rounded-2xl border border-slate-200 bg-white shadow-sm p-5">
+    <p class="text-xs font-medium uppercase tracking-wide text-slate-500">Payment processing fees, 30 days</p>
+    {% for currency_code, exponent, amount_minor in processor_fees %}
       {% if currency_code and exponent is not none %}
         <p class="mt-2 font-display text-2xl font-bold text-gold-600">{{ currency_code }} {{ admin_minor_amount(amount_minor, exponent) }}</p>
       {% else %}

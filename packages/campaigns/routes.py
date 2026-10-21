@@ -146,11 +146,13 @@ def _campaign_form_values():
         return None, "The campaign goal must be at least ₦1,000."
     if end_date < start_date:
         return None, "The end date must be on or after the start date."
+    net_goal_amount_minor = goal * 100
+    platform_fee_minor = (net_goal_amount_minor + 9) // 10
     return {
         "title": title,
         "description": description,
         "category_id": category.id,
-        "goal_amount_minor": goal * 100,
+        "goal_amount_minor": net_goal_amount_minor + platform_fee_minor,
         "currency_code": "NGN",
         "start_date": start_date,
         "end_date": end_date,
@@ -274,11 +276,11 @@ def detail():
         status="paid",
     ).order_by(ExpenseRequest.submitted_at.desc()).all()
     paid_minor = sum(expense.amount_minor for expense in expenses)
-    approved_minor = db.session.query(
+    committed_minor = db.session.query(
         func.coalesce(func.sum(ExpenseRequest.amount_minor), 0)
     ).filter(
         ExpenseRequest.campaign_id == campaign_record.id,
-        ExpenseRequest.status == "approved",
+        ExpenseRequest.status.in_(("approved", "paid")),
     ).scalar() or 0
     updates = CampaignUpdate.query.filter_by(
         campaign_id=campaign_record.id,
@@ -310,7 +312,10 @@ def detail():
         verified=verified,
         raised_minor=int(raised_minor),
         paid_minor=paid_minor,
-        available_minor=max(int(raised_minor) - paid_minor - int(approved_minor), 0),
+        available_minor=max(
+            min(int(raised_minor), revision.goal_amount_minor * 10 // 11) - int(committed_minor),
+            0,
+        ),
         progress=progress,
         days_left=days_left,
         donor_count=donor_count,
@@ -528,7 +533,10 @@ def manage():
         revision=revision,
         raised_minor=int(raised_minor),
         paid_minor=paid_minor,
-        available_minor=max(int(raised_minor) - committed_minor, 0),
+        available_minor=max(
+            min(int(raised_minor), revision.goal_amount_minor * 10 // 11) - committed_minor,
+            0,
+        ),
         progress=min(100, round(int(raised_minor) * 100 / revision.goal_amount_minor)),
         expenses=expenses,
         updates=updates,

@@ -59,10 +59,12 @@ def inject_admin_csrf_token():
     }
 
 
-@admin.before_request
+@admin.before_app_request
 def require_admin_login():
     """Keep every admin page behind the simple login session."""
-    if request.endpoint in {"admin.static", "admin.login"}:
+    if request.path != "/admin" and not request.path.startswith("/admin/"):
+        return None
+    if request.endpoint == "admin.static" or request.path == "/admin/login":
         return None
     admin_user = db.session.get(User, session.get("admin_user_id")) if session.get("admin_user_id") else None
     if (
@@ -76,7 +78,7 @@ def require_admin_login():
         ).first()
     ):
         session.clear()
-        return redirect(url_for("admin.login", next=request.full_path))
+        return redirect(url_for("user.landing_page"))
     if request.method == "POST":
         expected_token = session.get("_admin_csrf_token", "")
         submitted_token = request.form.get("csrf_token", "")
@@ -215,7 +217,7 @@ def dashboard():
         Donation.campaign_currency_code,
         Currency.minor_unit_exponent,
     ).order_by(Donation.campaign_currency_code).all()
-    platform_fees = db.session.query(
+    processor_fees = db.session.query(
         PaymentAttempt.provider_fee_currency_code,
         Currency.minor_unit_exponent,
         db.func.sum(PaymentAttempt.provider_fee_minor),
@@ -228,6 +230,35 @@ def dashboard():
         PaymentAttempt.provider_fee_currency_code,
         Currency.minor_unit_exponent,
     ).order_by(PaymentAttempt.provider_fee_currency_code).all()
+    latest_approved_version = (
+        db.session.query(db.func.max(CampaignRevision.version_number))
+        .filter(
+            CampaignRevision.campaign_id == Campaign.id,
+            CampaignRevision.status == "approved",
+        )
+        .correlate(Campaign)
+        .scalar_subquery()
+    )
+    campaign_platform_fees = db.session.query(
+        CampaignRevision.currency_code,
+        Currency.minor_unit_exponent,
+        db.func.sum(
+            CampaignRevision.goal_amount_minor
+            - CampaignRevision.goal_amount_minor * 10 // 11
+        ),
+    ).join(
+        Currency, Currency.code == CampaignRevision.currency_code
+    ).join(
+        Campaign, Campaign.id == CampaignRevision.campaign_id
+    ).filter(
+        Campaign.status == "active",
+        Campaign.deleted_at.is_(None),
+        CampaignRevision.status == "approved",
+        CampaignRevision.version_number == latest_approved_version,
+    ).group_by(
+        CampaignRevision.currency_code,
+        Currency.minor_unit_exponent,
+    ).order_by(CampaignRevision.currency_code).all()
     donor_count = db.session.query(db.func.count(db.func.distinct(Donation.donor_user_id))).filter(
         Donation.status == "succeeded",
         Donation.donor_user_id.isnot(None),
@@ -246,7 +277,8 @@ def dashboard():
         ).count(),
         queued_payouts=Disbursement.query.filter_by(status="queued").count(),
         donation_totals=donation_totals,
-        platform_fees=platform_fees,
+        processor_fees=processor_fees,
+        campaign_platform_fees=campaign_platform_fees,
         live_campaigns=Campaign.query.filter_by(status="active", deleted_at=None).count(),
         donor_count=int(donor_count or 0),
         recent_reviews=recent_reviews[:5],

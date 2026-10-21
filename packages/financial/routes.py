@@ -212,6 +212,8 @@ def donate():
         "revision": revision,
         "currency": currency,
         "raised_minor": raised_minor,
+        "net_goal_minor": revision.goal_amount_minor * 10 // 11,
+        "platform_fee_minor": revision.goal_amount_minor - revision.goal_amount_minor * 10 // 11,
         "progress": progress,
         "amount": amount,
         "guest_email": guest_email,
@@ -541,7 +543,12 @@ def ledger():
         credited_minor=credited_minor,
         difference_minor=max(gross_minor - credited_minor, 0),
         paid_minor=paid_total_minor,
-        available_minor=max(credited_minor - paid_total_minor - reserved_minor, 0),
+        available_minor=max(
+            min(credited_minor, revision.goal_amount_minor * 10 // 11)
+            - paid_total_minor
+            - reserved_minor,
+            0,
+        ),
         progress=min(100, round(credited_minor * 100 / revision.goal_amount_minor)),
     )
 
@@ -569,7 +576,12 @@ def expense_new():
         deleted_at=None,
     ).order_by(PayoutRecipient.display_name).all()
     raised_minor, paid_minor, reserved_minor = _campaign_money(campaign_record.id)
-    available_minor = max(raised_minor - paid_minor - reserved_minor, 0)
+    available_minor = max(
+        min(raised_minor, revision.goal_amount_minor * 10 // 11)
+        - paid_minor
+        - reserved_minor,
+        0,
+    )
     amount_factor = 10 ** currency.minor_unit_exponent if currency else 100
     maximum_amount = available_minor // amount_factor
     form_values = {

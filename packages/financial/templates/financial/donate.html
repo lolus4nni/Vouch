@@ -15,6 +15,7 @@
         <p class="text-xs font-semibold uppercase tracking-widest text-brand-600">Support this campaign</p>
         <h1 class="mt-1 font-display text-3xl font-bold text-brand-950">{{ revision.title }}</h1>
         <p class="mt-3 text-sm leading-6 text-slate-600">You will continue to Paystack’s secure checkout to choose a payment method enabled for this account.</p>
+        <p class="mt-3 rounded-xl bg-brand-50 p-4 text-sm leading-6 text-brand-900">The campaign target includes a 10% platform fee added to the amount the campaigner needs. Your donation amount is not increased by this fee.</p>
         {% if not paystack_ready %}
           <p class="mt-3 rounded-xl bg-amber-50 p-4 text-sm text-amber-900">Paystack test checkout is unavailable. This campaign must use NGN and the test secret key must be configured.</p>
         {% endif %}
@@ -49,7 +50,11 @@
         <div class="mt-4 h-2.5 overflow-hidden rounded-full bg-brand-100" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="{{ progress }}">
           <div class="h-full bg-brand-600" style="width: {{ progress }}%"></div>
         </div>
-        <p class="mt-2 text-sm text-slate-600">{{ revision.currency_code }} {{ "{:,.2f}".format(raised_minor / (10 ** currency.minor_unit_exponent)) }} received of {{ revision.currency_code }} {{ "{:,.2f}".format(revision.goal_amount_minor / (10 ** currency.minor_unit_exponent)) }}</p>
+        <p class="mt-2 text-sm text-slate-600">{{ revision.currency_code }} {{ "{:,.2f}".format(raised_minor / (10 ** currency.minor_unit_exponent)) }} received of {{ revision.currency_code }} {{ "{:,.2f}".format(revision.goal_amount_minor / (10 ** currency.minor_unit_exponent)) }} target</p>
+        <dl class="mt-4 space-y-2 border-t border-slate-100 pt-4 text-sm">
+          <div class="flex justify-between gap-3"><dt class="text-slate-500">Amount needed</dt><dd class="font-medium">{{ revision.currency_code }} {{ "{:,.2f}".format(net_goal_minor / (10 ** currency.minor_unit_exponent)) }}</dd></div>
+          <div class="flex justify-between gap-3"><dt class="text-slate-500">10% platform fee</dt><dd class="font-medium">{{ revision.currency_code }} {{ "{:,.2f}".format(platform_fee_minor / (10 ** currency.minor_unit_exponent)) }}</dd></div>
+        </dl>
       </div>
       <p class="rounded-2xl bg-amber-50 p-4 text-sm text-amber-900">Your donation is recorded only after Paystack verifies the payment.</p>
     </aside>
