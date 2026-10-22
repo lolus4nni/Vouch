@@ -1,0 +1,48 @@
+{% extends "layouts/member.html" %}
+
+{% block title %}Post an update{% endblock %}
+
+{% block topbar %}
+  <div class="min-w-0 flex-1">
+    <h1 class="truncate font-display text-xl font-bold text-brand-950 sm:text-2xl">Post an update</h1>
+    <p class="hidden truncate text-sm text-muted sm:block">Help Ada walk again: spinal surgery fund</p>
+  </div>
+  <div class="flex items-center gap-2"><a href="{{ url_for('campaign.manage', campaign_id=campaign.id) }}" class="inline-flex items-center justify-center gap-2 rounded-xl font-semibold transition focus:outline-none focus-visible:ring-4 disabled:cursor-not-allowed disabled:opacity-50 border border-slate-300 bg-surface text-slate-700 hover:bg-background focus-visible:ring-slate-200 px-3.5 py-2 text-xs">Cancel</a></div>
+
+{% endblock %}
+
+{% block content %}
+  <main id="main" class="flex-1 px-4 py-6 sm:px-6 lg:py-8">
+  <form action="{{ url_for('campaign.post_update', campaign_id=campaign.id) }}" method="post" class="mx-auto grid grid-cols-1 max-w-5xl gap-8 lg:grid-cols-3" novalidate>
+
+    <div class="rounded-2xl border border-border bg-surface shadow-sm space-y-5 p-6 sm:p-8 lg:col-span-2">
+      <div>
+    <label for="title" class="mb-1.5 block text-sm font-medium text-slate-700">Headline <span class="text-error" aria-hidden="true">*</span></label>
+    <input id="title" name="title" type="text" value="" placeholder="e.g. Surgery date confirmed: 14 November"
+           required  maxlength="150"
+           class="block w-full rounded-xl border border-slate-300 bg-surface px-4 py-3 text-sm text-ink placeholder:text-slate-400 focus:border-brand-600 focus:outline-none focus:ring-4 focus:ring-brand-100"
+           >
+
+  </div>
+      <div>
+    <label for="content" class="mb-1.5 block text-sm font-medium text-slate-700">What&#39;s new? <span class="text-error" aria-hidden="true">*</span></label>
+    <textarea id="content" name="content" rows="10" placeholder="Share progress, thank donors, explain what the money did." required 
+              class="block w-full rounded-xl border border-slate-300 bg-surface px-4 py-3 text-sm text-ink placeholder:text-slate-400 focus:border-brand-600 focus:outline-none focus:ring-4 focus:ring-brand-100"></textarea>
+
+  </div>
+      <div class="flex justify-end gap-3"><button class="inline-flex items-center justify-center gap-2 rounded-xl px-5 py-3 text-sm font-semibold transition focus:outline-none focus-visible:ring-4 disabled:cursor-not-allowed disabled:opacity-50 bg-brand-700 text-white shadow-sm hover:bg-brand-800 focus-visible:ring-brand-200">Publish update</button></div>
+    </div>
+    <aside class="rounded-2xl bg-brand-50 p-6 text-sm text-brand-900">
+      <p class="font-semibold">Great updates…</p>
+      <ul class="mt-3 space-y-3">
+
+        <li class="flex gap-2"><svg xmlns="http://www.w3.org/2000/svg" class="mt-0.5 h-4 w-4 shrink-0 text-brand-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 13l4 4L19 7"/></svg>Say thank you by name where you can</li>
+        <li class="flex gap-2"><svg xmlns="http://www.w3.org/2000/svg" class="mt-0.5 h-4 w-4 shrink-0 text-brand-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 13l4 4L19 7"/></svg>Connect progress to an expense or receipt</li>
+        <li class="flex gap-2"><svg xmlns="http://www.w3.org/2000/svg" class="mt-0.5 h-4 w-4 shrink-0 text-brand-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 13l4 4L19 7"/></svg>Include what happens next and when</li>
+        <li class="flex gap-2"><svg xmlns="http://www.w3.org/2000/svg" class="mt-0.5 h-4 w-4 shrink-0 text-brand-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 13l4 4L19 7"/></svg>Be honest about setbacks, donors respect it</li>
+      </ul>
+      <p class="mt-5 text-xs text-brand-700">Donors who gave to this campaign are notified.</p>
+    </aside>
+  </form>
+  </main>
+{% endblock %}

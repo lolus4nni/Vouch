@@ -1,0 +1,81 @@
+{% extends "layouts/admin.html" %}
+
+{% block title %}Donations monitor{% endblock %}
+
+{% block topbar %}
+  <div class="min-w-0 flex-1">
+    <h1 class="truncate font-display text-xl font-bold text-brand-950 sm:text-2xl">Donations monitor</h1>
+    <p class="hidden truncate text-sm text-slate-500 sm:block">Donation records and payment-provider status.</p>
+  </div>
+{% endblock %}
+
+{% block content %}
+  <main id="main" class="flex-1 px-4 py-6 sm:px-6 lg:py-8">
+    <div class="mx-auto max-w-6xl space-y-6">
+      <section class="grid grid-cols-1 gap-4 sm:grid-cols-3" aria-label="Donation totals">
+        <div class="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
+          <p class="text-xs font-medium uppercase tracking-wide text-slate-500">Successful gross volume</p>
+          {% for currency_code, exponent, amount_minor in gross_totals %}
+            <p class="mt-2 font-display text-2xl font-bold text-brand-800">{{ currency_code }} {{ admin_minor_amount(amount_minor, exponent) }}</p>
+          {% else %}
+            <p class="mt-2 font-display text-2xl font-bold text-brand-800">—</p>
+          {% endfor %}
+        </div>
+        <div class="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
+          <p class="text-xs font-medium uppercase tracking-wide text-slate-500">Recorded provider fees</p>
+          {% for currency_code, exponent, amount_minor in fee_totals %}
+            {% if currency_code and exponent is not none %}
+              <p class="mt-2 font-display text-2xl font-bold text-gold-600">{{ currency_code }} {{ admin_minor_amount(amount_minor, exponent) }}</p>
+            {% else %}
+              <p class="mt-2 font-display text-sm font-bold text-gold-600">Unknown currency: {{ amount_minor }} minor units</p>
+            {% endif %}
+          {% else %}
+            <p class="mt-2 font-display text-2xl font-bold text-gold-600">—</p>
+          {% endfor %}
+        </div>
+        <div class="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
+          <p class="text-xs font-medium uppercase tracking-wide text-slate-500">Donation records</p>
+          <p class="mt-2 font-display text-3xl font-bold text-slate-900">{{ donation_count }}</p>
+        </div>
+      </section>
+
+      <nav class="flex flex-wrap gap-2 text-sm font-medium" aria-label="Donation status filter">
+        {% for status, label in [('all', 'All'), ('succeeded', 'Successful'), ('pending', 'Pending'), ('failed', 'Failed'), ('refunded', 'Refunded'), ('partially_refunded', 'Partially refunded'), ('disputed', 'Disputed')] %}
+          <a href="{{ url_for('admin.donations', status=status) }}" class="whitespace-nowrap rounded-full px-4 py-2 {{ 'bg-brand-700 text-white' if selected_status == status else 'bg-white text-slate-600 ring-1 ring-slate-200 hover:bg-slate-50' }}">{{ label }}</a>
+        {% endfor %}
+      </nav>
+
+      <div class="overflow-x-auto rounded-2xl border border-slate-200 bg-white shadow-sm">
+        <table class="min-w-full divide-y divide-slate-200">
+          <thead class="bg-slate-50"><tr>
+            <th class="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide text-slate-500">When</th>
+            <th class="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide text-slate-500">Donor</th>
+            <th class="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide text-slate-500">Campaign</th>
+            <th class="px-4 py-3 text-right text-xs font-semibold uppercase tracking-wide text-slate-500">Amount</th>
+            <th class="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide text-slate-500">Provider</th>
+            <th class="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide text-slate-500">Reference</th>
+            <th class="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide text-slate-500">Status</th>
+          </tr></thead>
+          <tbody class="divide-y divide-slate-100">
+            {% for donation in donations %}
+              {% set attempt = latest_attempts.get(donation.id) %}
+              {% set revision = donation.campaign.revisions|sort(attribute='version_number', reverse=true)|first if donation.campaign.revisions else none %}
+              <tr class="hover:bg-slate-50">
+                <td class="whitespace-nowrap px-4 py-3.5 text-sm text-slate-700">{{ donation.created_at.strftime('%d %b %Y, %H:%M') }}</td>
+                <td class="px-4 py-3.5 text-sm text-slate-700">{{ donation.donor.display_name if donation.donor else ('Anonymous donor' if donation.is_anonymous else donation.guest_email or 'Guest donor') }}</td>
+                <td class="max-w-[14rem] truncate px-4 py-3.5 text-sm text-slate-700">{{ revision.title if revision else donation.campaign.slug }}</td>
+                <td class="whitespace-nowrap px-4 py-3.5 text-right text-sm font-semibold text-slate-700">{{ donation.campaign_currency_code }} {{ admin_minor_amount(donation.intended_amount_minor, donation.campaign_currency.minor_unit_exponent) }}</td>
+                <td class="px-4 py-3.5 text-sm capitalize text-slate-700">{{ attempt.provider if attempt else 'Not started' }}</td>
+                <td class="px-4 py-3.5 font-mono text-xs text-slate-700">{{ attempt.provider_reference if attempt and attempt.provider_reference else donation.receipt_id }}</td>
+                <td class="px-4 py-3.5 text-sm capitalize text-slate-700">{{ donation.status.replace('_', ' ') }}</td>
+              </tr>
+            {% else %}
+              <tr><td colspan="7" class="px-4 py-8 text-center text-sm text-slate-500">No donation records match this filter.</td></tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+      <p class="text-sm text-slate-500">Showing up to 100 newest matching records. Payment status comes from the stored donation record; no payment is initiated from this page.</p>
+    </div>
+  </main>
+{% endblock %}

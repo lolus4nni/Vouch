@@ -1,0 +1,155 @@
+{% extends "layouts/member.html" %}
+
+{% block title %}Start a campaign{% endblock %}
+
+{% block topbar %}
+  <div class="min-w-0 flex-1">
+    <h1 class="truncate font-display text-xl font-bold text-brand-950 sm:text-2xl">Start a campaign</h1>
+    <p class="hidden truncate text-sm text-muted sm:block">Save a draft or submit it for review. Donors can see it after approval.</p>
+  </div>
+  <div class="flex items-center gap-2"></div>
+
+{% endblock %}
+
+{% block content %}
+  <main id="main" class="flex-1 px-4 py-6 sm:px-6 lg:py-8">
+  <form action="{{ url_for('campaign.create') }}" method="post" enctype="multipart/form-data" class="mx-auto grid grid-cols-1 max-w-6xl gap-8 lg:grid-cols-3" novalidate>
+
+    <div class="space-y-6 lg:col-span-2">
+
+  <section class="rounded-2xl border border-border bg-surface shadow-sm p-6 sm:p-8">
+    <p class="text-xs font-semibold uppercase tracking-widest text-brand-600">Part 1</p>
+    <h2 class="mt-1 font-display text-2xl font-bold text-brand-950">The basics</h2>
+    <div class="mt-6 space-y-5">
+      <div>
+    <label for="title" class="mb-1.5 block text-sm font-medium text-slate-700">Campaign title <span class="text-error" aria-hidden="true">*</span></label>
+    <input id="title" name="title" type="text" value="" placeholder="e.g. Help Ada walk again: spinal surgery fund"
+           required  maxlength="150" data-slug-source
+           class="block w-full rounded-xl border border-slate-300 bg-surface px-4 py-3 text-sm text-ink placeholder:text-slate-400 focus:border-brand-600 focus:outline-none focus:ring-4 focus:ring-brand-100"
+           >
+    <p class="mt-1.5 text-xs text-muted">Be specific. Clear titles raise more.</p>
+
+  </div>
+      <p class="-mt-2 text-xs text-muted">Your link: <span class="font-mono text-brand-700">/campaigns/<span id="slug-preview">your-title</span></span></p>
+
+      <div class="grid grid-cols-1 gap-5 sm:grid-cols-2">
+        <div>
+          <label for="category_id" class="mb-1.5 block text-sm font-medium text-slate-700">Category <span class="text-error">*</span></label>
+          <select id="category_id" name="category_id" required class="block w-full rounded-xl border border-slate-300 bg-surface px-4 py-3 text-sm text-ink placeholder:text-slate-400 focus:border-brand-600 focus:outline-none focus:ring-4 focus:ring-brand-100">
+            <option value="" disabled selected>Choose one…</option>
+            {% for category in categories %}
+              <option value="{{ category.id }}">{{ category.name }}</option>
+            {% endfor %}
+          </select>
+
+        </div>
+        <div>
+          <label for="goal_amount" class="mb-1.5 block text-sm font-medium text-slate-700">Amount you need (₦) <span class="text-error">*</span></label>
+          <div class="relative"><span class="pointer-events-none absolute inset-y-0 left-4 grid place-items-center text-sm font-semibold text-muted">₦</span>
+            <input id="goal_amount" name="goal_amount" type="number" min="1000" step="1" required value="" placeholder="500000" class="block w-full rounded-xl border border-slate-300 bg-surface px-4 py-3 text-sm text-ink placeholder:text-slate-400 focus:border-brand-600 focus:outline-none focus:ring-4 focus:ring-brand-100 pl-9"></div>
+          <p class="mt-1.5 text-xs text-muted">Vouch adds a 10% platform fee to the public target automatically. For example, ₦100 needed becomes a ₦110 target.</p>
+
+        </div>
+        <div>
+    <label for="start_date" class="mb-1.5 block text-sm font-medium text-slate-700">Start date <span class="text-error" aria-hidden="true">*</span></label>
+    <input id="start_date" name="start_date" type="date" value="" placeholder=""
+           required  
+           class="block w-full rounded-xl border border-slate-300 bg-surface px-4 py-3 text-sm text-ink placeholder:text-slate-400 focus:border-brand-600 focus:outline-none focus:ring-4 focus:ring-brand-100"
+           >
+    <p class="mt-1.5 text-xs text-muted">Campaign goes live on this day after approval.</p>
+
+  </div>
+        <div>
+    <label for="end_date" class="mb-1.5 block text-sm font-medium text-slate-700">End date <span class="text-error" aria-hidden="true">*</span></label>
+    <input id="end_date" name="end_date" type="date" value="" placeholder=""
+           required  
+           class="block w-full rounded-xl border border-slate-300 bg-surface px-4 py-3 text-sm text-ink placeholder:text-slate-400 focus:border-brand-600 focus:outline-none focus:ring-4 focus:ring-brand-100"
+           >
+    <p class="mt-1.5 text-xs text-muted">30–60 days works best.</p>
+
+  </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="rounded-2xl border border-border bg-surface shadow-sm p-6 sm:p-8">
+    <p class="text-xs font-semibold uppercase tracking-widest text-brand-600">Part 2</p>
+    <h2 class="mt-1 font-display text-2xl font-bold text-brand-950">Tell your story</h2>
+    <div class="mt-5 grid grid-cols-1 gap-5 lg:grid-cols-3">
+      <div class="lg:col-span-2">
+        <div>
+    <label for="description" class="mb-1.5 block text-sm font-medium text-slate-700">Your story <span class="text-error" aria-hidden="true">*</span></label>
+    <textarea id="description" name="description" rows="14" placeholder="Who needs help? What happened? What will the money do? What happens if the goal isn&#39;t reached?" required maxlength="8000"
+              class="block w-full rounded-xl border border-slate-300 bg-surface px-4 py-3 text-sm text-ink placeholder:text-slate-400 focus:border-brand-600 focus:outline-none focus:ring-4 focus:ring-brand-100"></textarea>
+
+  </div>
+        <p class="mt-1 text-right text-xs text-slate-400"><span id="char-count">0</span> characters</p>
+      </div>
+      <aside class="rounded-2xl bg-brand-50 p-5 text-sm text-brand-900">
+        <p class="font-semibold">A story people believe</p>
+        <ul class="mt-3 space-y-3 text-brand-800">
+          <li class="flex gap-2"><svg xmlns="http://www.w3.org/2000/svg" class="mt-0.5 h-4 w-4 shrink-0 text-brand-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 13l4 4L19 7"/></svg> Start with the person, not the problem.</li>
+          <li class="flex gap-2"><svg xmlns="http://www.w3.org/2000/svg" class="mt-0.5 h-4 w-4 shrink-0 text-brand-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 13l4 4L19 7"/></svg> Be specific about how funds will be used.</li>
+          <li class="flex gap-2"><svg xmlns="http://www.w3.org/2000/svg" class="mt-0.5 h-4 w-4 shrink-0 text-brand-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 13l4 4L19 7"/></svg> Name who will receive the money (hospital, school, supplier).</li>
+          <li class="flex gap-2"><svg xmlns="http://www.w3.org/2000/svg" class="mt-0.5 h-4 w-4 shrink-0 text-brand-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 13l4 4L19 7"/></svg> Promise updates, then post them.</li>
+        </ul>
+      </aside>
+    </div>
+  </section>
+
+  <section class="rounded-2xl border border-border bg-surface shadow-sm p-6 sm:p-8">
+    <p class="text-xs font-semibold uppercase tracking-widest text-brand-600">Part 3</p>
+    <h2 class="mt-1 font-display text-2xl font-bold text-brand-950">Cover photo</h2>
+    <p class="mt-1 text-sm text-muted">A real, well-lit photo. Landscape works best (1600×900).</p>
+    <label for="cover" class="mt-5 flex cursor-pointer flex-col items-center justify-center rounded-2xl border-2 border-dashed border-slate-300 bg-background px-6 py-10 text-center transition hover:border-brand-400 hover:bg-brand-50">
+      <img id="cover-preview" alt="" class="mb-4 hidden max-h-48 rounded-xl object-cover">
+      <span class="text-brand-700"><svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 16v2a2 2 0 002 2h12a2 2 0 002-2v-2M16 8l-4-4m0 0L8 8m4-4v12"/></svg></span>
+      <span class="mt-2 text-sm font-semibold text-ink">Click to upload</span>
+      <span class="text-xs text-muted">JPG, PNG or WebP up to 5 MB</span>
+      <input id="cover" name="cover" type="file" accept="image/png,image/jpeg,image/webp" class="sr-only">
+    </label>
+
+  </section>
+
+  <script>
+    (function(){
+      var t = document.querySelector('[data-slug-source]'), p = document.getElementById('slug-preview');
+      if (t && p) t.addEventListener('input', function(){
+        p.textContent = t.value.toLowerCase().trim().replace(/[^a-z0-9]+/g,'-').replace(/^-+|-+$/g,'').slice(0,60) || 'your-title';
+      });
+      var d = document.getElementById('description'), n = document.getElementById('char-count');
+      if (d && n) { var u = function(){ n.textContent = d.value.length; }; d.addEventListener('input', u); u(); }
+      var f = document.getElementById('cover'), pv = document.getElementById('cover-preview');
+      if (f) f.addEventListener('change', function(){
+        var file = f.files[0]; if (!file) return;
+        if (file.size > 5*1024*1024) { alert('Image must be under 5 MB'); f.value=''; return; }
+        pv.src = URL.createObjectURL(file); pv.classList.remove('hidden');
+      });
+    })();
+  </script>
+      <div class="flex flex-wrap justify-end gap-3">
+        <button name="action" value="draft" class="inline-flex items-center justify-center gap-2 rounded-xl px-5 py-3 text-sm font-semibold transition focus:outline-none focus-visible:ring-4 disabled:cursor-not-allowed disabled:opacity-50 border border-slate-300 bg-surface text-slate-700 hover:bg-background focus-visible:ring-slate-200">Save as draft</button>
+        <button name="action" value="submit" class="inline-flex items-center justify-center gap-2 rounded-xl px-5 py-3 text-sm font-semibold transition focus:outline-none focus-visible:ring-4 disabled:cursor-not-allowed disabled:opacity-50 bg-brand-700 text-white shadow-sm hover:bg-brand-800 focus-visible:ring-brand-200">Submit for review <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M13 7l5 5m0 0l-5 5m5-5H6"/></svg></button>
+      </div>
+    </div>
+
+    <aside class="space-y-4 lg:sticky lg:top-24 lg:self-start">
+      <div class="relative overflow-hidden rounded-2xl bg-brand-900 p-6 text-white">
+        <div class="absolute inset-0 bg-gradient-to-br from-brand-700 to-brand-950"><img src="{{ url_for('campaign.static', filename='images/create-side.jpg') }}" alt="" class="h-full w-full object-cover opacity-25 mix-blend-luminosity" loading="lazy" onerror="this.style.display='none'"></div>
+        <div class="relative"><p class="text-xs font-semibold uppercase tracking-widest text-gold-300">What happens next</p>
+          <ol class="mt-4 space-y-4 text-sm text-brand-100">
+            <li class="flex gap-3"><span class="grid h-6 w-6 shrink-0 place-items-center rounded-full bg-accent text-xs font-bold text-brand-950">1</span>Save a draft or submit your campaign for review.</li>
+            <li class="flex gap-3"><span class="grid h-6 w-6 shrink-0 place-items-center rounded-full bg-surface/20 text-xs font-bold">2</span>Our team reviews submitted campaigns.</li>
+            <li class="flex gap-3"><span class="grid h-6 w-6 shrink-0 place-items-center rounded-full bg-surface/20 text-xs font-bold">3</span>Approved campaigns go live and show the Verified badge.</li>
+            <li class="flex gap-3"><span class="grid h-6 w-6 shrink-0 place-items-center rounded-full bg-surface/20 text-xs font-bold">4</span>You request expenses; we pay recipients directly.</li>
+          </ol></div>
+      </div>
+
+      <div class="rounded-2xl border border-gold-200 bg-gold-50 p-5 text-sm text-gold-700">
+        <p class="font-semibold">Your identity isn't verified yet</p>
+        <p class="mt-1">You can submit your campaign for review now. Verification is required before funds can be released. <a href="{{ url_for('user.verification') }}" class="font-semibold underline">Verify now</a></p>
+      </div>
+    </aside>
+  </form>
+  </main>
+{% endblock %}

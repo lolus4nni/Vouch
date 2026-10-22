@@ -1,0 +1,86 @@
+{% extends "layouts/member.html" %}
+
+{% block title %}Settings{% endblock %}
+
+{% block topbar %}
+  <div class="min-w-0 flex-1">
+    <h1 class="truncate font-display text-xl font-bold text-brand-950 sm:text-2xl">Settings</h1>
+    <p class="hidden truncate text-sm text-muted sm:block">Sign-in details and account controls.</p>
+  </div>
+  <div class="flex items-center gap-2"></div>
+
+{% endblock %}
+
+{% block content %}
+  <main id="main" class="flex-1 px-4 py-6 sm:px-6 lg:py-8">
+    <div class="mx-auto max-w-2xl space-y-8">
+
+      <form action="{{ url_for('user.settings') }}" method="post" class="rounded-2xl border border-border bg-surface shadow-sm space-y-5 p-6 sm:p-8">
+        <input type="hidden" name="section" value="email">
+        <div><h2 class="font-display text-xl font-bold text-brand-950">Email address</h2><p class="mt-1 text-sm text-muted">We send receipts and verification updates here.</p></div>
+        <div>
+      <label for="email" class="mb-1.5 block text-sm font-medium text-ink">Email <span class="text-error" aria-hidden="true">*</span></label>
+      <input id="email" name="email" type="email" value="{{ account.email or '' }}" placeholder=""
+            required autocomplete="email" 
+            class="block w-full rounded-xl border border-border bg-surface px-4 py-3 text-sm text-ink placeholder:text-muted/70 focus:border-brand-600 focus:outline-none focus:ring-4 focus:ring-brand-100"
+            >
+
+    </div>
+        <div>
+      <label for="current_password" class="mb-1.5 block text-sm font-medium text-ink">Current password <span class="text-error" aria-hidden="true">*</span></label>
+      <input id="current_password" name="current_password" type="password" value="" placeholder=""
+            required autocomplete="current-password" 
+            class="block w-full rounded-xl border border-border bg-surface px-4 py-3 text-sm text-ink placeholder:text-muted/70 focus:border-brand-600 focus:outline-none focus:ring-4 focus:ring-brand-100"
+            >
+      <p class="mt-1.5 text-xs text-muted">Needed to confirm it&#39;s you.</p>
+
+    </div>
+        <div class="text-right"><button class="inline-flex items-center justify-center gap-2 rounded-xl font-semibold transition focus:outline-none focus-visible:ring-4 disabled:cursor-not-allowed disabled:opacity-50 bg-accent text-ink shadow-sm hover:bg-accent/90 focus-visible:ring-accent/20 px-3.5 py-2 text-xs">Update email</button></div>
+      </form>
+
+      <form action="{{ url_for('user.settings') }}" method="post" class="rounded-2xl border border-border bg-surface shadow-sm space-y-5 p-6 sm:p-8">
+        <input type="hidden" name="section" value="password">
+        <div><h2 class="font-display text-xl font-bold text-brand-950">Change password</h2></div>
+        <div>
+      <label for="current_password" class="mb-1.5 block text-sm font-medium text-ink">Current password <span class="text-error" aria-hidden="true">*</span></label>
+      <input id="current_password" name="current_password" type="password" value="" placeholder=""
+            required autocomplete="current-password" 
+            class="block w-full rounded-xl border border-border bg-surface px-4 py-3 text-sm text-ink placeholder:text-muted/70 focus:border-brand-600 focus:outline-none focus:ring-4 focus:ring-brand-100"
+            >
+
+    </div>
+        <div class="grid grid-cols-1 gap-5 sm:grid-cols-2">
+          <div>
+      <label for="new_password" class="mb-1.5 block text-sm font-medium text-ink">New password <span class="text-error" aria-hidden="true">*</span></label>
+      <input id="new_password" name="new_password" type="password" value="" placeholder=""
+            required autocomplete="new-password" 
+            class="block w-full rounded-xl border border-border bg-surface px-4 py-3 text-sm text-ink placeholder:text-muted/70 focus:border-brand-600 focus:outline-none focus:ring-4 focus:ring-brand-100"
+            >
+      <p class="mt-1.5 text-xs text-muted">At least 8 characters</p>
+
+    </div>
+          <div>
+      <label for="confirm_password" class="mb-1.5 block text-sm font-medium text-ink">Confirm new password <span class="text-error" aria-hidden="true">*</span></label>
+      <input id="confirm_password" name="confirm_password" type="password" value="" placeholder=""
+            required autocomplete="new-password" 
+            class="block w-full rounded-xl border border-border bg-surface px-4 py-3 text-sm text-ink placeholder:text-muted/70 focus:border-brand-600 focus:outline-none focus:ring-4 focus:ring-brand-100"
+            >
+
+    </div>
+        </div>
+        <div class="text-right"><button class="inline-flex items-center justify-center gap-2 rounded-xl font-semibold transition focus:outline-none focus-visible:ring-4 disabled:cursor-not-allowed disabled:opacity-50 bg-accent text-ink shadow-sm hover:bg-accent/90 focus-visible:ring-accent/20 px-3.5 py-2 text-xs">Update password</button></div>
+      </form>
+
+      <section class="rounded-2xl border border-error/20 bg-error/5 p-6 sm:p-8">
+        <h2 class="font-display text-xl font-bold text-error">Deactivate account</h2>
+        <p class="mt-1 text-sm text-error/80">Your account will be disabled. Active campaigns must be closed first, and donation records are kept for financial compliance.</p>
+        <form action="{{ url_for('user.settings') }}" method="post" class="mt-5" onsubmit="return confirm('Deactivate your account? You can ask support to restore it later.');">
+          <input type="hidden" name="section" value="deactivate">
+          <label for="deactivate-password" class="mb-1.5 block text-sm font-medium text-ink">Current password</label>
+          <input id="deactivate-password" name="current_password" type="password" required autocomplete="current-password" class="mb-4 block w-full rounded-xl border border-border bg-surface px-4 py-3 text-sm text-ink focus:border-brand-600 focus:outline-none focus:ring-4 focus:ring-brand-100">
+          <button class="inline-flex items-center justify-center gap-2 rounded-xl font-semibold transition focus:outline-none focus-visible:ring-4 disabled:cursor-not-allowed disabled:opacity-50 bg-error text-white hover:bg-error/90 focus-visible:ring-error/20 px-3.5 py-2 text-xs">Deactivate my account</button>
+        </form>
+      </section>
+    </div>
+    </main>
+{% endblock %}

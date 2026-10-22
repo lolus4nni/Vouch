@@ -1,0 +1,9 @@
+{# Shared Jinja macros. Import with: {% import "partials/macros.html" as ui %} #}
+
+{% macro nav_link(endpoint, label, icon_path) -%}
+  {%- set current = request.endpoint == endpoint -%}
+  <a href="{{ url_for(endpoint) }}"{% if current %} aria-current="page"{% endif %}
+     class="flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium transition {{ 'bg-white/10 text-white' if current else 'text-brand-200 hover:bg-white/5 hover:text-white' }}">
+    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 shrink-0{{ ' text-gold-300' if current }}" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="{{ icon_path }}"/></svg>{{ label }}
+  </a>
+{%- endmacro %}

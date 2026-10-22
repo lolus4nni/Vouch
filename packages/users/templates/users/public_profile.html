@@ -1,0 +1,146 @@
+{% extends "layouts/public.html" %}
+
+{% block title %}{{ profile.display_name }} · Vouch{% endblock %}
+
+{% block content %}
+  {% set profile_type = profile_type|default('donor') %}
+  <main id="main">
+    <section class="relative h-48 overflow-hidden bg-gradient-to-r from-brand-700 via-brand-600 to-gold-400 sm:h-60">
+      <div class="absolute inset-0 bg-gradient-to-r from-brand-700/20 to-transparent"></div>
+    </section>
+    <div class="mx-auto max-w-5xl px-4 sm:px-6">
+      <div class="-mt-14 flex flex-col gap-5 sm:-mt-16 sm:flex-row sm:items-end">
+        <span class="grid h-28 w-28 shrink-0 place-items-center overflow-hidden rounded-3xl bg-brand-100 text-4xl font-bold text-brand-700 ring-4 ring-white shadow-lg sm:h-32 sm:w-32">
+          {{ profile.display_name[:1]|upper }}
+        </span>
+        <div class="flex-1 pb-2">
+          <div class="flex flex-wrap items-center gap-3">
+            <h1 class="font-display text-3xl font-bold text-brand-950">{{ organization.display_name if organization else profile.display_name }}</h1>
+            <span class="rounded-full bg-brand-50 px-3 py-1 text-xs font-semibold capitalize text-brand-800">{{ profile_type }}</span>
+            {% if is_verified %}
+              <span class="rounded-full bg-brand-100 px-2.5 py-0.5 text-xs font-medium text-brand-800">Verified</span>
+            {% endif %}
+          </div>
+          {% if organization %}
+            <p class="mt-1 text-sm text-muted">Organisation profile · Managed by {{ profile.display_name }}</p>
+          {% elif profile_type == 'campaigner' %}
+            <p class="mt-1 text-sm text-muted">Campaigner · Raising funds for verified causes</p>
+          {% else %}
+            <p class="mt-1 text-sm text-muted">Vouch supporter</p>
+          {% endif %}
+          {% if profile.address_state or profile.address_country %}
+            <p class="mt-1 text-sm text-muted">
+              {% if profile.address_state %}{{ profile.address_state }}{% endif %}
+              {% if profile.address_state and profile.address_country %}, {% endif %}
+              {% if profile.address_country %}{{ profile.address_country }}{% endif %}
+            </p>
+          {% endif %}
+        </div>
+      </div>
+
+      <div class="mt-8 grid grid-cols-1 gap-8 lg:grid-cols-3">
+        <div class="lg:col-span-2">
+          <h2 class="font-display text-xl font-bold text-brand-950">About</h2>
+          {% if profile.bio %}
+            <p class="mt-3 whitespace-pre-line leading-relaxed text-ink">{{ profile.bio }}</p>
+          {% else %}
+            <p class="mt-3 text-sm text-muted">No bio has been added yet.</p>
+          {% endif %}
+
+          {% if profile_type != 'donor' %}
+          <div class="mt-10 flex items-end justify-between gap-4">
+            <div>
+              <p class="text-xs font-semibold uppercase tracking-widest text-brand-600">{{ 'Organisation work' if organization else 'Fundraising' }}</p>
+              <h2 class="mt-1 font-display text-xl font-bold text-brand-950">Active campaigns</h2>
+            </div>
+            <span class="rounded-full bg-brand-50 px-3 py-1 text-sm font-semibold text-brand-800">{{ campaigns|length }}</span>
+          </div>
+          <div class="mt-5 grid grid-cols-1 gap-6 sm:grid-cols-2">
+            {% for row in campaigns %}
+              <article class="group overflow-hidden rounded-2xl border border-border bg-surface shadow-sm transition hover:-translate-y-0.5 hover:shadow-lg">
+                <a href="{{ url_for('campaign.detail', slug=row.campaign.slug) }}" class="block">
+                  <div class="relative aspect-[16/10] overflow-hidden bg-gradient-to-br from-brand-200 via-brand-100 to-gold-100">
+                    {% if row.revision.cover_image_url %}
+                      <img src="{{ row.revision.cover_image_url }}" alt="" class="h-full w-full object-cover" loading="lazy">
+                    {% endif %}
+                    {% if row.revision.category %}
+                      <span class="absolute left-3 top-3 rounded-full bg-surface/90 px-2.5 py-0.5 text-xs font-medium text-brand-800 backdrop-blur">{{ row.revision.category.name }}</span>
+                    {% endif %}
+                    {% if is_verified %}
+                      <span class="absolute right-3 top-3 rounded-full bg-brand-700 px-2.5 py-0.5 text-xs font-medium text-white">Verified</span>
+                    {% endif %}
+                  </div>
+                  <div class="p-5">
+                    <h3 class="line-clamp-2 font-display text-lg font-bold leading-snug text-brand-950 group-hover:text-brand-700">{{ row.revision.title }}</h3>
+                    <p class="mt-2 line-clamp-2 text-sm text-muted">{{ row.revision.description }}</p>
+                    <div class="mt-5">
+                      <div class="w-full overflow-hidden rounded-full bg-brand-100 h-2.5" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="{{ row.progress }}">
+                        <div class="h-full rounded-full bg-gradient-to-r from-brand-500 to-brand-700" style="width: {{ row.progress }}%"></div>
+                      </div>
+                      <div class="mt-2 flex items-end justify-between text-sm">
+                        <p><span class="font-semibold text-brand-800">₦{{ '{:,.2f}'.format(row.raised_minor / 100) }}</span> <span class="text-muted">of ₦{{ '{:,.2f}'.format(row.revision.goal_amount_minor / 100) }} target</span></p>
+                        <p class="font-semibold text-ink">{{ row.progress }}%</p>
+                      </div>
+                      <p class="mt-1 text-xs text-muted">Includes ₦{{ '{:,.2f}'.format((row.revision.goal_amount_minor - row.revision.goal_amount_minor * 10 // 11) / 100) }} platform fee · ₦{{ '{:,.2f}'.format((row.revision.goal_amount_minor * 10 // 11) / 100) }} needed</p>
+                    </div>
+                  </div>
+                </a>
+              </article>
+            {% else %}
+              <p class="rounded-2xl border border-dashed border-border p-5 text-sm text-muted">There are no active campaigns to display.</p>
+            {% endfor %}
+          </div>
+          {% else %}
+            <section class="mt-10 rounded-2xl border border-brand-100 bg-brand-50/70 p-6">
+              <p class="text-xs font-semibold uppercase tracking-widest text-brand-600">Supporter profile</p>
+              <h2 class="mt-2 font-display text-xl font-bold text-brand-950">Every act of giving matters.</h2>
+              <p class="mt-2 text-sm leading-6 text-muted">Explore verified campaigns and find a cause you care about.</p>
+              <a href="{{ url_for('campaign.explore') }}" class="mt-4 inline-flex rounded-xl bg-brand-700 px-4 py-2.5 text-sm font-semibold text-white hover:bg-brand-800">Explore campaigns</a>
+            </section>
+          {% endif %}
+        </div>
+
+        <aside class="space-y-4">
+          {% if profile_type != 'donor' %}
+            <div class="rounded-2xl border border-border bg-surface p-5 text-sm shadow-sm">
+              <h3 class="font-semibold text-ink">{{ 'Organisation snapshot' if organization else 'Campaign snapshot' }}</h3>
+              <dl class="mt-3 space-y-2">
+                <div class="flex justify-between"><dt class="text-muted">Raised</dt><dd class="font-semibold text-brand-800">₦{{ '{:,.2f}'.format(total_raised_minor / 100) }}</dd></div>
+                <div class="flex justify-between"><dt class="text-muted">Active campaigns</dt><dd class="font-semibold">{{ campaigns|length }}</dd></div>
+                <div class="flex justify-between"><dt class="text-muted">Member since</dt><dd class="font-semibold">{{ profile.created_at.strftime('%b %Y') }}</dd></div>
+              </dl>
+            </div>
+          {% else %}
+            <div class="rounded-2xl border border-border bg-surface p-5 text-sm shadow-sm">
+              <h3 class="font-semibold text-ink">Supporter details</h3>
+              <dl class="mt-3 space-y-2">
+                <div class="flex justify-between"><dt class="text-muted">Account type</dt><dd class="font-semibold">Donor</dd></div>
+                <div class="flex justify-between"><dt class="text-muted">Member since</dt><dd class="font-semibold">{{ profile.created_at.strftime('%b %Y') }}</dd></div>
+              </dl>
+              <p class="mt-4 text-xs leading-5 text-muted">Donation history is private and is not shown on this page.</p>
+            </div>
+          {% endif %}
+
+          {% if organization %}
+            <div class="rounded-2xl border border-border bg-surface p-5 text-sm shadow-sm">
+              <h3 class="font-semibold text-ink">Organisation</h3>
+              <dl class="mt-3 space-y-2">
+                <div><dt class="text-muted">Name</dt><dd class="font-medium">{{ organization.display_name }}</dd></div>
+                {% if organization.registration_number %}
+                  <div><dt class="text-muted">Registration number</dt><dd class="font-medium">{{ organization.registration_number }}</dd></div>
+                {% endif %}
+                {% if organization.founded_date %}
+                  <div><dt class="text-muted">Founded</dt><dd class="font-medium">{{ organization.founded_date.year }}</dd></div>
+                {% endif %}
+                <div><dt class="text-muted">Tax exempt</dt><dd class="font-medium">{{ 'Yes' if organization.tax_exempt_status else 'No' }}</dd></div>
+              </dl>
+              {% if organization.website_url %}
+                <p class="mt-4 break-all text-xs text-muted">{{ organization.website_url }}</p>
+              {% endif %}
+            </div>
+          {% endif %}
+        </aside>
+      </div>
+    </div>
+  </main>
+{% endblock %}

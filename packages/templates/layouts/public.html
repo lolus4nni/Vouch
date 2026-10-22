@@ -1,0 +1,126 @@
+{#
+  Public layout: sticky top bar + page content + footer.
+  Child templates may set active_nav to highlight a main-navigation link.
+#}
+{% extends "base.html" %}
+
+{% set btn = "inline-flex items-center justify-center gap-2 rounded-xl font-semibold transition focus:outline-none focus-visible:ring-4 disabled:cursor-not-allowed disabled:opacity-50" %}
+{% set nav_link = "rounded-lg px-3 py-2 text-sm font-medium transition hover:bg-brand-50 hover:text-brand-800" %}
+
+{% block body %}
+  <header class="sticky top-0 z-40 border-b border-border/70 bg-background/90 backdrop-blur">
+    <div class="mx-auto flex max-w-7xl items-center justify-between gap-4 px-4 py-3 sm:px-6 lg:px-8">
+      <a href="{{ url_for('user.landing_page') }}" class="flex shrink-0 items-center" aria-label="Vouch home">
+        <img src="{{ url_for('static', filename='images/brand/logo-dark.svg') }}" alt="Vouch" width="100" height="36" class="h-9 w-auto">
+      </a>
+
+      <nav class="hidden items-center gap-1 md:flex" aria-label="Main">
+        <a href="{{ url_for('campaign.explore') }}" class="{{ nav_link }} {{ 'bg-brand-50 text-brand-800' if active_nav == 'explore' else 'text-ink' }}">Explore</a>
+        <a href="{{ url_for('user.how_it_works') }}" class="{{ nav_link }} {{ 'bg-brand-50 text-brand-800' if active_nav == 'how' else 'text-ink' }}">How it works</a>
+        <a href="{{ url_for('user.landing_page') }}#trust" class="{{ nav_link }} text-ink">Our trust promise</a>
+      </nav>
+
+      <div class="hidden items-center gap-2 md:flex">
+        {% if signed_in_account %}
+          {% if not signed_in_account or signed_in_account.campaigner_enabled %}
+            <a href="{{ url_for('campaign.create') }}" class="{{ btn }} bg-accent text-ink shadow-sm hover:bg-accent-600 focus-visible:ring-accent-200 px-3.5 py-2 text-sm">Start a campaign</a>
+          {% endif %}
+          <details class="relative">
+            <summary class="flex cursor-pointer list-none items-center gap-2 rounded-full border border-border bg-surface py-1 pl-1 pr-3 hover:bg-background">
+              <span class="grid h-8 w-8 place-items-center overflow-hidden rounded-full bg-brand-100 text-sm font-bold text-brand-800">{{ signed_in_account.display_name[:1]|upper }}</span>
+              <span class="max-w-[8rem] truncate text-sm font-medium">{{ signed_in_account.display_name }}</span>
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-muted" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M19 9l-7 7-7-7"/></svg>
+            </summary>
+            <div class="absolute right-0 mt-2 w-56 rounded-2xl border border-border bg-surface p-2 shadow-lg">
+              <a class="block rounded-lg px-3 py-2 text-sm hover:bg-brand-50" href="{{ url_for('user.dashboard') }}">Dashboard</a>
+              <a class="block rounded-lg px-3 py-2 text-sm hover:bg-brand-50" href="{{ url_for('user.public_profile') }}">My public profile</a>
+              {% if signed_in_account.campaigner_enabled %}
+                <a class="block rounded-lg px-3 py-2 text-sm hover:bg-brand-50" href="{{ url_for('campaign.my_campaigns') }}">My campaigns</a>
+              {% endif %}
+              <a class="block rounded-lg px-3 py-2 text-sm hover:bg-brand-50" href="{{ url_for('finance.my_donations') }}">My donations</a>
+              <a class="block rounded-lg px-3 py-2 text-sm hover:bg-brand-50" href="{{ url_for('user.settings') }}">Settings</a>
+              <hr class="my-1 border-slate-100">
+              <a class="block rounded-lg px-3 py-2 text-sm text-rose-600 hover:bg-rose-50" href="{{ url_for('user.logout') }}">Sign out</a>
+            </div>
+          </details>
+        {% else %}
+          <a href="{{ url_for('user.login') }}" class="{{ btn }} text-brand-800 hover:bg-brand-50 focus-visible:ring-brand-100 px-3.5 py-2 text-sm">Sign in</a>
+          <a href="{{ url_for('user.register') }}" class="{{ btn }} bg-accent text-ink shadow-sm hover:bg-accent-600 focus-visible:ring-accent-200 px-3.5 py-2 text-sm">Get started</a>
+        {% endif %}
+      </div>
+
+      <button type="button" id="menu-btn" class="rounded-lg p-2 text-ink hover:bg-brand-50 md:hidden" aria-controls="mobile-menu" aria-expanded="false" aria-label="Open menu">
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 6h16M4 12h16M4 18h16"/></svg>
+      </button>
+    </div>
+
+    <div id="mobile-menu" class="hidden border-t border-border bg-background px-4 pb-4 pt-2 md:hidden">
+      <a class="block rounded-lg px-3 py-3 text-sm font-medium" href="{{ url_for('campaign.explore') }}">Explore campaigns</a>
+      <a class="block rounded-lg px-3 py-3 text-sm font-medium" href="{{ url_for('user.how_it_works') }}">How it works</a>
+      {% if signed_in_account %}
+        <a class="block rounded-lg px-3 py-3 text-sm font-medium" href="{{ url_for('user.dashboard') }}">Dashboard</a>
+        <div class="mt-3 grid grid-cols-2 gap-2">
+          {% if not signed_in_account or signed_in_account.campaigner_enabled %}
+            <a class="{{ btn }} bg-accent text-ink shadow-sm hover:bg-accent-600 px-5 py-3 text-sm" href="{{ url_for('campaign.create') }}">Start a campaign</a>
+          {% endif %}
+          <a class="{{ btn }} border border-border bg-surface text-ink hover:bg-background px-5 py-3 text-sm" href="{{ url_for('user.logout') }}">Sign out</a>
+        </div>
+      {% else %}
+        <div class="mt-3 grid grid-cols-2 gap-2">
+          <a class="{{ btn }} border border-border bg-surface text-ink hover:bg-background px-5 py-3 text-sm" href="{{ url_for('user.login') }}">Sign in</a>
+          <a class="{{ btn }} bg-accent text-ink shadow-sm hover:bg-accent-600 px-5 py-3 text-sm" href="{{ url_for('user.register') }}">Get started</a>
+        </div>
+      {% endif %}
+    </div>
+  </header>
+
+  {% block content %}{% endblock %}
+
+  <footer class="mt-24 bg-brand-950 text-brand-100">
+    <div class="mx-auto grid grid-cols-1 max-w-7xl gap-10 px-4 py-14 sm:px-6 md:grid-cols-4 lg:px-8">
+      <div class="md:col-span-1">
+        <img src="{{ url_for('static', filename='images/brand/logo-light.svg') }}" alt="Vouch" width="100" height="36" class="h-9 w-auto">
+        <p class="mt-4 text-sm leading-relaxed text-brand-200">Crowdfunding where trust is built in: verified people, verified causes, and spending anyone can follow.</p>
+      </div>
+      <div>
+        <h3 class="text-sm font-semibold text-white">Give</h3>
+        <ul class="mt-4 space-y-2 text-sm text-brand-200">
+          <li><a class="hover:text-white" href="{{ url_for('campaign.explore') }}">Explore campaigns</a></li>
+          <li><a class="hover:text-white" href="{{ url_for('user.how_it_works') }}">How giving works</a></li>
+          <li><a class="hover:text-white" href="{{ url_for('user.landing_page') }}#faq">Donor FAQ</a></li>
+        </ul>
+      </div>
+      <div>
+        <h3 class="text-sm font-semibold text-white">Raise</h3>
+        <ul class="mt-4 space-y-2 text-sm text-brand-200">
+          {% if not signed_in_account or signed_in_account.campaigner_enabled %}
+            <li><a class="hover:text-white" href="{{ url_for('campaign.create') }}">Start a campaign</a></li>
+          {% endif %}
+          <li><a class="hover:text-white" href="{{ url_for('user.register') }}">For NGOs</a></li>
+          <li><a class="hover:text-white" href="{{ url_for('user.how_it_works') }}#campaigners">Campaigner guide</a></li>
+        </ul>
+      </div>
+      <div>
+        <h3 class="text-sm font-semibold text-white">Trust</h3>
+        <ul class="mt-4 space-y-2 text-sm text-brand-200">
+          <li><a class="hover:text-white" href="{{ url_for('user.landing_page') }}#trust">Verification process</a></li>
+          <li><a class="hover:text-white" href="{{ url_for('user.landing_page') }}#fees">Fees, explained</a></li>
+          <li><a class="hover:text-white" href="{{ url_for('user.login') }}">Sign in</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="border-t border-white/10 py-5 text-center text-xs text-brand-300">© 2026 Vouch. All donations are processed by licensed payment gateways.</div>
+  </footer>
+{% endblock %}
+
+{% block layout_scripts %}
+  <script>
+    (function(){
+      var b = document.getElementById('menu-btn'), m = document.getElementById('mobile-menu');
+      if (b && m) b.addEventListener('click', function(){
+        var open = m.classList.toggle('hidden') === false;
+        b.setAttribute('aria-expanded', open);
+      });
+    })();
+  </script>
+{% endblock %}

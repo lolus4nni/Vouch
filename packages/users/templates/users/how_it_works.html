@@ -1,0 +1,73 @@
+{% extends "layouts/public.html" %}
+{% set active_nav = "how" %}
+
+{% block title %}How it works{% endblock %}
+
+{% block content %}
+    <main id="main">
+  <section class="bg-gradient-to-b from-brand-50 to-cream py-16 text-center">
+    <div class="mx-auto max-w-3xl px-4">
+      <p class="text-xs font-semibold uppercase tracking-widest text-brand-600">How it works</p>
+      <h1 class="mt-2 font-display text-4xl font-bold text-brand-950 sm:text-5xl">From a first click to a funded outcome</h1>
+      <p class="mt-4 text-lg text-muted">Here is exactly what happens, whichever side of the screen you're on.</p>
+      <div class="mt-6 flex justify-center gap-3 text-sm font-semibold">
+        <a href="#donors" class="rounded-full bg-brand-700 px-4 py-2 text-white">I want to give</a>
+        <a href="#campaigners" class="rounded-full border border-border bg-surface px-4 py-2 text-ink">I want to raise</a>
+      </div>
+    </div>
+  </section>
+
+  <section id="donors" class="mx-auto max-w-5xl scroll-mt-24 px-4 py-16 sm:px-6">
+    <div class="grid grid-cols-1 items-start gap-10 lg:grid-cols-5">
+      <div class="lg:col-span-2 lg:sticky lg:top-24">
+        <p class="text-xs font-semibold uppercase tracking-widest text-brand-600">For donors</p>
+        <h2 class="mt-2 font-display text-3xl font-bold text-brand-950">Give with your eyes open</h2>
+        <div class="relative mt-6 aspect-[4/3] overflow-hidden rounded-2xl bg-gradient-to-br from-brand-200 to-gold-100"><img src="{{ url_for('user.static', filename='images/how-donor.jpg') }}" alt="Donor browsing campaigns" class="h-full w-full object-cover" loading="lazy" onerror="this.style.display='none'"></div>
+      </div>
+      <ol class="space-y-5 lg:col-span-3">
+
+        <li class="rounded-2xl border border-border bg-surface shadow-sm flex gap-5 p-6"><span class="grid h-10 w-10 shrink-0 place-items-center rounded-full bg-brand-700 font-display text-lg font-bold text-white">1</span><div><h3 class="font-semibold text-ink">Browse and filter</h3><p class="mt-1 text-sm leading-relaxed text-muted">Search by category, urgency or progress. Each campaign shows its verification badge, goal, deadline and who is behind it.</p></div></li>
+
+        <li class="rounded-2xl border border-border bg-surface shadow-sm flex gap-5 p-6"><span class="grid h-10 w-10 shrink-0 place-items-center rounded-full bg-brand-700 font-display text-lg font-bold text-white">2</span><div><h3 class="font-semibold text-ink">Read the evidence</h3><p class="mt-1 text-sm leading-relaxed text-muted">Open the documents flagged public by the campaigner: reports, quotes, invoices. Read the reviewer&#39;s public note.</p></div></li>
+
+        <li class="rounded-2xl border border-border bg-surface shadow-sm flex gap-5 p-6"><span class="grid h-10 w-10 shrink-0 place-items-center rounded-full bg-brand-700 font-display text-lg font-bold text-white">3</span><div><h3 class="font-semibold text-ink">Donate in under a minute</h3><p class="mt-1 text-sm leading-relaxed text-muted">Choose an amount and optionally give anonymously. Each campaign target already includes a 10% platform fee added to the amount needed; your donation is not increased at checkout.</p></div></li>
+
+        <li class="rounded-2xl border border-border bg-surface shadow-sm flex gap-5 p-6"><span class="grid h-10 w-10 shrink-0 place-items-center rounded-full bg-brand-700 font-display text-lg font-bold text-white">4</span><div><h3 class="font-semibold text-ink">Get your receipt</h3><p class="mt-1 text-sm leading-relaxed text-muted">A receipt is stored in your account with the gateway reference so you can track or dispute any payment.</p></div></li>
+
+        <li class="rounded-2xl border border-border bg-surface shadow-sm flex gap-5 p-6"><span class="grid h-10 w-10 shrink-0 place-items-center rounded-full bg-brand-700 font-display text-lg font-bold text-white">5</span><div><h3 class="font-semibold text-ink">Follow the story</h3><p class="mt-1 text-sm leading-relaxed text-muted">Campaigners post updates. Each approved expense and payout appears in the campaign&#39;s public ledger.</p></div></li>
+
+      </ol>
+    </div>
+  </section>
+
+  <section id="campaigners" class="bg-surface py-16">
+    <div class="mx-auto max-w-5xl scroll-mt-24 px-4 sm:px-6">
+      <div class="grid grid-cols-1 items-start gap-10 lg:grid-cols-5">
+        <ol class="order-2 space-y-5 lg:order-1 lg:col-span-3">
+
+          <li class="rounded-2xl border border-border bg-surface shadow-sm flex gap-5 p-6"><span class="grid h-10 w-10 shrink-0 place-items-center rounded-full bg-gold-400 font-display text-lg font-bold text-brand-950">1</span><div><h3 class="font-semibold text-ink">Create your account</h3><p class="mt-1 text-sm leading-relaxed text-muted">Sign up as an individual campaigner or a registered NGO.</p></div></li>
+
+          <li class="rounded-2xl border border-border bg-surface shadow-sm flex gap-5 p-6"><span class="grid h-10 w-10 shrink-0 place-items-center rounded-full bg-gold-400 font-display text-lg font-bold text-brand-950">2</span><div><h3 class="font-semibold text-ink">Complete your profile and verify</h3><p class="mt-1 text-sm leading-relaxed text-muted">Add your legal name, phone number and address. NGOs add their registration number, website and tax-exempt status. Our team reviews within a few working days.</p></div></li>
+
+          <li class="rounded-2xl border border-border bg-surface shadow-sm flex gap-5 p-6"><span class="grid h-10 w-10 shrink-0 place-items-center rounded-full bg-gold-400 font-display text-lg font-bold text-brand-950">3</span><div><h3 class="font-semibold text-ink">Draft your campaign</h3><p class="mt-1 text-sm leading-relaxed text-muted">Enter the amount you need, choose a category, and write your story and end date. Vouch adds a 10% platform fee to the public target automatically: ₦100 needed becomes ₦110 to raise.</p></div></li>
+
+          <li class="rounded-2xl border border-border bg-surface shadow-sm flex gap-5 p-6"><span class="grid h-10 w-10 shrink-0 place-items-center rounded-full bg-gold-400 font-display text-lg font-bold text-brand-950">4</span><div><h3 class="font-semibold text-ink">Upload evidence and submit</h3><p class="mt-1 text-sm leading-relaxed text-muted">Attach documents that prove the need. A reviewer checks them and approves or asks for changes, with a public note either way.</p></div></li>
+
+          <li class="rounded-2xl border border-border bg-surface shadow-sm flex gap-5 p-6"><span class="grid h-10 w-10 shrink-0 place-items-center rounded-full bg-gold-400 font-display text-lg font-bold text-brand-950">5</span><div><h3 class="font-semibold text-ink">Go live and keep donors close</h3><p class="mt-1 text-sm leading-relaxed text-muted">Post updates regularly. Updates are the single biggest driver of repeat giving.</p></div></li>
+
+          <li class="rounded-2xl border border-border bg-surface shadow-sm flex gap-5 p-6"><span class="grid h-10 w-10 shrink-0 place-items-center rounded-full bg-gold-400 font-display text-lg font-bold text-brand-950">6</span><div><h3 class="font-semibold text-ink">Request expenses, get paid safely</h3><p class="mt-1 text-sm leading-relaxed text-muted">Request expenses for your stated need. The 10% fee is retained from the public target, so approved campaign expenses cannot exceed the amount you originally entered.</p></div></li>
+
+        </ol>
+        <div class="order-1 lg:order-2 lg:col-span-2 lg:sticky lg:top-24">
+          <p class="text-xs font-semibold uppercase tracking-widest text-brand-600">For campaigners & NGOs</p>
+          <h2 class="mt-2 font-display text-3xl font-bold text-brand-950">Raise funds people believe in</h2>
+          <div class="relative mt-6 aspect-[4/3] overflow-hidden rounded-2xl bg-gradient-to-br from-gold-200 to-brand-100"><img src="{{ url_for('user.static', filename='images/how-campaigner.jpg') }}" alt="Campaigner preparing documents" class="h-full w-full object-cover" loading="lazy" onerror="this.style.display='none'"></div>
+          <a href="{{ url_for('user.register') }}" class="inline-flex items-center justify-center gap-2 rounded-xl px-5 py-3 text-sm font-semibold transition focus:outline-none focus-visible:ring-4 disabled:cursor-not-allowed disabled:opacity-50 bg-accent text-ink shadow-sm hover:bg-accent/90 focus-visible:ring-accent/20 mt-6 w-full">Start your campaign</a>
+        </div>
+      </div>
+    </div>
+  </section>
+  </main>
+
+
+{% endblock %}

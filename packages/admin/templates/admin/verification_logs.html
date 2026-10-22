@@ -1,0 +1,40 @@
+{% extends "layouts/admin.html" %}
+
+{% block title %}Audit trail{% endblock %}
+
+{% block topbar %}
+  <div class="min-w-0 flex-1">
+    <h1 class="truncate font-display text-xl font-bold text-brand-950 sm:text-2xl">Audit trail</h1>
+    <p class="hidden truncate text-sm text-slate-500 sm:block">Recorded review decisions, newest first. Read-only.</p>
+  </div>
+{% endblock %}
+
+{% block content %}
+  <main id="main" class="flex-1 px-4 py-6 sm:px-6 lg:py-8">
+    <div class="mx-auto max-w-5xl">
+      <nav class="mb-6 flex flex-wrap gap-2 text-sm font-medium" aria-label="Audit event filter">
+        {% for event_type, label in [('all', 'All'), ('campaigns', 'Campaigns'), ('expenses', 'Expenses'), ('identities', 'Identities')] %}
+          <a href="{{ url_for('admin.verification_logs', type=event_type) }}" class="rounded-full px-4 py-2 {{ 'bg-brand-700 text-white' if selected_type == event_type else 'bg-white text-slate-600 ring-1 ring-slate-200 hover:bg-slate-50' }}">{{ label }}</a>
+        {% endfor %}
+      </nav>
+
+      <ul class="space-y-3">
+        {% for decision, subject_type, subject_name, reviewer, decided_at, public_notes, internal_notes in audit_entries %}
+          <li class="rounded-2xl border border-slate-200 bg-white p-5 text-sm shadow-sm">
+            <div class="flex flex-wrap items-center gap-x-3 gap-y-1">
+              <span class="rounded-full bg-slate-100 px-2.5 py-0.5 text-xs font-medium capitalize text-slate-700">{{ decision.replace('_', ' ') }}</span>
+              <span class="font-semibold">{{ subject_type }}: {{ subject_name }}</span>
+              <span class="text-slate-500">by {{ reviewer }}</span>
+              <span class="ml-auto text-xs text-slate-400">{{ decided_at.strftime('%d %b %Y, %H:%M') }}</span>
+            </div>
+            {% if public_notes %}<p class="mt-3 text-slate-700"><span class="text-xs font-semibold uppercase tracking-wide text-brand-700">Public</span><br>{{ public_notes }}</p>{% endif %}
+            {% if internal_notes %}<p class="mt-3 rounded-lg bg-slate-50 p-3 text-slate-600"><span class="text-xs font-semibold uppercase tracking-wide text-slate-500">Internal</span><br>{{ internal_notes }}</p>{% endif %}
+          </li>
+        {% else %}
+          <li class="rounded-2xl border border-slate-200 bg-white p-5 text-center text-sm text-slate-500">No review decisions match this filter.</li>
+        {% endfor %}
+      </ul>
+      <p class="mt-4 text-sm text-slate-500">Showing up to 100 most recent decisions across the selected types.</p>
+    </div>
+  </main>
+{% endblock %}

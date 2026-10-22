@@ -1,0 +1,400 @@
+{% extends "layouts/public.html" %}
+
+{% block title %}Fund causes you can trust{% endblock %}
+
+{% block content %}
+    <main id="main">
+
+  <section class="relative overflow-hidden">
+    <div class="absolute inset-0 -z-10 bg-gradient-to-b from-brand-50 via-cream to-cream"></div>
+    <div class="absolute -right-24 -top-24 -z-10 h-96 w-96 rounded-full bg-gold-200/50 blur-3xl"></div>
+    <div class="mx-auto grid grid-cols-1 max-w-7xl items-center gap-12 px-4 pb-20 pt-14 sm:px-6 lg:grid-cols-2 lg:gap-16 lg:px-8 lg:pb-28 lg:pt-20">
+      <div>
+        <span class="inline-flex items-center gap-1 rounded-full px-2.5 py-0.5 text-xs font-medium bg-brand-100 text-brand-800"><svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 12l2 2 4-4m5.6-4A12 12 0 0112 3a12 12 0 01-8.6 3A12 12 0 003 12c0 5.6 3.8 10.3 9 11.6 5.2-1.3 9-6 9-11.6 0-1.9-.3-3.7-.4-6z"/></svg> Every campaign checked by a real person</span>
+        <h1 class="mt-6 font-display text-4xl font-bold leading-[1.1] tracking-tight text-brand-950 sm:text-5xl lg:text-6xl">
+          Behind every need is a story. <span class="text-brand-600">Give to the ones that are true.</span>
+        </h1>
+        <p class="mt-6 max-w-xl text-lg leading-relaxed text-muted">
+          We verify the people, the causes and the spending, then show you all of it. Fund a medical bill, a classroom, a small business or a community project and watch exactly where every naira goes.
+        </p>
+        <div class="mt-8 flex flex-wrap items-center gap-3">
+          <a href="{{ url_for('campaign.explore') }}" class="inline-flex items-center justify-center gap-2 rounded-xl font-semibold transition focus:outline-none focus-visible:ring-4 disabled:cursor-not-allowed disabled:opacity-50 bg-accent text-ink shadow-sm hover:bg-accent/90 focus-visible:ring-accent/20 px-6 py-3.5 text-base">Find a cause to back <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M13 7l5 5m0 0l-5 5m5-5H6"/></svg></a>
+          <a href="{{ url_for('user.register') }}" class="inline-flex items-center justify-center gap-2 rounded-xl font-semibold transition focus:outline-none focus-visible:ring-4 disabled:cursor-not-allowed disabled:opacity-50 border border-border bg-surface text-ink hover:bg-background focus-visible:ring-slate-200 px-6 py-3.5 text-base">I need to raise funds</a>
+        </div>
+        <ul class="mt-8 flex flex-wrap gap-x-6 gap-y-2 text-sm text-muted">
+          <li class="flex items-center gap-2"><svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-brand-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg> Identity-verified campaigners</li>
+          <li class="flex items-center gap-2"><svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-brand-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg> Expenses reviewed before payout</li>
+          <li class="flex items-center gap-2"><svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-brand-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg> Public progress updates</li>
+        </ul>
+      </div>
+
+      <div class="relative">
+        <div class="relative aspect-[4/5] overflow-hidden rounded-[2rem] bg-gradient-to-br from-brand-300 via-brand-200 to-gold-200 shadow-2xl sm:aspect-[5/4] lg:aspect-[4/5]">
+          <img src="{{ url_for('user.static', filename='images/hero.jpg') }}" alt="A community celebrating a funded project" class="h-full w-full object-cover" loading="eager" fetchpriority="high" onerror="this.style.display='none'">
+        </div>
+
+        <div class="absolute -bottom-6 left-4 right-4 rounded-2xl border border-border bg-surface p-4 shadow-xl sm:left-auto sm:right-6 sm:w-80">
+          <div class="flex items-center gap-3">
+            <span class="grid h-10 w-10 place-items-center rounded-full bg-brand-100 text-brand-700"><svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 14l6-6M9.5 8.5h.01M14.5 13.5h.01M5 21V4a1 1 0 011-1h12a1 1 0 011 1v17l-3-2-3 2-3-2-3 2z"/></svg></span>
+            <div>
+              <p class="text-sm font-semibold text-ink">Receipt verified</p>
+              <p class="text-xs text-muted">Hospital invoice reviewed · payout sent directly to the hospital</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="border-y border-border bg-surface">
+    <dl class="mx-auto grid max-w-7xl grid-cols-2 gap-y-8 px-4 py-10 text-center sm:px-6 lg:grid-cols-4 lg:px-8">
+      <div><dt class="text-sm text-muted">Raised for good causes</dt><dd class="mt-1 font-display text-3xl font-bold text-brand-800 sm:text-4xl">₦48.5M</dd></div>
+      <div><dt class="text-sm text-muted">Campaigns fully funded</dt><dd class="mt-1 font-display text-3xl font-bold text-brand-800 sm:text-4xl">132</dd></div>
+      <div><dt class="text-sm text-muted">Generous donors</dt><dd class="mt-1 font-display text-3xl font-bold text-brand-800 sm:text-4xl">9,840</dd></div>
+      <div><dt class="text-sm text-muted">Verified campaigns live</dt><dd class="mt-1 font-display text-3xl font-bold text-brand-800 sm:text-4xl">57</dd></div>
+    </dl>
+  </section>
+
+  <section class="mx-auto max-w-7xl px-4 py-20 sm:px-6 lg:px-8 lg:py-28">
+    <div class="mx-auto text-center max-w-2xl">
+    <p class="text-xs font-semibold uppercase tracking-widest text-brand-600">The problem</p>
+    <h2 class="mt-2 font-display text-3xl font-bold tracking-tight text-brand-950 sm:text-4xl">Giving online shouldn&#39;t feel like a leap of faith</h2>
+    <p class="mt-4 text-base leading-relaxed text-muted">Most of us have wanted to help and then hesitated. These are the questions that stopped us.</p>
+  </div>
+    <div class="mt-12 grid grid-cols-1 gap-6 md:grid-cols-3">
+
+      <div class="rounded-2xl border border-border bg-surface shadow-sm p-7">
+        <span class="grid h-10 w-10 place-items-center rounded-full bg-error/5 text-error"><svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 9v4m0 4h.01M10.3 3.9L1.8 18a2 2 0 001.7 3h17a2 2 0 001.7-3L13.7 3.9a2 2 0 00-3.4 0z"/></svg></span>
+        <h3 class="mt-5 font-display text-xl font-bold text-brand-950">&#34;Is this person even real?&#34;</h3>
+        <p class="mt-3 text-sm leading-relaxed text-muted">Anyone can post a sad photo. Without identity checks, genuine people lose out to fakes and donors lose trust.</p>
+      </div>
+
+      <div class="rounded-2xl border border-border bg-surface shadow-sm p-7">
+        <span class="grid h-10 w-10 place-items-center rounded-full bg-error/5 text-error"><svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 9v4m0 4h.01M10.3 3.9L1.8 18a2 2 0 001.7 3h17a2 2 0 001.7-3L13.7 3.9a2 2 0 00-3.4 0z"/></svg></span>
+        <h3 class="mt-5 font-display text-xl font-bold text-brand-950">&#34;Where did my money actually go?&#34;</h3>
+        <p class="mt-3 text-sm leading-relaxed text-muted">Funds are often handed over in one lump with no questions asked, and nobody can say what they were spent on.</p>
+      </div>
+
+      <div class="rounded-2xl border border-border bg-surface shadow-sm p-7">
+        <span class="grid h-10 w-10 place-items-center rounded-full bg-error/5 text-error"><svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 9v4m0 4h.01M10.3 3.9L1.8 18a2 2 0 001.7 3h17a2 2 0 001.7-3L13.7 3.9a2 2 0 00-3.4 0z"/></svg></span>
+        <h3 class="mt-5 font-display text-xl font-bold text-brand-950">&#34;Whatever happened to that campaign?&#34;</h3>
+        <p class="mt-3 text-sm leading-relaxed text-muted">You give once, then silence. No updates, no outcome, no way to know you made a difference.</p>
+      </div>
+
+    </div>
+  </section>
+
+  <section id="trust" class="bg-brand-950 py-20 text-white lg:py-28">
+    <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+      <div class="mx-auto max-w-2xl text-center">
+        <p class="text-xs font-semibold uppercase tracking-widest text-gold-300">Our promise</p>
+        <h2 class="mt-2 font-display text-3xl font-bold sm:text-4xl">Four checkpoints between your donation and the people it helps</h2>
+        <p class="mt-4 text-brand-200">Trust isn't a slogan here. It is a process, and every step leaves a record you can see.</p>
+      </div>
+
+      <ol class="mt-14 grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-4">
+
+        <li class="relative rounded-2xl border border-white/10 bg-surface/5 p-6">
+          <span class="font-display text-4xl font-bold text-gold-400/80">01</span>
+          <span class="mt-4 grid h-11 w-11 place-items-center rounded-xl bg-brand-800 text-gold-300"><svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M17 20h5v-2a4 4 0 00-5-3.9M9 11a4 4 0 100-8 4 4 0 000 8zm8 0a3 3 0 100-6M2 20v-2a4 4 0 014-4h6a4 4 0 014 4v2"/></svg></span>
+          <h3 class="mt-4 text-lg font-semibold">We verify the person</h3>
+          <p class="mt-2 text-sm leading-relaxed text-brand-200">Campaigners submit their legal name, address and ID. NGOs also submit their registration number and tax-exempt status.</p>
+        </li>
+
+        <li class="relative rounded-2xl border border-white/10 bg-surface/5 p-6">
+          <span class="font-display text-4xl font-bold text-gold-400/80">02</span>
+          <span class="mt-4 grid h-11 w-11 place-items-center rounded-xl bg-brand-800 text-gold-300"><svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.6a1 1 0 01.7.3l5.4 5.4a1 1 0 01.3.7V19a2 2 0 01-2 2z"/></svg></span>
+          <h3 class="mt-4 text-lg font-semibold">We verify the cause</h3>
+          <p class="mt-2 text-sm leading-relaxed text-brand-200">Evidence such as medical reports, quotes, invoices and registration papers is reviewed before a campaign can go live.</p>
+        </li>
+
+        <li class="relative rounded-2xl border border-white/10 bg-surface/5 p-6">
+          <span class="font-display text-4xl font-bold text-gold-400/80">03</span>
+          <span class="mt-4 grid h-11 w-11 place-items-center rounded-xl bg-brand-800 text-gold-300"><svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 14l6-6M9.5 8.5h.01M14.5 13.5h.01M5 21V4a1 1 0 011-1h12a1 1 0 011 1v17l-3-2-3 2-3-2-3 2z"/></svg></span>
+          <h3 class="mt-4 text-lg font-semibold">We verify every expense</h3>
+          <p class="mt-2 text-sm leading-relaxed text-brand-200">Campaigners request spending against a real invoice. We check it, then pay the recipient directly, not the campaigner.</p>
+        </li>
+
+        <li class="relative rounded-2xl border border-white/10 bg-surface/5 p-6">
+          <span class="font-display text-4xl font-bold text-gold-400/80">04</span>
+          <span class="mt-4 grid h-11 w-11 place-items-center rounded-xl bg-brand-800 text-gold-300"><svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2 12s3.6-7 10-7 10 7 10 7-3.6 7-10 7S2 12 2 12zm10 3a3 3 0 100-6 3 3 0 000 6z"/></svg></span>
+          <h3 class="mt-4 text-lg font-semibold">We show our work</h3>
+          <p class="mt-2 text-sm leading-relaxed text-brand-200">Each decision is logged with a public note. Donors see updates, spending and outcomes on the campaign page.</p>
+        </li>
+
+      </ol>
+
+      <div class="mx-auto mt-12 flex max-w-3xl items-start gap-4 rounded-2xl bg-gold-400/10 p-5 ring-1 ring-gold-300/30">
+        <svg xmlns="http://www.w3.org/2000/svg" class="mt-0.5 h-6 w-6 shrink-0 text-gold-300" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-12V7a4 4 0 00-8 0v2h8z"/></svg>
+        <p class="text-sm leading-relaxed text-brand-100"><strong class="text-white">Why payouts go direct:</strong> money for a hospital bill is sent to the hospital; money for school fees goes to the school. That is how we make sure your gift does exactly what it was meant to.</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="mx-auto max-w-7xl px-4 py-20 sm:px-6 lg:px-8 lg:py-28">
+    <div class="flex flex-wrap items-end justify-between gap-4">
+      <div class="max-w-2xl">
+    <p class="text-xs font-semibold uppercase tracking-widest text-brand-600">Happening now</p>
+    <h2 class="mt-2 font-display text-3xl font-bold tracking-tight text-brand-950 sm:text-4xl">Verified campaigns that need you</h2>
+
+  </div>
+      <a href="{{ url_for('campaign.explore') }}" class="inline-flex items-center justify-center gap-2 rounded-xl px-5 py-3 text-sm font-semibold transition focus:outline-none focus-visible:ring-4 disabled:cursor-not-allowed disabled:opacity-50 text-brand-800 hover:bg-brand-50 focus-visible:ring-brand-100">See all campaigns <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M13 7l5 5m0 0l-5 5m5-5H6"/></svg></a>
+    </div>
+
+    <div class="mt-10 grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
+      <article class="rounded-2xl border border-border bg-surface shadow-sm group overflow-hidden transition hover:-translate-y-0.5 hover:shadow-lg">
+    <a href="{{ url_for('campaign.detail') }}" class="block">
+      <div class="relative aspect-[16/10] overflow-hidden bg-gradient-to-br from-brand-200 via-brand-100 to-gold-100">
+
+        <span class="inline-flex items-center gap-1 rounded-full px-2.5 py-0.5 text-xs font-medium absolute left-3 top-3 bg-surface/90 text-brand-800 backdrop-blur">Health &amp; Medical</span>
+        <span class="inline-flex items-center gap-1 rounded-full px-2.5 py-0.5 text-xs font-medium absolute right-3 top-3 bg-brand-700 text-white"><svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 12l2 2 4-4m5.6-4A12 12 0 0112 3a12 12 0 01-8.6 3A12 12 0 003 12c0 5.6 3.8 10.3 9 11.6 5.2-1.3 9-6 9-11.6 0-1.9-.3-3.7-.4-6z"/></svg>Verified</span>
+      </div>
+      <div class="p-5">
+        <h3 class="line-clamp-2 font-display text-lg font-bold leading-snug text-brand-950 group-hover:text-brand-700">Help Ada walk again: spinal surgery fund</h3>
+        <p class="mt-2 line-clamp-2 text-sm text-muted">Ada is 9 and needs urgent spinal surgery. Her family has done everything they can. With your help she will walk back...</p>
+        <div class="mt-5">
+          <div class="w-full overflow-hidden rounded-full bg-brand-100 h-2.5" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="42">
+    <div class="h-full rounded-full bg-gradient-to-r from-brand-500 to-brand-700" style="width: 41.7%"></div>
+  </div>
+          <div class="mt-2 flex items-end justify-between text-sm">
+            <p><span class="font-semibold text-brand-800">₦1.2M</span> <span class="text-muted">raised of ₦3.0M</span></p>
+            <p class="font-semibold text-ink">42%</p>
+          </div>
+        </div>
+      </div>
+    </a>
+  </article><article class="rounded-2xl border border-border bg-surface shadow-sm group overflow-hidden transition hover:-translate-y-0.5 hover:shadow-lg">
+    <a href="{{ url_for('campaign.detail') }}" class="block">
+      <div class="relative aspect-[16/10] overflow-hidden bg-gradient-to-br from-brand-200 via-brand-100 to-gold-100">
+
+        <span class="inline-flex items-center gap-1 rounded-full px-2.5 py-0.5 text-xs font-medium absolute left-3 top-3 bg-surface/90 text-brand-800 backdrop-blur">Health &amp; Medical</span>
+        <span class="inline-flex items-center gap-1 rounded-full px-2.5 py-0.5 text-xs font-medium absolute right-3 top-3 bg-brand-700 text-white"><svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 12l2 2 4-4m5.6-4A12 12 0 0112 3a12 12 0 01-8.6 3A12 12 0 003 12c0 5.6 3.8 10.3 9 11.6 5.2-1.3 9-6 9-11.6 0-1.9-.3-3.7-.4-6z"/></svg>Verified</span>
+      </div>
+      <div class="p-5">
+        <h3 class="line-clamp-2 font-display text-lg font-bold leading-snug text-brand-950 group-hover:text-brand-700">Rebuild Ikorodu Community Library</h3>
+        <p class="mt-2 line-clamp-2 text-sm text-muted">Ada is 9 and needs urgent spinal surgery. Her family has done everything they can. With your help she will walk back...</p>
+        <div class="mt-5">
+          <div class="w-full overflow-hidden rounded-full bg-brand-100 h-2.5" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="60">
+    <div class="h-full rounded-full bg-gradient-to-r from-brand-500 to-brand-700" style="width: 60.0%"></div>
+  </div>
+          <div class="mt-2 flex items-end justify-between text-sm">
+            <p><span class="font-semibold text-brand-800">₦480K</span> <span class="text-muted">raised of ₦800K</span></p>
+            <p class="font-semibold text-ink">60%</p>
+          </div>
+        </div>
+      </div>
+    </a>
+  </article><article class="rounded-2xl border border-border bg-surface shadow-sm group overflow-hidden transition hover:-translate-y-0.5 hover:shadow-lg">
+    <a href="{{ url_for('campaign.detail') }}" class="block">
+      <div class="relative aspect-[16/10] overflow-hidden bg-gradient-to-br from-brand-200 via-brand-100 to-gold-100">
+
+        <span class="inline-flex items-center gap-1 rounded-full px-2.5 py-0.5 text-xs font-medium absolute left-3 top-3 bg-surface/90 text-brand-800 backdrop-blur">Health &amp; Medical</span>
+        <span class="inline-flex items-center gap-1 rounded-full px-2.5 py-0.5 text-xs font-medium absolute right-3 top-3 bg-brand-700 text-white"><svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 12l2 2 4-4m5.6-4A12 12 0 0112 3a12 12 0 01-8.6 3A12 12 0 003 12c0 5.6 3.8 10.3 9 11.6 5.2-1.3 9-6 9-11.6 0-1.9-.3-3.7-.4-6z"/></svg>Verified</span>
+      </div>
+      <div class="p-5">
+        <h3 class="line-clamp-2 font-display text-lg font-bold leading-snug text-brand-950 group-hover:text-brand-700">Clean water borehole for Ogbese village</h3>
+        <p class="mt-2 line-clamp-2 text-sm text-muted">Ada is 9 and needs urgent spinal surgery. Her family has done everything they can. With your help she will walk back...</p>
+        <div class="mt-5">
+          <div class="w-full overflow-hidden rounded-full bg-brand-100 h-2.5" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="97">
+    <div class="h-full rounded-full bg-gradient-to-r from-brand-500 to-brand-700" style="width: 96.7%"></div>
+  </div>
+          <div class="mt-2 flex items-end justify-between text-sm">
+            <p><span class="font-semibold text-brand-800">₦2.9M</span> <span class="text-muted">raised of ₦3.0M</span></p>
+            <p class="font-semibold text-ink">97%</p>
+          </div>
+        </div>
+      </div>
+    </a>
+  </article>
+    </div>
+
+    <h3 class="mt-16 font-display text-2xl font-bold text-brand-950">Browse by what matters to you</h3>
+    <div class="mt-6 grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-6">
+
+      <a href="{{ url_for('campaign.explore') }}" class="group relative aspect-square overflow-hidden rounded-2xl bg-gradient-to-br from-brand-600 to-brand-800">
+        <img src="{{ url_for('campaign.static', filename='images/categories/health.jpg') }}" alt="Health &amp; Medical" class="absolute inset-0 h-full w-full object-cover transition duration-500 group-hover:scale-110" loading="lazy" onerror="this.style.display='none'">
+        <span class="absolute inset-0 bg-gradient-to-t from-brand-950/80 via-brand-950/20 to-transparent"></span>
+        <span class="absolute bottom-3 left-3 right-3 font-semibold text-white">Health &amp; Medical</span>
+      </a>
+
+      <a href="{{ url_for('campaign.explore') }}" class="group relative aspect-square overflow-hidden rounded-2xl bg-gradient-to-br from-brand-600 to-brand-800">
+        <img src="{{ url_for('campaign.static', filename='images/categories/education.jpg') }}" alt="Education" class="absolute inset-0 h-full w-full object-cover transition duration-500 group-hover:scale-110" loading="lazy" onerror="this.style.display='none'">
+        <span class="absolute inset-0 bg-gradient-to-t from-brand-950/80 via-brand-950/20 to-transparent"></span>
+        <span class="absolute bottom-3 left-3 right-3 font-semibold text-white">Education</span>
+      </a>
+
+    </div>
+
+  </section>
+
+  <section class="bg-brand-50 py-20 lg:py-28">
+    <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+      <div class="mx-auto text-center max-w-2xl">
+    <p class="text-xs font-semibold uppercase tracking-widest text-brand-600">How it works</p>
+    <h2 class="mt-2 font-display text-3xl font-bold tracking-tight text-brand-950 sm:text-4xl">Simple whether you give or you raise</h2>
+
+  </div>
+      <div class="mt-14 grid grid-cols-1 gap-8 lg:grid-cols-2">
+        <div class="rounded-2xl border border-border bg-surface shadow-sm overflow-hidden">
+          <div class="relative aspect-[16/9] overflow-hidden bg-gradient-to-br from-brand-300 to-brand-500 sm:aspect-[2/1]"><img src="{{ url_for('user.static', filename='images/story-donor.jpg') }}" alt="A donor reading a campaign update" class="h-full w-full object-cover" loading="lazy" onerror="this.style.display='none'"></div>
+          <div class="p-7">
+            <p class="text-xs font-semibold uppercase tracking-widest text-brand-600">If you want to give</p>
+            <ol class="mt-4 space-y-4">
+
+              <li class="flex gap-4"><span class="grid h-7 w-7 shrink-0 place-items-center rounded-full bg-brand-700 text-xs font-bold text-white">1</span><div><p class="font-semibold text-ink">Choose a verified campaign</p><p class="text-sm text-muted">Read the story, see the evidence and the verification badge.</p></div></li>
+
+              <li class="flex gap-4"><span class="grid h-7 w-7 shrink-0 place-items-center rounded-full bg-brand-700 text-xs font-bold text-white">2</span><div><p class="font-semibold text-ink">Give any amount, give anonymously if you wish</p><p class="text-sm text-muted">Pick your payment method and see the exact fee breakdown first.</p></div></li>
+
+              <li class="flex gap-4"><span class="grid h-7 w-7 shrink-0 place-items-center rounded-full bg-brand-700 text-xs font-bold text-white">3</span><div><p class="font-semibold text-ink">Follow the impact</p><p class="text-sm text-muted">Get updates and see each expense approved and paid out.</p></div></li>
+
+            </ol>
+          </div>
+        </div>
+        <div class="rounded-2xl border border-border bg-surface shadow-sm overflow-hidden">
+          <div class="relative aspect-[16/9] overflow-hidden bg-gradient-to-br from-gold-200 to-gold-400 sm:aspect-[2/1]"><img src="{{ url_for('user.static', filename='images/story-campaigner.jpg') }}" alt="A campaigner sharing their story" class="h-full w-full object-cover" loading="lazy" onerror="this.style.display='none'"></div>
+          <div class="p-7">
+            <p class="text-xs font-semibold uppercase tracking-widest text-brand-600">If you need to raise funds</p>
+            <ol class="mt-4 space-y-4">
+
+              <li class="flex gap-4"><span class="grid h-7 w-7 shrink-0 place-items-center rounded-full bg-gold-400 text-xs font-bold text-brand-950">1</span><div><p class="font-semibold text-ink">Create your account and verify your identity</p><p class="text-sm text-muted">A one-time check that protects you and your donors.</p></div></li>
+
+              <li class="flex gap-4"><span class="grid h-7 w-7 shrink-0 place-items-center rounded-full bg-gold-400 text-xs font-bold text-brand-950">2</span><div><p class="font-semibold text-ink">Tell your story and upload evidence</p><p class="text-sm text-muted">Set a goal, add photos and documents that prove the need.</p></div></li>
+
+              <li class="flex gap-4"><span class="grid h-7 w-7 shrink-0 place-items-center rounded-full bg-gold-400 text-xs font-bold text-brand-950">3</span><div><p class="font-semibold text-ink">Receive funds the safe way</p><p class="text-sm text-muted">Request an expense with its invoice; we pay the recipient and log it publicly.</p></div></li>
+
+            </ol>
+          </div>
+        </div>
+      </div>
+      <p class="mt-8 text-center"><a href="{{ url_for('user.how_it_works') }}" class="font-semibold text-brand-700 hover:underline">Read the full walkthrough →</a></p>
+    </div>
+  </section>
+
+  <section id="fees" class="mx-auto max-w-7xl px-4 py-20 sm:px-6 lg:px-8 lg:py-28">
+    <div class="grid grid-cols-1 items-center gap-12 lg:grid-cols-2">
+      <div>
+        <p class="text-xs font-semibold uppercase tracking-widest text-brand-600">Honest fees</p>
+        <h2 class="mt-2 font-display text-3xl font-bold text-brand-950 sm:text-4xl">A clear target, with the platform fee included.</h2>
+        <p class="mt-4 leading-relaxed text-muted">Campaigners enter only what they need. Vouch automatically adds a platform fee equal to 10% of that amount to the campaign target. Once raised, the campaigner can request expenses up to the amount they originally asked for; the platform fee is retained. Payment processor fees may be recorded separately.</p>
+        <ul class="mt-6 space-y-3 text-sm text-ink">
+          <li class="flex gap-3"><svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 shrink-0 text-brand-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg> Example: ₦100 needed + ₦10 fee = ₦110 target</li>
+          <li class="flex gap-3"><svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 shrink-0 text-brand-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg> Donors are not charged an extra 10% at checkout</li>
+          <li class="flex gap-3"><svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 shrink-0 text-brand-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg> Expenses are limited to the campaigner's stated need</li>
+        </ul>
+      </div>
+
+      <div class="rounded-2xl border border-border bg-surface shadow-sm p-7">
+        <p class="text-xs font-semibold uppercase tracking-wide text-muted">Example: a campaign target</p>
+        <dl class="mt-5 space-y-4 text-sm">
+          <div class="flex justify-between"><dt class="text-muted">Campaigner needs</dt><dd class="font-semibold text-ink">₦100,000</dd></div>
+          <div class="flex justify-between"><dt class="text-muted">10% platform fee</dt><dd class="text-ink">+ ₦10,000</dd></div>
+          <div class="h-px bg-slate-200"></div>
+          <div class="flex justify-between text-base"><dt class="font-semibold text-brand-900">Public fundraising target</dt><dd class="font-display text-xl font-bold text-brand-700">₦110,000</dd></div>
+        </dl>
+        <p class="mt-4 text-xs text-muted">The campaigner may request up to ₦100,000 in approved expenses.</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="px-4 sm:px-6 lg:px-8">
+    <div class="relative mx-auto max-w-7xl overflow-hidden rounded-[2rem] bg-brand-800">
+      <div class="absolute inset-0 bg-gradient-to-br from-brand-700 to-brand-950"><img src="{{ url_for('user.static', filename='images/ngo-banner.jpg') }}" alt="" class="h-full w-full object-cover opacity-30 mix-blend-luminosity" loading="lazy" onerror="this.style.display='none'"></div>
+      <div class="relative grid grid-cols-1 gap-8 p-8 text-white sm:p-12 lg:grid-cols-3 lg:items-center">
+        <div class="lg:col-span-2">
+          <p class="text-xs font-semibold uppercase tracking-widest text-gold-300">For registered organisations</p>
+          <h2 class="mt-2 font-display text-3xl font-bold sm:text-4xl">An NGO? Show donors your credentials once, and carry that trust into every campaign.</h2>
+          <p class="mt-4 max-w-2xl text-brand-100">Add your registration number, founding date, website and tax-exempt status. Verified organisations get a badge on every campaign they run.</p>
+        </div>
+        <div class="lg:text-right"><a href="{{ url_for('user.register') }}" class="inline-flex items-center justify-center gap-2 rounded-xl font-semibold transition focus:outline-none focus-visible:ring-4 disabled:cursor-not-allowed disabled:opacity-50 bg-accent text-ink shadow-sm hover:bg-accent/90 focus-visible:ring-accent/20 px-6 py-3.5 text-base">Register your organisation</a></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="mx-auto max-w-7xl px-4 py-20 sm:px-6 lg:px-8 lg:py-28">
+    <div class="mx-auto text-center max-w-2xl">
+    <p class="text-xs font-semibold uppercase tracking-widest text-brand-600">Voices</p>
+    <h2 class="mt-2 font-display text-3xl font-bold tracking-tight text-brand-950 sm:text-4xl">People who gave. People who were helped.</h2>
+
+  </div>
+    <div class="mt-12 grid grid-cols-1 gap-6 md:grid-cols-3">
+
+      <figure class="rounded-2xl border border-border bg-surface shadow-sm flex flex-col p-7">
+        <svg class="h-8 w-8 text-gold-400" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path d="M9.6 6C6.5 7.3 4 10 4 14.3V18h6v-6H7c.2-2 1.4-3.3 3.3-4.2L9.6 6zm9 0c-3.1 1.3-5.6 4-5.6 8.3V18h6v-6h-3c.2-2 1.4-3.3 3.3-4.2L18.600 6z"/></svg>
+        <blockquote class="mt-4 flex-1 text-ink">I could see the invoice, the approval and the payout. For the first time I knew my money did what it said.</blockquote>
+        <figcaption class="mt-6 flex items-center gap-3">
+          <span class="relative h-11 w-11 overflow-hidden rounded-full bg-gradient-to-br from-brand-200 to-gold-200"><img src="{{ url_for('user.static', filename='images/testimonial-1.jpg') }}" alt="Amaka O." class="h-full w-full object-cover" loading="lazy" onerror="this.style.display='none'"></span>
+          <span><span class="block text-sm font-semibold text-ink">Amaka O.</span><span class="block text-xs text-muted">Donor, Lagos</span></span>
+        </figcaption>
+      </figure>
+
+      <figure class="rounded-2xl border border-border bg-surface shadow-sm flex flex-col p-7">
+        <svg class="h-8 w-8 text-gold-400" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path d="M9.6 6C6.5 7.3 4 10 4 14.3V18h6v-6H7c.2-2 1.4-3.3 3.3-4.2L9.6 6zm9 0c-3.1 1.3-5.6 4-5.6 8.3V18h6v-6h-3c.2-2 1.4-3.3 3.3-4.2L18.600 6z"/></svg>
+        <blockquote class="mt-4 flex-1 text-ink">Verification took a day. After that, donors trusted my story and the surgery was fully funded in three weeks.</blockquote>
+        <figcaption class="mt-6 flex items-center gap-3">
+          <span class="relative h-11 w-11 overflow-hidden rounded-full bg-gradient-to-br from-brand-200 to-gold-200"><img src="{{ url_for('user.static', filename='images/testimonial-2.jpg') }}" alt="Tunde A." class="h-full w-full object-cover" loading="lazy" onerror="this.style.display='none'"></span>
+          <span><span class="block text-sm font-semibold text-ink">Tunde A.</span><span class="block text-xs text-muted">Campaigner, Ibadan</span></span>
+        </figcaption>
+      </figure>
+
+      <figure class="rounded-2xl border border-border bg-surface shadow-sm flex flex-col p-7">
+        <svg class="h-8 w-8 text-gold-400" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path d="M9.6 6C6.5 7.3 4 10 4 14.3V18h6v-6H7c.2-2 1.4-3.3 3.3-4.2L9.6 6zm9 0c-3.1 1.3-5.6 4-5.6 8.3V18h6v-6h-3c.2-2 1.4-3.3 3.3-4.2L18.600 6z"/></svg>
+        <blockquote class="mt-4 flex-1 text-ink">As an NGO, the public ledger saves us countless emails. Supporters can see everything for themselves.</blockquote>
+        <figcaption class="mt-6 flex items-center gap-3">
+          <span class="relative h-11 w-11 overflow-hidden rounded-full bg-gradient-to-br from-brand-200 to-gold-200"><img src="{{ url_for('user.static', filename='images/testimonial-3.jpg') }}" alt="Hope Initiative" class="h-full w-full object-cover" loading="lazy" onerror="this.style.display='none'"></span>
+          <span><span class="block text-sm font-semibold text-ink">Hope Initiative</span><span class="block text-xs text-muted">Registered NGO, Abuja</span></span>
+        </figcaption>
+      </figure>
+
+    </div>
+  </section>
+
+  <section id="faq" class="mx-auto max-w-3xl px-4 pb-20 sm:px-6 lg:pb-28">
+    <div class="mx-auto text-center max-w-2xl">
+    <p class="text-xs font-semibold uppercase tracking-widest text-brand-600">Questions</p>
+    <h2 class="mt-2 font-display text-3xl font-bold tracking-tight text-brand-950 sm:text-4xl">Things people ask before they give</h2>
+
+  </div>
+    <div class="mt-10 divide-y divide-slate-200 rounded-2xl border border-border bg-surface">
+
+      <details class="group p-6" open>
+        <summary class="flex cursor-pointer list-none items-center justify-between gap-4 font-semibold text-ink">Can a campaigner just take the money?<span class="transition group-open:rotate-180"><svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-muted" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M19 9l-7 7-7-7"/></svg></span></summary>
+        <p class="mt-3 text-sm leading-relaxed text-muted">No. Funds are never handed over as a lump sum. Campaigners request specific expenses with supporting documents; once reviewed, we pay the recipient directly.</p>
+      </details>
+
+      <details class="group p-6" >
+        <summary class="flex cursor-pointer list-none items-center justify-between gap-4 font-semibold text-ink">What if a campaign turns out to be fraudulent?<span class="transition group-open:rotate-180"><svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-muted" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M19 9l-7 7-7-7"/></svg></span></summary>
+        <p class="mt-3 text-sm leading-relaxed text-muted">Our review team can pause or reject a campaign at any time. Every decision is recorded in an audit log, and donations can be refunded where payouts have not yet been made.</p>
+      </details>
+
+      <details class="group p-6" >
+        <summary class="flex cursor-pointer list-none items-center justify-between gap-4 font-semibold text-ink">Can I give anonymously?<span class="transition group-open:rotate-180"><svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-muted" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M19 9l-7 7-7-7"/></svg></span></summary>
+        <p class="mt-3 text-sm leading-relaxed text-muted">Yes. Tick &#34;give anonymously&#34; at checkout and your name will not appear on the public donor list. We still keep your receipt for your records.</p>
+      </details>
+
+      <details class="group p-6" >
+        <summary class="flex cursor-pointer list-none items-center justify-between gap-4 font-semibold text-ink">Which payment methods are supported?<span class="transition group-open:rotate-180"><svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-muted" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M19 9l-7 7-7-7"/></svg></span></summary>
+        <p class="mt-3 text-sm leading-relaxed text-muted">Cards, bank transfer and other options provided by our licensed payment gateways. You will see what is available at checkout.</p>
+      </details>
+
+      <details class="group p-6" >
+        <summary class="flex cursor-pointer list-none items-center justify-between gap-4 font-semibold text-ink">How do I know a verified badge is real?<span class="transition group-open:rotate-180"><svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-muted" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M19 9l-7 7-7-7"/></svg></span></summary>
+        <p class="mt-3 text-sm leading-relaxed text-muted">The badge is only added after a reviewer signs off on the person and the evidence. The reviewer&#39;s public note is visible on the campaign page.</p>
+      </details>
+
+    </div>
+  </section>
+
+  <section class="px-4 sm:px-6 lg:px-8">
+    <div class="mx-auto max-w-5xl rounded-[2rem] bg-gradient-to-br from-gold-300 to-gold-400 px-6 py-14 text-center sm:px-12">
+      <h2 class="font-display text-3xl font-bold text-brand-950 sm:text-4xl">Your next gift could be someone's turning point.</h2>
+      <p class="mx-auto mt-3 max-w-xl text-brand-900/80">Join donors and campaigners who chose transparency.</p>
+      <div class="mt-8 flex flex-wrap justify-center gap-3">
+        <a href="{{ url_for('user.register') }}" class="inline-flex items-center justify-center gap-2 rounded-xl font-semibold transition focus:outline-none focus-visible:ring-4 disabled:cursor-not-allowed disabled:opacity-50 bg-accent text-ink shadow-sm hover:bg-accent/90 focus-visible:ring-accent/20 px-7 py-3.5 text-base">Create a free account</a>
+        <a href="{{ url_for('campaign.explore') }}" class="inline-flex items-center justify-center gap-2 rounded-xl font-semibold transition focus:outline-none focus-visible:ring-4 disabled:cursor-not-allowed disabled:opacity-50 bg-surface px-7 py-3.5 text-base text-brand-900 hover:bg-brand-50">Browse campaigns</a>
+      </div>
+    </div>
+  </section>
+  </main>
+
+
+{% endblock %}

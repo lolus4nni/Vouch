@@ -1,0 +1,221 @@
+{% extends "layouts/public.html" %}
+
+{% block title %}{{ revision.title }} · Vouch{% endblock %}
+{% block description %}{{ revision.description[:160] }}{% endblock %}
+
+{% block head %}
+  <meta property="og:title" content="{{ revision.title }}">
+  <meta property="og:description" content="{{ revision.description[:160] }}">
+  <meta property="og:type" content="article">
+{% endblock %}
+
+{% block content %}
+  <main id="main">
+    <div class="mx-auto max-w-7xl px-4 pt-6 sm:px-6 lg:px-8">
+      <nav class="text-sm text-muted" aria-label="Breadcrumb">
+        <a href="{{ url_for('campaign.explore') }}" class="hover:text-brand-700">Campaigns</a>
+        {% if revision.category %}
+          <span class="mx-2">/</span>
+          <span>{{ revision.category.name }}</span>
+        {% endif %}
+      </nav>
+      <header class="mt-4 max-w-4xl">
+        <h1 class="font-display text-3xl font-bold leading-tight text-brand-950 sm:text-4xl lg:text-5xl">{{ revision.title }}</h1>
+        <div class="mt-4 flex flex-wrap items-center gap-3">
+          {% if verified %}
+            <span class="rounded-full bg-brand-100 px-2.5 py-0.5 text-xs font-medium text-brand-800">Verified organiser</span>
+          {% endif %}
+          {% if revision.category %}
+            <span class="rounded-full bg-slate-100 px-2.5 py-0.5 text-xs font-medium text-slate-700">{{ revision.category.name }}</span>
+          {% endif %}
+        </div>
+      </header>
+    </div>
+
+    <div class="mx-auto mt-8 grid max-w-7xl grid-cols-1 gap-10 px-4 sm:px-6 lg:grid-cols-3 lg:px-8">
+      <div class="min-w-0 lg:col-span-2">
+        <div class="aspect-[16/9] overflow-hidden rounded-3xl bg-gradient-to-br from-brand-300 via-brand-200 to-gold-200 shadow-lg">
+          {% if revision.cover_image_url %}
+            <img src="{{ revision.cover_image_url }}" alt="{{ revision.title }} cover photo" class="h-full w-full object-cover">
+          {% else %}
+            <div class="h-full w-full" role="img" aria-label="Campaign cover image not available"></div>
+          {% endif %}
+        </div>
+
+        <div class="mt-6 flex flex-wrap items-center gap-4 rounded-2xl border border-border bg-surface p-4">
+          <span class="grid h-12 w-12 shrink-0 place-items-center overflow-hidden rounded-full bg-brand-100 font-bold text-brand-700">
+            {{ organizer.display_name[:1]|upper if organizer else '?' }}
+          </span>
+          <div class="min-w-0 flex-1">
+            <p class="text-xs text-muted">Organised by</p>
+            {% if organizer %}
+              <a href="{{ url_for('user.public_profile', user_id=organizer.id) }}" class="block truncate font-semibold text-ink hover:text-brand-700">{{ organization.display_name if organization else organizer.display_name }}</a>
+            {% else %}
+              <p class="font-semibold text-ink">Campaign organiser</p>
+            {% endif %}
+          </div>
+          {% if verified %}
+            <span class="rounded-full bg-brand-100 px-2.5 py-0.5 text-xs font-medium text-brand-800">Verified</span>
+          {% endif %}
+        </div>
+
+        <nav class="sticky top-[57px] z-30 -mx-4 mt-8 overflow-x-auto border-b border-border bg-background/95 px-4 backdrop-blur sm:mx-0 sm:px-0" aria-label="Campaign sections">
+          <ul class="flex gap-6 whitespace-nowrap text-sm font-medium">
+            <li><a href="#story" class="inline-block py-3 text-slate-600 hover:text-brand-800">Story</a></li>
+            <li><a href="#updates" class="inline-block py-3 text-slate-600 hover:text-brand-800">Updates ({{ updates|length }})</a></li>
+            <li><a href="#spending" class="inline-block py-3 text-slate-600 hover:text-brand-800">Spending ({{ expenses|length }})</a></li>
+            <li><a href="#evidence" class="inline-block py-3 text-slate-600 hover:text-brand-800">Evidence ({{ evidence|length }})</a></li>
+            <li><a href="#donors" class="inline-block py-3 text-slate-600 hover:text-brand-800">Donors ({{ donor_count }})</a></li>
+          </ul>
+        </nav>
+
+        <section id="story" class="scroll-mt-32 py-10">
+          <h2 class="font-display text-2xl font-bold text-brand-950">The story</h2>
+          <div class="mt-4 whitespace-pre-line text-base leading-8 text-slate-700">{{ revision.description }}</div>
+        </section>
+
+        <section id="updates" class="scroll-mt-32 border-t border-border py-10">
+          <h2 class="font-display text-2xl font-bold text-brand-950">Updates</h2>
+          <ol class="mt-6 space-y-6 border-l-2 border-brand-100 pl-6">
+            {% for update in updates %}
+              <li class="relative">
+                <span class="absolute -left-[33px] top-1.5 h-4 w-4 rounded-full border-4 border-cream bg-brand-600"></span>
+                <p class="text-xs font-medium text-muted">{{ update.published_at.strftime('%d %b %Y') }}</p>
+                <h3 class="mt-1 text-lg font-semibold text-ink">{{ update.title }}</h3>
+                <p class="mt-2 whitespace-pre-line text-sm leading-7 text-slate-700">{{ update.content }}</p>
+              </li>
+            {% else %}
+              <li class="text-sm text-muted">There are no campaign updates yet.</li>
+            {% endfor %}
+          </ol>
+        </section>
+
+        <section id="spending" class="scroll-mt-32 border-t border-border py-10">
+          <h2 class="font-display text-2xl font-bold text-brand-950">Where the money goes</h2>
+          <div class="mt-6 grid grid-cols-1 gap-4 sm:grid-cols-3">
+            <div class="rounded-2xl border border-border bg-surface p-4 shadow-sm">
+              <p class="text-xs text-muted">Raised</p>
+              <p class="font-display text-2xl font-bold text-brand-800">₦{{ '{:,.2f}'.format(raised_minor / 100) }}</p>
+            </div>
+            <div class="rounded-2xl border border-border bg-surface p-4 shadow-sm">
+              <p class="text-xs text-muted">Spent and paid out</p>
+              <p class="font-display text-2xl font-bold text-ink">₦{{ '{:,.2f}'.format(paid_minor / 100) }}</p>
+            </div>
+            <div class="rounded-2xl border border-border bg-surface p-4 shadow-sm">
+              <p class="text-xs text-muted">Available, less approved expenses</p>
+              <p class="font-display text-2xl font-bold text-gold-600">₦{{ '{:,.2f}'.format(available_minor / 100) }}</p>
+            </div>
+          </div>
+          <div class="mt-4">
+            <div class="h-2 overflow-hidden rounded-full bg-brand-100" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="{{ progress }}">
+              <div class="h-full bg-progress" style="width: {{ progress }}%"></div>
+            </div>
+            <p class="mt-1 text-xs text-muted">{{ progress }}% of the goal raised</p>
+          </div>
+          <ul class="mt-6 divide-y divide-slate-100 rounded-2xl border border-border bg-surface shadow-sm">
+            {% for expense in expenses %}
+              <li class="flex flex-wrap items-center gap-4 px-5 py-4">
+                <div class="min-w-0 flex-1">
+                  <p class="font-medium text-ink">{{ expense.title }}</p>
+                  <p class="text-xs text-muted">Paid {{ expense.submitted_at.strftime('%d %b %Y') }}</p>
+                </div>
+                <p class="font-semibold">₦{{ '{:,.2f}'.format(expense.amount_minor / 100) }}</p>
+              </li>
+            {% else %}
+              <li class="px-5 py-4 text-sm text-muted">No expenses have been paid out yet.</li>
+            {% endfor %}
+          </ul>
+        </section>
+
+        <section id="evidence" class="scroll-mt-32 border-t border-border py-10">
+          <h2 class="font-display text-2xl font-bold text-brand-950">Evidence and verification</h2>
+          {% if review and review.public_notes %}
+            <p class="mt-4 rounded-2xl bg-brand-50 p-4 text-sm text-brand-900">{{ review.public_notes }}</p>
+          {% endif %}
+          <ul class="mt-5 grid grid-cols-1 gap-3 sm:grid-cols-2">
+            {% for item in evidence %}
+              <li class="rounded-2xl border border-border bg-surface p-4 text-sm shadow-sm">
+                <span class="font-medium capitalize text-ink">{{ item.document_type|replace('_', ' ') }}</span>
+                <span class="mt-1 block text-xs text-muted">Reviewed {{ item.reviewed_at.strftime('%d %b %Y') if item.reviewed_at else item.created_at.strftime('%d %b %Y') }}</span>
+              </li>
+            {% else %}
+              <li class="text-sm text-muted">There is no public evidence to display yet.</li>
+            {% endfor %}
+          </ul>
+        </section>
+
+        <section id="donors" class="scroll-mt-32 border-t border-border py-10">
+          <h2 class="font-display text-2xl font-bold text-brand-950">{{ donor_count }} donations</h2>
+          <ul class="mt-6 grid grid-cols-1 gap-3 sm:grid-cols-2">
+            {% for donation in recent_donations %}
+              <li class="flex items-center gap-3 rounded-2xl border border-border bg-surface p-4 shadow-sm">
+                <span class="grid h-10 w-10 place-items-center rounded-full bg-gold-100 font-bold text-gold-700">
+                  {{ 'A' if donation.is_anonymous else donation.donor.display_name[:1]|upper if donation.donor else 'S' }}
+                </span>
+                <div class="min-w-0 flex-1">
+                  <p class="truncate text-sm font-semibold">{{ 'Anonymous donor' if donation.is_anonymous else donation.donor.display_name if donation.donor else 'Supporter' }}</p>
+                  <p class="text-xs text-muted">{{ donation.created_at.strftime('%d %b %Y') }}</p>
+                </div>
+                <p class="font-semibold text-brand-800">₦{{ '{:,.2f}'.format((donation.credited_amount_minor or 0) / 100) }}</p>
+              </li>
+            {% else %}
+              <li class="text-sm text-muted">Be the first to support this campaign.</li>
+            {% endfor %}
+          </ul>
+        </section>
+      </div>
+
+      <aside class="lg:col-span-1">
+        <div class="space-y-4 lg:sticky lg:top-24">
+          <div class="rounded-2xl border border-border bg-surface p-6 shadow-lg">
+            <p class="font-display text-4xl font-bold text-brand-800">₦{{ '{:,.2f}'.format(raised_minor / 100) }}</p>
+            <p class="mt-1 text-sm text-muted">raised of ₦{{ '{:,.2f}'.format(revision.goal_amount_minor / 100) }} target</p>
+            <p class="mt-1 text-xs text-muted">₦{{ '{:,.2f}'.format((revision.goal_amount_minor * 10 // 11) / 100) }} needed + ₦{{ '{:,.2f}'.format((revision.goal_amount_minor - revision.goal_amount_minor * 10 // 11) / 100) }} platform fee</p>
+            <div class="mt-4">
+              <div class="h-3 overflow-hidden rounded-full bg-brand-100" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="{{ progress }}">
+                <div class="h-full bg-progress" style="width: {{ progress }}%"></div>
+              </div>
+            </div>
+            <dl class="mt-4 grid grid-cols-3 gap-2 text-center">
+              <div><dt class="text-xs text-muted">Funded</dt><dd class="font-semibold">{{ progress }}%</dd></div>
+              <div><dt class="text-xs text-muted">Donations</dt><dd class="font-semibold">{{ donor_count }}</dd></div>
+              <div><dt class="text-xs text-muted">Days left</dt><dd class="font-semibold">{{ days_left if days_left is not none else '—' }}</dd></div>
+            </dl>
+            {% if reached_target %}
+              <p class="mt-6 rounded-xl bg-brand-50 px-4 py-3 text-center text-sm font-semibold text-brand-900">This campaign has reached its target and is no longer accepting donations.</p>
+            {% else %}
+              <a href="{{ url_for('finance.donate', campaign_id=campaign.id) }}" class="mt-6 inline-flex w-full items-center justify-center rounded-xl bg-accent px-5 py-3.5 text-base font-semibold text-ink shadow-sm hover:bg-accent-600">Donate now</a>
+            {% endif %}
+            <button type="button" id="share-btn" data-url="{{ url_for('campaign.detail', slug=campaign.slug, _external=True) }}" data-title="{{ revision.title }}" class="mt-3 w-full rounded-xl border border-slate-300 bg-surface px-5 py-3 text-sm font-semibold text-slate-700 hover:bg-background">Share this campaign</button>
+            <p class="mt-4 text-xs leading-relaxed text-muted">Donation processing is subject to the payment options available in this app.</p>
+          </div>
+          {% if verified %}
+            <div class="rounded-2xl bg-brand-50 p-5 text-brand-900">
+              <p class="text-sm font-semibold">Verified organiser</p>
+              <p class="mt-2 text-xs leading-relaxed">The organiser has an approved verification record.</p>
+            </div>
+          {% endif %}
+          <p class="text-center text-xs text-muted"><a href="{{ url_for('campaign.report', campaign_id=campaign.id) }}" class="hover:text-rose-600">Report this campaign</a></p>
+        </div>
+      </aside>
+    </div>
+  </main>
+{% endblock %}
+
+{% block scripts %}
+  <script>
+    document.getElementById('share-btn').addEventListener('click', async function () {
+      var button = this;
+      try {
+        if (navigator.share) {
+          await navigator.share({ title: button.dataset.title, url: button.dataset.url });
+        } else {
+          await navigator.clipboard.writeText(button.dataset.url);
+          button.textContent = 'Link copied';
+        }
+      } catch (error) {
+        if (error.name !== 'AbortError') button.textContent = 'Unable to share right now';
+      }
+    });
+  </script>
+{% endblock %}

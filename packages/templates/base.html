@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en" class="h-full scroll-smooth">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>{% block title %}Fund causes you can trust{% endblock %} · Vouch</title>
+    <meta name="description" content="{% block description %}Fund causes you can verify. Every donation tracked, every expense reviewed, every update public.{% endblock %}">
+    <meta name="theme-color" content="#134E4A">
+    <link rel="icon" type="image/svg+xml" href="{{ url_for('static', filename='images/brand/logo-dark.svg') }}">
+
+    {# Fonts: Inter for body/UI text, Fraunces for display headings #}
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+      // One shared palette for every page. Base colors are the Vouch scheme:
+        //  teal #0F766E / #134E4A, coral #F4623A, amber #F5A524, green #22A06B,
+        //  red #D92D20, cream #FAF8F5, ink #1C2B2A, muted #5B6B6A. 
+      tailwind.config = {
+        theme: {
+          extend: {
+            colors: {
+              brand:  { 50:'#EFF8F7',100:'#D8EEEB',200:'#B4DDD8',300:'#80C7C0',400:'#43A99F',500:'#0F766E',600:'#0F766E',700:'#0F766E',800:'#134E4A',900:'#134E4A',950:'#134E4A' },
+              gold:   { 50:'#FFF8E8',100:'#FEEFC8',200:'#FCE09B',300:'#F8CA63',400:'#F5A524',500:'#F5A524',600:'#B86B10',700:'#8A4B09' },
+              accent: { DEFAULT:'#F4623A',50:'#FFF1EC',100:'#FFE0D5',200:'#FFC2AB',300:'#FF9A78',400:'#F4623A',500:'#F4623A',600:'#E34E2B',700:'#BD3D22' },
+              slate:  { 50:'#FAF8F5',100:'#F4F6F4',200:'#E3E8E6',300:'#C6D0CE',400:'#82918F',500:'#5B6B6A',600:'#4B5B5A',700:'#354543',800:'#1C2B2A',900:'#1C2B2A',950:'#14211F' },
+              rose:   { 50:'#FEF3F2',100:'#FEE4E2',200:'#FECDCA',300:'#FDA29B',400:'#F97066',500:'#D92D20',600:'#B42318',700:'#912018' },
+              primary: '#0F766E',
+              'primary-dark': '#134E4A',
+              highlight: '#F5A524',
+              progress: '#22A06B',
+              error: '#D92D20',
+              background: '#FAF8F5',
+              canvas: '#FAF8F5',
+              cream: '#FAF8F5',
+              surface: '#FFFFFF',
+              border: '#E3E8E6',
+              ink: '#1C2B2A',
+              muted: '#5B6B6A'
+            },
+            fontFamily: {
+              sans: ['Inter', 'ui-sans-serif', 'system-ui', '-apple-system', 'Segoe UI', 'Roboto', 'sans-serif'],
+              display: ['Fraunces', 'Georgia', 'Cambria', '"Times New Roman"', 'serif']
+            }
+          }
+        }
+      }
+    </script>
+    <style>
+      body { font-feature-settings: "cv11", "ss01"; text-rendering: optimizeLegibility; }
+      .font-display { font-optical-sizing: auto; letter-spacing: -0.015em; }
+      h1, h2, h3 { text-wrap: balance; }
+      p { text-wrap: pretty; }
+      img, video { max-width: 100%; height: auto; }
+    </style>
+    {% block head %}{% endblock %}
+  </head>
+  <body class="min-h-full bg-background font-sans text-[15px] leading-relaxed text-ink antialiased sm:text-base">
+    <a href="#main" class="sr-only focus:not-sr-only focus:fixed focus:left-4 focus:top-4 focus:z-50 focus:rounded-lg focus:bg-surface focus:px-4 focus:py-2 focus:shadow">Skip to content</a>
+
+    {% with messages = get_flashed_messages(with_categories=true) %}
+      {% if messages %}
+        <div class="fixed inset-x-4 top-4 z-50 mx-auto max-w-md space-y-2 sm:left-auto sm:right-4 sm:w-full" aria-label="Notifications">
+          {% for category, message in messages %}
+            <p
+              class="rounded-xl px-4 py-3 text-sm shadow-lg {{ 'bg-rose-100 text-rose-900' if category == 'error' else 'bg-gold-100 text-ink' if category == 'warning' else 'bg-slate-100 text-ink' if category == 'info' else 'bg-brand-100 text-brand-900' }}"
+              role="{{ 'alert' if category == 'error' else 'status' }}"
+              aria-live="{{ 'assertive' if category == 'error' else 'polite' }}"
+              aria-atomic="true"
+            >{{ message }}</p>
+          {% endfor %}
+        </div>
+      {% endif %}
+    {% endwith %}
+
+    {% block body %}{% endblock %}
+
+    {% block layout_scripts %}{% endblock %}
+    {% block scripts %}{% endblock %}
+  </body>
+</html>

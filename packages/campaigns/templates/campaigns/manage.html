@@ -1,0 +1,109 @@
+{% extends "layouts/member.html" %}
+
+{% block title %}{{ revision.title }} · Campaign management{% endblock %}
+
+{% block topbar %}
+  <div class="min-w-0 flex-1">
+    <h1 class="truncate font-display text-xl font-bold text-brand-950 sm:text-2xl">{{ revision.title }}</h1>
+    <p class="hidden truncate text-sm text-muted sm:block">Campaign management</p>
+  </div>
+  <div class="flex items-center gap-2">
+    <a href="{{ url_for('campaign.detail', slug=campaign.slug) }}" class="rounded-xl border border-slate-300 bg-surface px-3.5 py-2 text-xs font-semibold text-slate-700 hover:bg-background">View public page</a>
+    <a href="{{ url_for('campaign.edit', campaign_id=campaign.id) }}" class="rounded-xl bg-brand-700 px-3.5 py-2 text-xs font-semibold text-white hover:bg-brand-800">Edit campaign</a>
+  </div>
+{% endblock %}
+
+{% block content %}
+  <main id="main" class="flex-1 px-4 py-6 sm:px-6 lg:py-8">
+    <div class="mx-auto max-w-6xl space-y-8">
+      <div class="flex flex-wrap items-center gap-3 rounded-2xl border border-border bg-surface p-5 shadow-sm">
+        <span class="rounded-full bg-slate-100 px-2.5 py-0.5 text-xs font-medium capitalize text-slate-700">{{ campaign.status|replace('_', ' ') }}</span>
+        <span class="flex-1 text-sm text-muted">
+          {% if campaign.status == 'active' %}Your campaign is live. Keep donors updated.
+          {% elif campaign.status == 'submitted' %}Your campaign is waiting for review.
+          {% elif revision.status == 'changes_requested' %}Make the requested changes and submit again.
+          {% else %}This campaign is saved as a draft.{% endif %}
+        </span>
+      </div>
+
+      <section class="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4" aria-label="Campaign totals">
+        <div class="rounded-2xl border border-border bg-surface p-5 shadow-sm">
+          <p class="text-xs font-medium uppercase tracking-wide text-muted">Raised</p>
+          <p class="mt-2 font-display text-3xl font-bold text-brand-800">₦{{ '{:,.2f}'.format(raised_minor / 100) }}</p>
+          <p class="mt-1 text-xs text-muted">{{ progress }}% of ₦{{ '{:,.2f}'.format(revision.goal_amount_minor / 100) }} target</p>
+          <p class="mt-1 text-xs text-muted">Your need: ₦{{ '{:,.2f}'.format((revision.goal_amount_minor * 10 // 11) / 100) }} · Includes 10% platform fee</p>
+        </div>
+        <div class="rounded-2xl border border-border bg-surface p-5 shadow-sm">
+          <p class="text-xs font-medium uppercase tracking-wide text-muted">Paid expenses</p>
+          <p class="mt-2 font-display text-3xl font-bold text-ink">₦{{ '{:,.2f}'.format(paid_minor / 100) }}</p>
+        </div>
+        <div class="rounded-2xl border border-border bg-surface p-5 shadow-sm">
+          <p class="text-xs font-medium uppercase tracking-wide text-muted">Available</p>
+          <p class="mt-2 font-display text-3xl font-bold text-gold-600">₦{{ '{:,.2f}'.format(available_minor / 100) }}</p>
+          <p class="mt-1 text-xs text-muted">Capped at your stated need, after approved and paid expenses</p>
+        </div>
+        <div class="rounded-2xl border border-border bg-surface p-5 shadow-sm">
+          <p class="text-xs font-medium uppercase tracking-wide text-muted">Campaign end</p>
+          <p class="mt-2 font-display text-xl font-bold text-ink">{{ revision.end_date.strftime('%d %b %Y') if revision.end_date else 'Not set' }}</p>
+        </div>
+      </section>
+
+      <div class="grid grid-cols-1 gap-8 lg:grid-cols-5">
+        <section class="lg:col-span-3">
+          <div class="mb-4 flex items-center justify-between gap-3">
+            <h2 class="font-display text-xl font-bold text-brand-950">Expenses</h2>
+            <a href="{{ url_for('finance.expense_new', campaign_id=campaign.id) }}" class="rounded-xl bg-brand-700 px-3.5 py-2 text-xs font-semibold text-white hover:bg-brand-800">Request expense</a>
+          </div>
+          <ul class="divide-y divide-slate-100 rounded-2xl border border-border bg-surface shadow-sm">
+            {% for expense in expenses %}
+              <li class="flex items-center gap-4 px-5 py-4">
+                <div class="min-w-0 flex-1">
+                  <p class="truncate font-medium text-ink">{{ expense.title }}</p>
+                  <p class="text-xs text-muted">Submitted {{ expense.submitted_at.strftime('%d %b %Y') }}</p>
+                </div>
+                <div class="text-right">
+                  <p class="font-semibold">₦{{ '{:,.2f}'.format(expense.amount_minor / 100) }}</p>
+                  <span class="text-xs capitalize text-muted">{{ expense.status|replace('_', ' ') }}</span>
+                </div>
+              </li>
+            {% else %}
+              <li class="px-5 py-4 text-sm text-muted">No expense requests have been made.</li>
+            {% endfor %}
+          </ul>
+        </section>
+
+        <section class="space-y-8 lg:col-span-2">
+          <div>
+            <div class="mb-4 flex items-center justify-between">
+              <h2 class="font-display text-xl font-bold text-brand-950">Updates</h2>
+              <a href="{{ url_for('campaign.post_update', campaign_id=campaign.id) }}" class="text-sm font-semibold text-brand-700 hover:underline">Post update</a>
+            </div>
+            <ul class="divide-y divide-slate-100 rounded-2xl border border-border bg-surface shadow-sm">
+              {% for update in updates %}
+                <li class="px-5 py-3 text-sm">
+                  <p class="font-medium text-ink">{{ update.title }}</p>
+                  <p class="text-xs text-muted">{{ update.created_at.strftime('%d %b %Y') }}</p>
+                </li>
+              {% else %}
+                <li class="px-5 py-3 text-sm text-muted">No updates have been posted.</li>
+              {% endfor %}
+            </ul>
+          </div>
+          <div>
+            <h2 class="mb-4 font-display text-xl font-bold text-brand-950">Latest donations</h2>
+            <ul class="divide-y divide-slate-100 rounded-2xl border border-border bg-surface shadow-sm">
+              {% for donation in donations %}
+                <li class="flex items-center justify-between gap-3 px-5 py-3 text-sm">
+                  <span class="truncate">{{ 'Anonymous donor' if donation.is_anonymous else donation.donor.display_name if donation.donor else 'Supporter' }}<span class="block text-xs text-muted">{{ donation.created_at.strftime('%d %b %Y') }}</span></span>
+                  <span class="shrink-0 font-semibold text-brand-800">₦{{ '{:,.2f}'.format((donation.credited_amount_minor or 0) / 100) }}</span>
+                </li>
+              {% else %}
+                <li class="px-5 py-3 text-sm text-muted">No successful donations yet.</li>
+              {% endfor %}
+            </ul>
+          </div>
+        </section>
+      </div>
+    </div>
+  </main>
+{% endblock %}

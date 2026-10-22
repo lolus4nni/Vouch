@@ -1,0 +1,134 @@
+{% extends "layouts/member.html" %}
+
+{% block title %}Verification{% endblock %}
+
+{% block topbar %}
+  <div class="min-w-0 flex-1">
+    <h1 class="truncate font-display text-xl font-bold text-primary-dark sm:text-2xl">Verification</h1>
+    <p class="hidden truncate text-sm text-muted sm:block">Where your identity check stands, and what to do next.</p>
+  </div>
+  <div class="flex items-center gap-2"></div>
+
+{% endblock %}
+
+{% block content %}
+  <main id="main" class="flex-1 px-4 py-6 sm:px-6 lg:py-8">
+    <div class="mx-auto max-w-5xl space-y-6">
+      <section class="overflow-hidden rounded-3xl border border-border bg-surface shadow-sm">
+        <div class="flex flex-col gap-4 bg-primary-dark px-6 py-7 text-white sm:flex-row sm:items-center sm:justify-between sm:px-8">
+          <div>
+            <span class="inline-flex items-center gap-2 rounded-full bg-surface/10 px-3 py-1 text-xs font-semibold uppercase tracking-wide text-teal-100">Verification status</span>
+            <h2 class="mt-4 font-display text-2xl font-bold sm:text-3xl">{{ verification_case.status|replace('_', ' ')|title if verification_case else 'Not submitted' }}</h2>
+            <p class="mt-2 max-w-lg text-sm leading-6 text-teal-100">
+              {% if verification_case and verification_case.status in ['submitted', 'in_review'] %}
+                Your documents are with our review team.
+              {% elif verification_case and verification_case.status == 'changes_requested' %}
+                Please upload the requested documents or updated information.
+              {% elif verification_case and verification_case.status == 'approved' %}
+                Your verification is complete.
+              {% elif verification_case and verification_case.status == 'rejected' %}
+                Your verification was not approved. Contact support if you need help.
+              {% else %}
+                Upload a document to submit your verification for review.
+              {% endif %}
+            </p>
+          </div>
+          <span class="inline-flex shrink-0 items-center rounded-full bg-highlight/15 px-3.5 py-2 text-sm font-semibold text-amber-100 ring-1 ring-inset ring-highlight/30">
+            {{ verification_case.status|replace('_', ' ')|title if verification_case else 'Not submitted' }}
+          </span>
+        </div>
+      </section>
+
+      <div class="grid grid-cols-1 items-start gap-6 lg:grid-cols-[1.2fr_0.8fr]">
+        <section class="rounded-3xl border border-border bg-surface p-6 shadow-sm sm:p-8">
+          <div class="flex items-start gap-4">
+            <span class="grid h-11 w-11 shrink-0 place-items-center rounded-2xl bg-accent/10 text-accent">
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.6a1 1 0 01.7.3l5.4 5.4a1 1 0 01.3.7V19a2 2 0 01-2 2z"/></svg>
+            </span>
+            <div>
+              <h2 class="font-display text-xl font-bold text-ink">Identity documents</h2>
+              <p class="mt-1 text-sm leading-6 text-muted">Upload a government ID, proof of address{% if organization %}, or organization registration document{% endif %}. Only you and authorized reviewers can access these files.</p>
+            </div>
+          </div>
+          <form action="{{ url_for('user.verification') }}" method="post" enctype="multipart/form-data" class="mt-6 space-y-5">
+            <div>
+              <label class="mb-2 block text-sm font-semibold text-ink" for="doc_type">Document type</label>
+              <select id="doc_type" name="doc_type" class="block w-full rounded-xl border border-border bg-surface px-4 py-3 text-sm text-ink focus:border-primary focus:outline-none focus:ring-4 focus:ring-primary/10">
+                <option value="identity">National ID / Passport</option>
+                <option value="proof_of_address">Proof of address</option>
+                {% if organization %}
+                  <option value="organization_registration">Organization registration</option>
+                {% endif %}
+              </select>
+            </div>
+            <div>
+              <label class="mb-2 block text-sm font-semibold text-ink" for="file">Choose a file</label>
+              <input id="file" name="file" type="file" required accept=".pdf,.jpg,.jpeg,.png" class="block w-full rounded-xl border border-dashed border-primary/30 bg-background px-4 py-3 text-sm text-muted file:mr-4 file:rounded-lg file:border-0 file:bg-primary file:px-3 file:py-2 file:text-xs file:font-semibold file:text-white hover:file:bg-primary-dark focus:outline-none focus:ring-4 focus:ring-primary/10">
+              <p class="mt-2 text-xs text-muted">PDF, JPG or PNG · Maximum file size 5 MB</p>
+            </div>
+            <div class="flex flex-col-reverse gap-3 border-t border-border pt-5 sm:flex-row sm:items-center sm:justify-between">
+              <p class="flex items-center gap-2 text-xs text-muted">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-primary" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 22s8-4 8-11V5l-8-3-8 3v6c0 7 8 11 8 11z"/><path d="M9 12l2 2 4-4"/></svg>
+                Your documents are stored securely.
+              </p>
+              <button class="inline-flex items-center justify-center gap-2 rounded-xl bg-accent px-5 py-3 text-sm font-semibold text-ink shadow-sm transition hover:bg-[#df4d2b] focus:outline-none focus-visible:ring-4 focus-visible:ring-accent/20 disabled:cursor-not-allowed disabled:opacity-50">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 16v2a2 2 0 002 2h12a2 2 0 002-2v-2M16 8l-4-4m0 0L8 8m4-4v12"/></svg>
+                Upload document
+              </button>
+            </div>
+          </form>
+
+          <div class="mt-8">
+            <div class="flex items-center justify-between gap-3">
+              <h3 class="text-sm font-semibold text-ink">Uploaded documents</h3>
+              <span class="rounded-full bg-primary/10 px-2.5 py-1 text-xs font-semibold text-primary">{{ verification_case.documents|length if verification_case else 0 }} files</span>
+            </div>
+            <ul class="mt-3 divide-y divide-border rounded-2xl border border-border">
+              {% if verification_case and verification_case.documents %}
+                {% for document in verification_case.documents %}
+                  <li class="flex items-center gap-3 px-4 py-4 text-sm">
+                    <span class="grid h-10 w-10 shrink-0 place-items-center rounded-xl bg-background text-xs font-bold uppercase text-primary" aria-hidden="true">{{ document.file_asset.detected_content_type.split('/')[-1] }}</span>
+                    <span class="min-w-0 flex-1">
+                      <span class="block truncate font-medium text-ink">{{ document.file_asset.original_filename or 'Uploaded document' }}</span>
+                      <span class="mt-0.5 block text-xs capitalize text-muted">{{ document.document_type|replace('_', ' ') }} · Uploaded {{ document.received_at.strftime('%d %b %Y') }}</span>
+                    </span>
+                    <a href="{{ url_for('user.verification_document', document_id=document.id) }}" class="shrink-0 rounded-lg border border-border px-3 py-2 text-xs font-semibold text-primary hover:bg-primary/5">Download</a>
+                  </li>
+                {% endfor %}
+              {% else %}
+                <li class="px-4 py-4 text-sm text-muted">No documents uploaded yet.</li>
+              {% endif %}
+            </ul>
+          </div>
+        </section>
+
+        <section class="rounded-3xl border border-border bg-surface p-6 shadow-sm sm:p-8">
+          <div class="flex items-start gap-4">
+            <span class="grid h-11 w-11 shrink-0 place-items-center rounded-2xl bg-highlight/15 text-amber-700">
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 8v4l3 2m6-2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+            </span>
+            <div>
+              <h2 class="font-display text-xl font-bold text-ink">Reviewer updates</h2>
+              <p class="mt-1 text-sm leading-6 text-muted">Notes from the team handling your verification.</p>
+            </div>
+          </div>
+          {% if latest_review and latest_review.public_notes %}
+            <ol class="mt-6 space-y-5 border-l-2 border-primary/15 pl-6">
+              <li class="relative">
+                <span class="absolute -left-[31px] top-1 h-3 w-3 rounded-full border-2 border-white bg-progress ring-2 ring-progress/20"></span>
+                <p class="text-xs text-muted">{{ latest_review.decided_at.strftime('%d %b %Y') }} · <span class="font-semibold capitalize text-progress">{{ latest_review.decision|replace('_', ' ') }}</span></p>
+                <p class="mt-2 rounded-2xl bg-background p-4 text-sm leading-6 text-ink">{{ latest_review.public_notes }}</p>
+              </li>
+            </ol>
+          {% else %}
+            <p class="mt-6 text-sm text-muted">There are no reviewer updates yet.</p>
+          {% endif %}
+          <div class="mt-8 rounded-2xl bg-primary/5 p-4">
+            <p class="text-sm font-semibold text-primary-dark">What happens next?</p>
+            <p class="mt-1 text-sm leading-6 text-muted">{% if verification_case and verification_case.status == 'approved' %}Your verification is complete.{% elif verification_case and verification_case.status == 'rejected' %}Contact support if you have questions about this decision.{% elif verification_case %}A reviewer will finish the check. You can upload additional documents if needed.{% else %}Upload a document to send your verification for review.{% endif %}</p>
+          </div>
+        </section>
+      </div>
+    </div>
+    </main>
+{% endblock %}

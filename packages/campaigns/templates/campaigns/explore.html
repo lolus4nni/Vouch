@@ -1,0 +1,179 @@
+{% extends "layouts/public.html" %}
+{% set active_nav = "explore" %}
+
+{% block title %}Explore campaigns{% endblock %}
+
+{% block content %}
+  <main id="main">
+    <section class="bg-brand-900">
+      <div class="mx-auto max-w-7xl px-4 py-14 sm:px-6 lg:px-8">
+        <h1 class="font-display text-4xl font-bold text-white sm:text-5xl">Find a cause worth backing</h1>
+        <p class="mt-3 max-w-2xl text-lg text-brand-100">Browse active campaigns and see how much each one has raised.</p>
+        <form action="{{ url_for('campaign.explore') }}" method="get" role="search" class="mt-8 flex max-w-2xl gap-2 rounded-2xl bg-surface p-2 shadow-xl">
+          <label class="sr-only" for="q">Search campaigns</label>
+          <input id="q" name="q" value="{{ search }}" placeholder="Search by title or keyword" class="min-w-0 flex-1 rounded-xl border-0 bg-transparent px-3 py-3 text-sm focus:outline-none focus:ring-0">
+          <button class="rounded-xl bg-accent px-5 py-3 text-sm font-semibold text-ink hover:bg-accent-600">Search</button>
+        </form>
+      </div>
+    </section>
+
+    <div class="mx-auto grid max-w-7xl grid-cols-1 gap-8 px-4 py-10 sm:px-6 lg:grid-cols-4 lg:px-8">
+      <aside class="lg:col-span-1">
+        <form id="campaign-filters" action="{{ url_for('campaign.search') }}" method="get" class="space-y-6 rounded-2xl border border-border bg-surface p-5 shadow-sm lg:sticky lg:top-24">
+          <div>
+            <label for="category_id" class="text-sm font-semibold text-ink">Category</label>
+            <select id="category_id" name="category_id" class="mt-2 block w-full rounded-xl border border-slate-300 bg-surface px-4 py-3 text-sm">
+              <option value="">All categories</option>
+              {% for category in categories %}
+                <option value="{{ category.id }}" {{ 'selected' if selected_category|string == category.id|string else '' }}>{{ category.name }}</option>
+              {% endfor %}
+            </select>
+          </div>
+          <div>
+            <label for="sort" class="text-sm font-semibold text-ink">Sort by</label>
+            <select id="sort" name="sort" class="mt-2 block w-full rounded-xl border border-slate-300 bg-surface px-4 py-3 text-sm">
+              <option value="newest" {{ 'selected' if selected_sort == 'newest' else '' }}>Newest</option>
+              <option value="ending" {{ 'selected' if selected_sort == 'ending' else '' }}>Ending soon</option>
+              <option value="funded" {{ 'selected' if selected_sort == 'funded' else '' }}>Most funded</option>
+              <option value="goal" {{ 'selected' if selected_sort == 'goal' else '' }}>Nearest to goal</option>
+            </select>
+          </div>
+          <label class="flex items-center gap-3 text-sm text-slate-700">
+            <input type="checkbox" name="verified" value="1" {{ 'checked' if verified else '' }} class="h-4 w-4 rounded border-slate-300 text-brand-700 focus:ring-brand-200">
+            Verified campaigns only
+          </label>
+        </form>
+      </aside>
+
+      <section class="lg:col-span-3" aria-live="polite">
+        <p id="campaign-count" class="mb-5 text-sm text-muted">{{ campaigns|length }} campaigns</p>
+        <div id="campaign-results" class="grid grid-cols-1 gap-6 sm:grid-cols-2 xl:grid-cols-3">
+          {% for revision, campaign_record, raised_minor, is_verified in campaigns %}
+            {% set progress = [100, ((raised_minor * 100 / revision.goal_amount_minor)|round|int)]|min %}
+            <article class="overflow-hidden rounded-2xl border border-border bg-surface shadow-sm transition hover:-translate-y-0.5 hover:shadow-lg">
+              <a href="{{ url_for('campaign.detail', slug=campaign_record.slug) }}" class="block">
+                <div class="relative aspect-[16/10] bg-gradient-to-br from-brand-200 via-brand-100 to-gold-100">
+                  {% if revision.cover_image_url %}
+                    <img src="{{ revision.cover_image_url }}" alt="{{ revision.title }} cover photo" class="absolute inset-0 h-full w-full object-cover">
+                  {% endif %}
+                  {% if revision.category %}
+                    <span class="absolute left-3 top-3 rounded-full bg-surface/90 px-2.5 py-0.5 text-xs font-medium text-brand-800">{{ revision.category.name }}</span>
+                  {% endif %}
+                  {% if is_verified %}
+                    <span class="absolute right-3 top-3 rounded-full bg-brand-700 px-2.5 py-0.5 text-xs font-medium text-white">Verified</span>
+                  {% endif %}
+                </div>
+                <div class="p-5">
+                  <h2 class="line-clamp-2 font-display text-lg font-bold leading-snug text-brand-950">{{ revision.title }}</h2>
+                  <p class="mt-2 line-clamp-2 text-sm text-slate-600">{{ revision.description }}</p>
+                  <div class="mt-5 h-2.5 overflow-hidden rounded-full bg-brand-100" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="{{ progress }}">
+                    <div class="h-full bg-progress" style="width: {{ progress }}%"></div>
+                  </div>
+                  <div class="mt-2 flex items-end justify-between text-sm">
+                    <p><span class="font-semibold text-brand-800">₦{{ '{:,.2f}'.format(raised_minor / 100) }}</span><span class="text-muted"> of ₦{{ '{:,.2f}'.format(revision.goal_amount_minor / 100) }}</span></p>
+                    <span class="font-semibold text-slate-700">{{ progress }}%</span>
+                  </div>
+                </div>
+              </a>
+            </article>
+          {% else %}
+            <p class="rounded-xl bg-surface p-6 text-sm text-muted">No active campaigns match these filters.</p>
+          {% endfor %}
+        </div>
+      </section>
+    </div>
+  </main>
+{% endblock %}
+
+{% block scripts %}
+  <script>
+    (function () {
+      var searchForm = document.querySelector('form[role="search"]');
+      var filterForm = document.getElementById('campaign-filters');
+      var results = document.getElementById('campaign-results');
+      var count = document.getElementById('campaign-count');
+      var timer;
+
+      function addText(parent, tag, className, text) {
+        var element = document.createElement(tag);
+        element.className = className;
+        element.textContent = text;
+        parent.appendChild(element);
+        return element;
+      }
+
+      function showCampaigns(campaigns) {
+        results.replaceChildren();
+        campaigns.forEach(function (campaign) {
+          var card = document.createElement('article');
+          card.className = 'overflow-hidden rounded-2xl border border-border bg-surface shadow-sm';
+          var link = document.createElement('a');
+          link.className = 'block';
+          link.href = '/campaigns/detail?slug=' + encodeURIComponent(campaign.slug);
+          var image = document.createElement('div');
+          image.className = 'relative aspect-[16/10] bg-gradient-to-br from-brand-200 via-brand-100 to-gold-100';
+          if (campaign.cover_image_url) {
+            var cover = document.createElement('img');
+            cover.src = campaign.cover_image_url;
+            cover.alt = campaign.title + ' cover photo';
+            cover.className = 'absolute inset-0 h-full w-full object-cover';
+            image.appendChild(cover);
+          }
+          addText(image, 'span', 'absolute left-3 top-3 rounded-full bg-surface/90 px-2.5 py-0.5 text-xs font-medium text-brand-800', campaign.category);
+          if (campaign.verified) {
+            addText(image, 'span', 'absolute right-3 top-3 rounded-full bg-brand-700 px-2.5 py-0.5 text-xs font-medium text-white', 'Verified');
+          }
+          link.appendChild(image);
+          var content = document.createElement('div');
+          content.className = 'p-5';
+          addText(content, 'p', 'text-xs font-medium text-brand-700', campaign.category);
+          addText(content, 'h2', 'mt-2 font-display text-lg font-bold text-brand-950', campaign.title);
+          addText(content, 'p', 'mt-2 text-sm text-slate-600', campaign.description);
+          var goal = campaign.goal_minor || 0;
+          var raised = campaign.raised_minor || 0;
+          var progress = goal ? Math.min(100, Math.round(raised * 100 / goal)) : 0;
+          var bar = document.createElement('div');
+          bar.className = 'mt-5 h-2.5 overflow-hidden rounded-full bg-brand-100';
+          var fill = document.createElement('div');
+          fill.className = 'h-full bg-progress';
+          fill.style.width = progress + '%';
+          bar.appendChild(fill);
+          content.appendChild(bar);
+          addText(content, 'p', 'mt-2 text-sm text-muted', '₦' + (raised / 100).toLocaleString() + ' raised of ₦' + (goal / 100).toLocaleString());
+          link.appendChild(content);
+          card.appendChild(link);
+          results.appendChild(card);
+        });
+        if (!campaigns.length) {
+          addText(results, 'p', 'rounded-xl bg-surface p-6 text-sm text-muted', 'No active campaigns match these filters.');
+        }
+        count.textContent = campaigns.length + ' campaigns';
+      }
+
+      async function loadCampaigns() {
+        var values = new FormData(filterForm);
+        new FormData(searchForm).forEach(function (value, key) {
+          values.set(key, value);
+        });
+        try {
+          var response = await fetch(filterForm.action + '?' + new URLSearchParams(values));
+          if (!response.ok) throw new Error('Campaign search failed. Please try again.');
+          showCampaigns(await response.json());
+        } catch (error) {
+          count.textContent = error.message;
+        }
+      }
+
+      searchForm.addEventListener('submit', function (event) {
+        event.preventDefault();
+        loadCampaigns();
+      });
+      searchForm.elements.q.addEventListener('input', function () {
+        clearTimeout(timer);
+        timer = setTimeout(loadCampaigns, 250);
+      });
+      filterForm.addEventListener('change', loadCampaigns);
+      loadCampaigns();
+    })();
+  </script>
+{% endblock %}

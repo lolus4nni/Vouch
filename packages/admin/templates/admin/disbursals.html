@@ -1,0 +1,89 @@
+{% extends "layouts/admin.html" %}
+
+{% block title %}Payouts{% endblock %}
+
+{% block topbar %}
+  <div class="min-w-0 flex-1">
+    <h1 class="truncate font-display text-xl font-bold text-brand-950 sm:text-2xl">Payouts</h1>
+    <p class="hidden truncate text-sm text-slate-500 sm:block">Review approved requests and recorded payout history.</p>
+  </div>
+{% endblock %}
+
+{% block content %}
+  <main id="main" class="flex-1 px-4 py-6 sm:px-6 lg:py-8">
+    <div class="mx-auto max-w-6xl space-y-8">
+      <p class="rounded-2xl border border-gold-200 bg-gold-50 p-4 text-sm text-gold-800">
+        Payouts cannot be sent until a payment provider is configured. This page only displays saved records.
+      </p>
+
+      <section>
+        <h2 class="mb-4 font-display text-xl font-bold text-brand-950">Approved expenses awaiting payout ({{ approved_expenses|length }})</h2>
+        <div class="overflow-x-auto rounded-2xl border border-slate-200 bg-white shadow-sm">
+          <table class="min-w-full divide-y divide-slate-200">
+            <thead class="bg-slate-50"><tr>
+              <th class="px-4 py-3 text-left text-xs font-semibold uppercase text-slate-500">Expense</th>
+              <th class="px-4 py-3 text-left text-xs font-semibold uppercase text-slate-500">Recipient</th>
+              <th class="px-4 py-3 text-left text-xs font-semibold uppercase text-slate-500">Provider</th>
+              <th class="px-4 py-3 text-right text-xs font-semibold uppercase text-slate-500">Amount</th>
+              <th class="px-4 py-3"></th>
+            </tr></thead>
+            <tbody class="divide-y divide-slate-100">
+              {% for expense in approved_expenses %}
+                {% set revision = expense.campaign.revisions|sort(attribute='version_number', reverse=true)|first if expense.campaign.revisions else none %}
+                <tr>
+                  <td class="px-4 py-3.5 text-sm text-slate-700">
+                    <p class="font-medium text-slate-900">{{ expense.title }}</p>
+                    <p class="max-w-xs truncate text-xs text-slate-500">{{ revision.title if revision else expense.campaign.slug }}</p>
+                  </td>
+                  <td class="px-4 py-3.5 text-sm text-slate-700">{{ expense.recipient.display_name }}</td>
+                  <td class="px-4 py-3.5 text-sm capitalize text-slate-700">{{ expense.recipient.provider }}</td>
+                  <td class="whitespace-nowrap px-4 py-3.5 text-right text-sm font-semibold text-slate-700">{{ expense.currency_code }} {{ admin_minor_amount(expense.amount_minor, expense.currency.minor_unit_exponent) }}</td>
+                  <td class="px-4 py-3.5 text-right"><a href="{{ url_for('admin.expense_review', expense_id=expense.id) }}" class="rounded-xl border border-slate-300 bg-white px-3.5 py-2 text-xs font-semibold text-slate-700">Review</a></td>
+                </tr>
+              {% else %}
+                <tr><td colspan="5" class="px-4 py-8 text-center text-sm text-slate-500">No approved expenses are waiting for payout.</td></tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <section>
+        <h2 class="mb-4 font-display text-xl font-bold text-brand-950">Payout history</h2>
+        <div class="overflow-x-auto rounded-2xl border border-slate-200 bg-white shadow-sm">
+          <table class="min-w-full divide-y divide-slate-200">
+            <thead class="bg-slate-50"><tr>
+              <th class="px-4 py-3 text-left text-xs font-semibold uppercase text-slate-500">Created</th>
+              <th class="px-4 py-3 text-left text-xs font-semibold uppercase text-slate-500">Expense</th>
+              <th class="px-4 py-3 text-left text-xs font-semibold uppercase text-slate-500">Recipient</th>
+              <th class="px-4 py-3 text-right text-xs font-semibold uppercase text-slate-500">Amount</th>
+              <th class="px-4 py-3 text-left text-xs font-semibold uppercase text-slate-500">Provider reference</th>
+              <th class="px-4 py-3 text-left text-xs font-semibold uppercase text-slate-500">Status</th>
+            </tr></thead>
+            <tbody class="divide-y divide-slate-100">
+              {% for disbursement in disbursements %}
+                <tr>
+                  <td class="whitespace-nowrap px-4 py-3.5 text-sm text-slate-700">{{ disbursement.created_at.strftime('%d %b %Y, %H:%M') }}</td>
+                  <td class="px-4 py-3.5 text-sm text-slate-700">{{ disbursement.expense_request.title }}</td>
+                  <td class="px-4 py-3.5 text-sm text-slate-700">{{ disbursement.recipient.display_name }}</td>
+                  <td class="whitespace-nowrap px-4 py-3.5 text-right text-sm text-slate-700">{{ disbursement.currency_code }} {{ admin_minor_amount(disbursement.amount_minor, disbursement.currency.minor_unit_exponent) }}</td>
+                  <td class="px-4 py-3.5 font-mono text-xs text-slate-700">
+                    {% for attempt in disbursement.attempts %}
+                      {% if attempt.provider_reference %}{{ attempt.provider_reference }}{% else %}{{ attempt.status }}{% endif %}{% if not loop.last %}<br>{% endif %}
+                    {% else %}
+                      No provider attempt
+                    {% endfor %}
+                  </td>
+                  <td class="px-4 py-3.5 text-sm capitalize text-slate-700">{{ disbursement.status }}</td>
+                </tr>
+              {% else %}
+                <tr><td colspan="6" class="px-4 py-8 text-center text-sm text-slate-500">No payout records have been saved.</td></tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+      </section>
+      <p class="text-sm text-slate-500">Each payout list shows up to 100 records: oldest approved requests first and newest payout records first.</p>
+    </div>
+  </main>
+{% endblock %}

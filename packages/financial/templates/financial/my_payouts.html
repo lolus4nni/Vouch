@@ -1,0 +1,45 @@
+{% extends "layouts/member.html" %}
+
+{% block title %}Expenses &amp; payouts{% endblock %}
+
+{% block topbar %}
+  <div class="min-w-0 flex-1">
+    <h1 class="truncate font-display text-xl font-bold text-brand-950 sm:text-2xl">Expenses &amp; payouts</h1>
+    <p class="hidden truncate text-sm text-slate-500 sm:block">Expense requests for campaigns you manage.</p>
+  </div>
+{% endblock %}
+
+{% block content %}
+  <main id="main" class="flex-1 px-4 py-6 sm:px-6 lg:py-8">
+    <div class="mx-auto max-w-6xl space-y-6">
+      <div class="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+        <div class="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm"><p class="text-xs uppercase tracking-wide text-slate-500">Requests</p><p class="mt-2 font-display text-3xl font-bold text-brand-800">{{ request_count }}</p></div>
+        <div class="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm"><p class="text-xs uppercase tracking-wide text-slate-500">Paid</p><p class="mt-2 font-display text-3xl font-bold text-slate-900">{{ paid_count }}</p></div>
+        <div class="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm"><p class="text-xs uppercase tracking-wide text-slate-500">Awaiting review</p><p class="mt-2 font-display text-3xl font-bold text-slate-900">{{ pending_count }}</p></div>
+        <div class="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm"><p class="text-xs uppercase tracking-wide text-slate-500">Approved, not paid</p><p class="mt-2 font-display text-3xl font-bold text-gold-600">{{ approved_waiting_count }}</p></div>
+      </div>
+
+      <div class="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm">
+        <div class="overflow-x-auto"><table class="min-w-full divide-y divide-slate-200">
+          <thead class="bg-slate-50"><tr><th class="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide text-slate-500">Expense</th><th class="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide text-slate-500">Campaign</th><th class="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide text-slate-500">Submitted</th><th class="px-4 py-3 text-right text-xs font-semibold uppercase tracking-wide text-slate-500">Amount</th><th class="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide text-slate-500">Review</th><th class="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide text-slate-500">Payout</th></tr></thead>
+          <tbody class="divide-y divide-slate-100">
+            {% for row in expense_rows %}
+              {% set expense = row.expense %}
+              <tr>
+                <td class="px-4 py-3.5 text-sm"><a href="{{ url_for('finance.expense_detail', expense_id=expense.id) }}" class="font-medium text-slate-900 hover:text-brand-700">{{ expense.title }}</a><p class="text-xs text-slate-500">To {{ expense.recipient.display_name }}</p></td>
+                <td class="max-w-[14rem] truncate px-4 py-3.5 text-sm text-slate-700">{{ row.revision.title if row.revision else expense.campaign.slug }}</td>
+                <td class="whitespace-nowrap px-4 py-3.5 text-sm text-slate-700">{{ expense.submitted_at.strftime("%d %b %Y") }}</td>
+                <td class="whitespace-nowrap px-4 py-3.5 text-right text-sm font-semibold">{{ expense.currency_code }} {{ "{:,.2f}".format(expense.amount_minor / (10 ** expense.currency.minor_unit_exponent)) }}</td>
+                <td class="px-4 py-3.5 text-sm capitalize text-slate-700">{{ expense.status.replace("_", " ") }}</td>
+                <td class="px-4 py-3.5 text-sm capitalize text-slate-700">{{ expense.disbursement.status if expense.disbursement else "not sent" }}</td>
+              </tr>
+            {% else %}
+              <tr><td colspan="6" class="px-4 py-10 text-center text-sm text-slate-500">You have not submitted expense requests for your campaigns.</td></tr>
+            {% endfor %}
+          </tbody>
+        </table></div>
+      </div>
+      <p class="text-xs text-slate-500">Payout execution is unavailable until a payment provider is configured. Approval does not mean a transfer was sent.</p>
+    </div>
+  </main>
+{% endblock %}

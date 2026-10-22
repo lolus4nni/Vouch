@@ -1,0 +1,164 @@
+{% extends "layouts/member.html" %}
+
+{% block title %}{{ 'Organisation profile' if organization else 'My profile' }}{% endblock %}
+
+{% block topbar %}
+          <div class="min-w-0 flex-1">
+            <h1 class="truncate font-display text-xl font-bold text-brand-950 sm:text-2xl">{{ 'Organisation profile' if organization else 'My profile' }}</h1>
+            <p class="hidden truncate text-sm text-muted sm:block">{% if organization %}Manage your organisation details and public identity.{% else %}Accurate details help us verify you faster and help donors trust you.{% endif %}</p>
+          </div>
+          <div class="flex items-center gap-2">
+    <span class="inline-flex items-center gap-1 rounded-full px-2.5 py-0.5 text-xs font-medium {{ 'bg-brand-100 text-brand-800' if verification_status == 'approved' else 'bg-gold-100 text-gold-700' if verification_status in ['submitted', 'in_review'] else 'bg-rose-100 text-rose-700' if verification_status in ['changes_requested', 'rejected'] else 'bg-slate-100 text-muted' }}">
+      {% if verification_status == 'approved' %}Verified
+      {% elif verification_status in ['submitted', 'in_review'] %}Review in progress
+      {% elif verification_status in ['changes_requested', 'rejected'] %}Needs attention
+      {% else %}Not submitted{% endif %}
+    </span>
+    <a href="{{ url_for('user.public_profile', user_id=account.id) }}" class="inline-flex items-center justify-center gap-2 rounded-xl font-semibold transition focus:outline-none focus-visible:ring-4 disabled:cursor-not-allowed disabled:opacity-50 border border-border bg-surface text-ink hover:bg-background focus-visible:ring-slate-200 px-3.5 py-2 text-xs">View public page</a>
+  </div>
+
+{% endblock %}
+
+{% block content %}
+  <main id="main" class="flex-1 px-4 py-6 sm:px-6 lg:py-8">
+    <form action="{{ url_for('user.profile_edit') }}" method="post" enctype="multipart/form-data" class="mx-auto max-w-3xl space-y-8">
+
+      <section class="rounded-2xl border border-border bg-surface shadow-sm p-6 sm:p-8">
+        <h2 class="font-display text-xl font-bold text-brand-950">Public identity</h2>
+        <p class="mt-1 text-sm text-muted">This is what donors and visitors see.</p>
+        <div class="mt-6 flex flex-col gap-6 sm:flex-row">
+          <div class="shrink-0 text-center">
+            <span class="mx-auto grid h-28 w-28 place-items-center overflow-hidden rounded-full bg-brand-100 text-4xl font-bold text-brand-700 ring-4 ring-white shadow">
+              <img id="avatar-preview" alt="" class="hidden h-full w-full object-cover"><span id="avatar-initial">{{ account.display_name[:1]|upper }}</span>
+            </span>
+            <label for="avatar" class="inline-flex items-center justify-center gap-2 rounded-xl font-semibold transition focus:outline-none focus-visible:ring-4 disabled:cursor-not-allowed disabled:opacity-50 border border-border bg-surface text-ink hover:bg-background focus-visible:ring-slate-200 px-3.5 py-2 text-xs mt-3 cursor-pointer">Change photo</label>
+            <input id="avatar" name="avatar" type="file" accept="image/png,image/jpeg,image/webp" class="sr-only">
+            <p class="mt-1.5 text-xs text-muted">JPG, PNG or WebP, up to 2 MB</p>
+
+          </div>
+          <div class="flex-1 space-y-5">
+            <div>
+      <label for="display_name" class="mb-1.5 block text-sm font-medium text-ink">Display name <span class="text-error" aria-hidden="true">*</span></label>
+      <input id="display_name" name="display_name" type="text" value="{{ account.display_name }}" placeholder=""
+            required  
+            class="block w-full rounded-xl border border-border bg-surface px-4 py-3 text-sm text-ink placeholder:text-muted/70 focus:border-brand-600 focus:outline-none focus:ring-4 focus:ring-brand-100"
+            >
+      <p class="mt-1.5 text-xs text-muted">Shown on your campaigns and donations.</p>
+
+    </div>
+            <div>
+      <label for="bio" class="mb-1.5 block text-sm font-medium text-ink">Short bio</label>
+      <textarea id="bio" name="bio" rows="4" placeholder="Who are you, and why do you care?"  maxlength="500"
+                class="block w-full rounded-xl border border-border bg-surface px-4 py-3 text-sm text-ink placeholder:text-muted/70 focus:border-brand-600 focus:outline-none focus:ring-4 focus:ring-brand-100">{{ account.bio or '' }}</textarea>
+      <p class="mt-1.5 text-xs text-muted">Up to 500 characters.</p>
+
+    </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="rounded-2xl border border-border bg-surface shadow-sm p-6 sm:p-8">
+        <div class="flex items-start justify-between gap-4">
+          <div><h2 class="font-display text-xl font-bold text-brand-950">Verification details</h2><p class="mt-1 text-sm text-muted">Private. Only our review team can see these.</p></div>
+          <span class="inline-flex items-center gap-1 rounded-full px-2.5 py-0.5 text-xs font-medium bg-slate-100 text-muted"><svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-12V7a4 4 0 00-8 0v2h8z"/></svg> Private</span>
+        </div>
+        <div class="mt-6 grid grid-cols-1 gap-5 sm:grid-cols-2">
+          <div class="sm:col-span-2"><div>
+      <label for="legal_name" class="mb-1.5 block text-sm font-medium text-ink">Registered organisation name <span class="text-error" aria-hidden="true">*</span></label>
+      <input id="legal_name" name="legal_name" type="text" value="{{ account.legal_name or '' }}" placeholder="As on registration certificate"
+            required autocomplete="name" 
+            class="block w-full rounded-xl border border-border bg-surface px-4 py-3 text-sm text-ink placeholder:text-muted/70 focus:border-brand-600 focus:outline-none focus:ring-4 focus:ring-brand-100"
+            >
+      <p class="mt-1.5 text-xs text-muted">Must match your identity document.</p>
+
+    </div></div>
+          <div><div>
+      <label for="phone_number" class="mb-1.5 block text-sm font-medium text-ink">Phone number <span class="text-error" aria-hidden="true">*</span></label>
+      <input id="phone_number" name="phone_number" type="tel" value="{{ account.phone_number or '' }}" placeholder="+234…"
+            required autocomplete="tel" 
+            class="block w-full rounded-xl border border-border bg-surface px-4 py-3 text-sm text-ink placeholder:text-muted/70 focus:border-brand-600 focus:outline-none focus:ring-4 focus:ring-brand-100"
+            >
+
+    </div></div>
+          <div><div>
+      <label for="address_country" class="mb-1.5 block text-sm font-medium text-ink">Country <span class="text-error" aria-hidden="true">*</span></label>
+      <input id="address_country" name="address_country" type="text" value="{{ account.address_country or '' }}" placeholder=""
+            required autocomplete="country-name" 
+            class="block w-full rounded-xl border border-border bg-surface px-4 py-3 text-sm text-ink placeholder:text-muted/70 focus:border-brand-600 focus:outline-none focus:ring-4 focus:ring-brand-100"
+            >
+
+    </div></div>
+          <div class="sm:col-span-2"><div>
+      <label for="address_street" class="mb-1.5 block text-sm font-medium text-ink">Street address <span class="text-error" aria-hidden="true">*</span></label>
+      <textarea id="address_street" name="address_street" rows="2" placeholder="House number, street, area" required 
+                class="block w-full rounded-xl border border-border bg-surface px-4 py-3 text-sm text-ink placeholder:text-muted/70 focus:border-brand-600 focus:outline-none focus:ring-4 focus:ring-brand-100">{{ account.address_street or '' }}</textarea>
+
+    </div></div>
+          <div><div>
+      <label for="address_state" class="mb-1.5 block text-sm font-medium text-ink">State <span class="text-error" aria-hidden="true">*</span></label>
+      <input id="address_state" name="address_state" type="text" value="{{ account.address_state or '' }}" placeholder="e.g. Lagos"
+            required autocomplete="address-level1" 
+            class="block w-full rounded-xl border border-border bg-surface px-4 py-3 text-sm text-ink placeholder:text-muted/70 focus:border-brand-600 focus:outline-none focus:ring-4 focus:ring-brand-100"
+            >
+
+    </div></div>
+        </div>
+      </section>
+
+      {% if organization %}
+      <section class="rounded-2xl border border-border bg-surface shadow-sm p-6 sm:p-8">
+        <h2 class="font-display text-xl font-bold text-brand-950">Organisation credentials</h2>
+        <p class="mt-1 text-sm text-muted">Verified organisations earn a badge on all their campaigns.</p>
+        <div class="mt-6 grid grid-cols-1 gap-5 sm:grid-cols-2">
+          <div>
+      <label for="registration_number" class="mb-1.5 block text-sm font-medium text-ink">Registration number <span class="text-error" aria-hidden="true">*</span></label>
+      <input id="registration_number" name="registration_number" type="text" value="{{ organization.registration_number if organization else '' }}" placeholder="e.g. RC 1234567"
+            required  
+            class="block w-full rounded-xl border border-border bg-surface px-4 py-3 text-sm text-ink placeholder:text-muted/70 focus:border-brand-600 focus:outline-none focus:ring-4 focus:ring-brand-100"
+            >
+
+    </div>
+          <div>
+      <label for="founded_date" class="mb-1.5 block text-sm font-medium text-ink">Date founded</label>
+      <input id="founded_date" name="founded_date" type="date" value="{{ organization.founded_date.isoformat() if organization and organization.founded_date else '' }}" placeholder=""
+
+            class="block w-full rounded-xl border border-border bg-surface px-4 py-3 text-sm text-ink placeholder:text-muted/70 focus:border-brand-600 focus:outline-none focus:ring-4 focus:ring-brand-100"
+            >
+
+    </div>
+          <div class="sm:col-span-2"><div>
+      <label for="website_url" class="mb-1.5 block text-sm font-medium text-ink">Website</label>
+      <input id="website_url" name="website_url" type="url" value="{{ organization.website_url if organization else '' }}" placeholder="https://"
+
+            class="block w-full rounded-xl border border-border bg-surface px-4 py-3 text-sm text-ink placeholder:text-muted/70 focus:border-brand-600 focus:outline-none focus:ring-4 focus:ring-brand-100"
+            >
+
+    </div></div>
+          <label class="flex items-start gap-3 rounded-xl border border-border p-4 text-sm sm:col-span-2">
+            <input type="checkbox" name="tax_exempt_status" value="1" class="mt-0.5 h-4 w-4 rounded border-border text-brand-700 focus:ring-brand-200" {{ 'checked' if organization and organization.tax_exempt_status else '' }}>
+            <span><span class="font-semibold text-ink">We are tax-exempt</span><span class="block text-muted">You'll be asked to upload proof as part of verification.</span></span>
+          </label>
+        </div>
+      </section>
+      {% endif %}
+
+      <div class="flex flex-wrap items-center justify-end gap-3">
+
+          <button type="submit" name="action" value="save" class="inline-flex items-center justify-center gap-2 rounded-xl px-5 py-3 text-sm font-semibold transition focus:outline-none focus-visible:ring-4 disabled:cursor-not-allowed disabled:opacity-50 border border-border bg-surface text-ink hover:bg-background focus-visible:ring-slate-200">Save draft</button>
+          <button type="submit" name="action" value="submit_verification" class="inline-flex items-center justify-center gap-2 rounded-xl px-5 py-3 text-sm font-semibold transition focus:outline-none focus-visible:ring-4 disabled:cursor-not-allowed disabled:opacity-50 bg-accent text-ink shadow-sm hover:bg-accent/90 focus-visible:ring-accent/20">Save & continue to verification <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M13 7l5 5m0 0l-5 5m5-5H6"/></svg></button>
+
+      </div>
+    </form>
+    </main>
+{% endblock %}
+
+{% block scripts %}
+  <script>
+      document.getElementById('avatar').addEventListener('change', function(e){
+        var f = e.target.files[0]; if (!f) return;
+        if (f.size > 2*1024*1024) { alert('Please choose an image under 2 MB.'); e.target.value=''; return; }
+        var img = document.getElementById('avatar-preview'), ini = document.getElementById('avatar-initial');
+        img.src = URL.createObjectURL(f); img.classList.remove('hidden'); if (ini) ini.classList.add('hidden');
+      });
+    </script>
+{% endblock %}

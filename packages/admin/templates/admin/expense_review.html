@@ -1,0 +1,100 @@
+{% extends "layouts/admin.html" %}
+
+{% block title %}Expense: {{ expense.title }}{% endblock %}
+
+{% block topbar %}
+  <div class="min-w-0 flex-1">
+    <h1 class="truncate font-display text-xl font-bold text-brand-950 sm:text-2xl">{{ expense.title }}</h1>
+    <p class="hidden truncate text-sm text-slate-500 sm:block">{{ expense.campaign.revisions|sort(attribute='version_number', reverse=true)|first|attr('title') if expense.campaign.revisions else 'Campaign expense' }}</p>
+  </div>
+  <a href="{{ url_for('admin.expense_queue') }}" class="rounded-xl border border-slate-300 bg-white px-3.5 py-2 text-xs font-semibold text-slate-700">Back to queue</a>
+{% endblock %}
+
+{% block content %}
+  <main id="main" class="flex-1 px-4 py-6 sm:px-6 lg:py-8">
+    <div class="mx-auto grid max-w-6xl gap-8 lg:grid-cols-3">
+      <div class="space-y-6 lg:col-span-2">
+        <section class="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+          <div class="flex items-start justify-between gap-4">
+            <div><p class="text-xs font-medium uppercase text-slate-500">Amount requested</p><p class="mt-1 font-display text-3xl font-bold text-brand-800">{{ expense.currency_code }} {{ admin_minor_amount(expense.amount_minor, expense.currency.minor_unit_exponent) }}</p></div>
+            <span class="rounded-full bg-slate-100 px-3 py-1 text-xs capitalize text-slate-700">{{ expense.status.replace('_', ' ') }}</span>
+          </div>
+          <p class="mt-5 whitespace-pre-line text-sm leading-7 text-slate-700">{{ expense.description }}</p>
+          <dl class="mt-5 grid gap-4 border-t border-slate-100 pt-5 text-sm sm:grid-cols-2">
+            <div><dt class="text-slate-500">Submitted by</dt><dd class="font-medium">{{ expense.submitter.display_name }}</dd></div>
+            <div><dt class="text-slate-500">Submitted</dt><dd class="font-medium">{{ expense.submitted_at.strftime('%d %b %Y') }}</dd></div>
+            <div><dt class="text-slate-500">Campaign</dt><dd class="font-medium">{{ expense.campaign.revisions|sort(attribute='version_number', reverse=true)|first|attr('title') if expense.campaign.revisions else 'Campaign' }}</dd></div>
+          </dl>
+        </section>
+
+        <section class="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+          <h2 class="font-display text-lg font-bold text-brand-950">Supporting documents</h2>
+          {% if expense.evidence %}
+            <ul class="mt-3 divide-y divide-slate-100">
+              {% for document in expense.evidence %}
+                <li class="py-3 text-sm text-slate-700">{{ document.file_asset.original_filename or 'Uploaded document' }}{% if document.is_public %} · Public{% else %} · Private{% endif %}</li>
+              {% endfor %}
+            </ul>
+            <p class="mt-2 text-xs text-slate-500">Secure file viewing is unavailable until file storage is configured.</p>
+          {% else %}
+            <p class="mt-3 text-sm text-slate-500">No documents are attached.</p>
+          {% endif %}
+        </section>
+
+        <section class="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+          <h2 class="font-display text-lg font-bold text-brand-950">Review history</h2>
+          {% if expense.reviews %}
+            <ol class="mt-4 space-y-3">
+              {% for review in expense.reviews|sort(attribute='decided_at', reverse=true) %}
+                <li class="border-l-2 border-slate-100 pl-4 text-sm">
+                  <p class="text-xs text-slate-500">{{ review.decided_at.strftime('%d %b %Y, %H:%M') }} · {{ review.reviewer.display_name }}</p>
+                  <p class="font-semibold capitalize">{{ review.decision.replace('_', ' ') }}</p>
+                  {% if review.public_notes %}<p class="mt-1">{{ review.public_notes }}</p>{% endif %}
+                  {% if review.internal_notes %}<p class="mt-1 rounded-lg bg-slate-50 p-2 text-slate-600">Staff note: {{ review.internal_notes }}</p>{% endif %}
+                </li>
+              {% endfor %}
+            </ol>
+          {% else %}
+            <p class="mt-3 text-sm text-slate-500">No review decisions have been recorded.</p>
+          {% endif %}
+        </section>
+      </div>
+
+      <aside class="space-y-6 lg:self-start">
+        <section class="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+          <h2 class="font-display text-lg font-bold text-brand-950">Recipient</h2>
+          <p class="mt-3 font-semibold">{{ expense.recipient.display_name }}</p>
+          <p class="text-sm capitalize text-slate-500">{{ expense.recipient.recipient_type }} · {{ expense.recipient.provider }}</p>
+          {% if expense.recipient.bank_code %}<p class="mt-2 text-sm text-slate-600">Bank code: {{ expense.recipient.bank_code }}</p>{% endif %}
+          <p class="mt-3 text-xs text-slate-500">Private recipient account details are not displayed.</p>
+        </section>
+        {% if expense.status in ['submitted', 'in_review', 'changes_requested'] %}
+          <form action="{{ url_for('admin.expense_review', expense_id=expense.id) }}" method="post" class="space-y-5 rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+            <input type="hidden" name="csrf_token" value="{{ admin_csrf_token }}">
+            <div>
+              <h2 class="font-display text-lg font-bold text-brand-950">Your decision</h2>
+              <p class="mt-1 text-sm text-slate-500">Approval does not send a payout. A note is required when requesting changes or rejecting.</p>
+            </div>
+            <div>
+              <label for="public_notes" class="mb-1.5 block text-sm font-medium text-slate-700">Note to the organiser</label>
+              <textarea id="public_notes" name="public_notes" rows="3" class="block w-full rounded-xl border border-slate-300 px-4 py-3 text-sm">{{ public_notes or '' }}</textarea>
+            </div>
+            <div>
+              <label for="internal_notes" class="mb-1.5 block text-sm font-medium text-slate-700">Staff notes (optional)</label>
+              <textarea id="internal_notes" name="internal_notes" rows="3" class="block w-full rounded-xl border border-slate-300 px-4 py-3 text-sm">{{ internal_notes or '' }}</textarea>
+            </div>
+            <div class="flex flex-wrap gap-2 border-t border-slate-100 pt-5">
+              <button type="submit" name="action_taken" value="approved" class="rounded-xl bg-accent-500 px-3.5 py-2 text-xs font-semibold text-ink">Approve request</button>
+              <button type="submit" name="action_taken" value="request_changes" class="rounded-xl bg-gold-400 px-3.5 py-2 text-xs font-semibold text-brand-950">Request changes</button>
+              <button type="submit" name="action_taken" value="rejected" class="rounded-xl bg-error px-3.5 py-2 text-xs font-semibold text-white">Reject</button>
+            </div>
+          </form>
+        {% else %}
+          <section class="rounded-2xl border border-slate-200 bg-white p-5 text-sm text-slate-600">
+            This request has already been reviewed and cannot be changed here.
+          </section>
+        {% endif %}
+      </aside>
+    </div>
+  </main>
+{% endblock %}
