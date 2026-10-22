@@ -181,7 +181,11 @@
               <div><dt class="text-xs text-muted">Donations</dt><dd class="font-semibold">{{ donor_count }}</dd></div>
               <div><dt class="text-xs text-muted">Days left</dt><dd class="font-semibold">{{ days_left if days_left is not none else '—' }}</dd></div>
             </dl>
-            <a href="{{ url_for('finance.donate', campaign_id=campaign.id) }}" class="mt-6 inline-flex w-full items-center justify-center rounded-xl bg-accent px-5 py-3.5 text-base font-semibold text-ink shadow-sm hover:bg-accent-600">Donate now</a>
+            {% if reached_target %}
+              <p class="mt-6 rounded-xl bg-brand-50 px-4 py-3 text-center text-sm font-semibold text-brand-900">This campaign has reached its target and is no longer accepting donations.</p>
+            {% else %}
+              <a href="{{ url_for('finance.donate', campaign_id=campaign.id) }}" class="mt-6 inline-flex w-full items-center justify-center rounded-xl bg-accent px-5 py-3.5 text-base font-semibold text-ink shadow-sm hover:bg-accent-600">Donate now</a>
+            {% endif %}
             <button type="button" id="share-btn" data-url="{{ url_for('campaign.detail', slug=campaign.slug, _external=True) }}" data-title="{{ revision.title }}" class="mt-3 w-full rounded-xl border border-slate-300 bg-surface px-5 py-3 text-sm font-semibold text-slate-700 hover:bg-background">Share this campaign</button>
             <p class="mt-4 text-xs leading-relaxed text-muted">Donation processing is subject to the payment options available in this app.</p>
           </div>

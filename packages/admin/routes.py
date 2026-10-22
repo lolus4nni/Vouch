@@ -239,26 +239,46 @@ def dashboard():
         .correlate(Campaign)
         .scalar_subquery()
     )
-    campaign_platform_fees = db.session.query(
+    successful_campaign_totals = db.session.query(
+        Donation.campaign_id.label("campaign_id"),
+        db.func.sum(Donation.credited_amount_minor).label("raised_minor"),
+    ).filter(
+        Donation.status == "succeeded",
+    ).group_by(
+        Donation.campaign_id,
+    ).subquery()
+    campaign_fee_rows = db.session.query(
         CampaignRevision.currency_code,
         Currency.minor_unit_exponent,
-        db.func.sum(
-            CampaignRevision.goal_amount_minor
-            - CampaignRevision.goal_amount_minor * 10 // 11
-        ),
+        CampaignRevision.goal_amount_minor,
+        db.func.coalesce(successful_campaign_totals.c.raised_minor, 0),
     ).join(
         Currency, Currency.code == CampaignRevision.currency_code
     ).join(
         Campaign, Campaign.id == CampaignRevision.campaign_id
+    ).outerjoin(
+        successful_campaign_totals,
+        successful_campaign_totals.c.campaign_id == Campaign.id,
     ).filter(
-        Campaign.status == "active",
+        Campaign.status.in_(("active", "closed")),
         Campaign.deleted_at.is_(None),
         CampaignRevision.status == "approved",
         CampaignRevision.version_number == latest_approved_version,
-    ).group_by(
-        CampaignRevision.currency_code,
-        Currency.minor_unit_exponent,
-    ).order_by(CampaignRevision.currency_code).all()
+    ).all()
+    accumulated_fees = {}
+    for currency_code, exponent, goal_minor, raised_minor in campaign_fee_rows:
+        net_goal_minor = goal_minor * 10 // 11
+        fee_minor = max(
+            min(int(raised_minor), goal_minor) - min(int(raised_minor), net_goal_minor),
+            0,
+        )
+        key = (currency_code, exponent)
+        accumulated_fees[key] = accumulated_fees.get(key, 0) + fee_minor
+    campaign_platform_fees = [
+        (currency_code, exponent, amount_minor)
+        for (currency_code, exponent), amount_minor in sorted(accumulated_fees.items())
+        if amount_minor > 0
+    ]
     donor_count = db.session.query(db.func.count(db.func.distinct(Donation.donor_user_id))).filter(
         Donation.status == "succeeded",
         Donation.donor_user_id.isnot(None),
@@ -298,7 +318,89 @@ def campaign_queue():
         .limit(100)
         .all()
     )
-    return render_template("admin/campaign_queue.html", revisions=revisions)
+    latest_approved_version = (
+        db.session.query(db.func.max(CampaignRevision.version_number))
+        .filter(
+            CampaignRevision.campaign_id == Campaign.id,
+            CampaignRevision.status == "approved",
+        )
+        .correlate(Campaign)
+        .scalar_subquery()
+    )
+    raised = (
+        db.session.query(db.func.coalesce(db.func.sum(Donation.credited_amount_minor), 0))
+        .filter(
+            Donation.campaign_id == Campaign.id,
+            Donation.status == "succeeded",
+        )
+        .correlate(Campaign)
+        .scalar_subquery()
+    )
+    campaigns_at_target = (
+        db.session.query(Campaign, CampaignRevision, raised.label("raised_minor"))
+        .join(CampaignRevision, CampaignRevision.campaign_id == Campaign.id)
+        .filter(
+            Campaign.status == "active",
+            Campaign.deleted_at.is_(None),
+            CampaignRevision.status == "approved",
+            CampaignRevision.version_number == latest_approved_version,
+            raised >= CampaignRevision.goal_amount_minor,
+        )
+        .order_by(Campaign.created_at.desc())
+        .limit(100)
+        .all()
+    )
+    completed_campaigns = (
+        db.session.query(Campaign, CampaignRevision, raised.label("raised_minor"))
+        .join(CampaignRevision, CampaignRevision.campaign_id == Campaign.id)
+        .filter(
+            Campaign.status == "closed",
+            Campaign.deleted_at.is_(None),
+            CampaignRevision.status == "approved",
+            CampaignRevision.version_number == latest_approved_version,
+        )
+        .order_by(Campaign.updated_at.desc())
+        .limit(100)
+        .all()
+    )
+    return render_template(
+        "admin/campaign_queue.html",
+        revisions=revisions,
+        campaigns_at_target=campaigns_at_target,
+        completed_campaigns=completed_campaigns,
+    )
+
+
+@admin.route("/complete_campaign", methods=["POST"])
+def complete_campaign():
+    campaign_id = request.form.get("campaign_id", type=int)
+    campaign_record = db.session.get(Campaign, campaign_id) if campaign_id else None
+    if (
+        campaign_record is None
+        or campaign_record.status != "active"
+        or campaign_record.deleted_at is not None
+    ):
+        flash("Choose an active campaign to complete.", "error")
+        return redirect(url_for("admin.campaign_queue"))
+
+    revision = CampaignRevision.query.filter_by(
+        campaign_id=campaign_record.id,
+        status="approved",
+    ).order_by(CampaignRevision.version_number.desc()).first()
+    raised_minor = db.session.query(
+        db.func.coalesce(db.func.sum(Donation.credited_amount_minor), 0)
+    ).filter(
+        Donation.campaign_id == campaign_record.id,
+        Donation.status == "succeeded",
+    ).scalar() or 0
+    if revision is None or raised_minor < revision.goal_amount_minor:
+        flash("A campaign can only be completed after it reaches its target.", "error")
+        return redirect(url_for("admin.campaign_queue"))
+
+    campaign_record.status = "closed"
+    db.session.commit()
+    flash("The campaign was completed and removed from the live view.", "success")
+    return redirect(url_for("admin.campaign_queue"))
 
 
 @admin.route("/campaign_review", methods=["GET", "POST"])

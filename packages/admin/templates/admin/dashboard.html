@@ -53,7 +53,8 @@
 
   </div>
       <div class="rounded-2xl border border-slate-200 bg-white shadow-sm p-5">
-    <p class="text-xs font-medium uppercase tracking-wide text-slate-500">Platform fee portions in live targets</p>
+    <p class="text-xs font-medium uppercase tracking-wide text-slate-500">Accumulated platform fees</p>
+    <p class="mt-1 text-xs text-slate-500">Fees retained from successful donations</p>
     {% for currency_code, exponent, amount_minor in campaign_platform_fees %}
       <p class="mt-2 font-display text-2xl font-bold text-gold-600">{{ currency_code }} {{ admin_minor_amount(amount_minor, exponent) }}</p>
     {% else %}

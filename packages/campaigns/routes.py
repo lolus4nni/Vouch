@@ -317,6 +317,7 @@ def detail():
             0,
         ),
         progress=progress,
+        reached_target=int(raised_minor) >= revision.goal_amount_minor,
         days_left=days_left,
         donor_count=donor_count,
         recent_donations=recent_donations,

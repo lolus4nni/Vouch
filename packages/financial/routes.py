@@ -206,6 +206,9 @@ def donate():
     secret_key, callback_url = _paystack_settings()
     paystack_ready = bool(secret_key and callback_url)
     raised_minor, _, _ = _campaign_money(campaign_record.id)
+    if raised_minor >= revision.goal_amount_minor:
+        flash("This campaign has reached its target and is no longer accepting donations.", "info")
+        return redirect(url_for("campaign.detail", slug=campaign_record.slug))
     progress = min(100, round(raised_minor * 100 / revision.goal_amount_minor))
     context = {
         "campaign": campaign_record,
